@@ -1,2 +1,2 @@
 # McSwap
-The Open Source McSwap User Interface.
+The Open Source Compressed NFT Swap Interface
