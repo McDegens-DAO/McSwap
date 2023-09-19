@@ -1,0 +1,19 @@
+// config
+let conf = {};
+conf.host = window.location.protocol+"//"+window.location.host; // host domain
+conf.cluster = conf.host + "/rpc/"; // proxy folder
+conf.nft_explorer = "https://solscan.io/token/"; // set path to your preferred nft explorer 
+conf.cnft_explorer = "https://xray.helius.xyz/token/"; // set path to your preferred cnft explorer 
+conf.pikl = "AVm6WLmMuzdedAMjpXLYmSGjLLPPjjVWNuR6JJhJLWn3"; // set custom token mint for proposals
+conf.pikl_image = "https://pikl.mcdegen.xyz/pictures/PIKL.png"; // set custom token image for proposals
+conf.pikl_symbol = "PIKL"; // set custom token symbol for proposals
+conf.pikl_decimals = 9; // set custom token decimals for proposals
+conf.logo = "https://mcswap.xyz/img/M-300.png"; // set centered logo image
+conf.logo_wallet = "https://mcswap.xyz/img/M-300-DIM.png"; // set wallet background
+conf.logo_icon = "https://mcswap.xyz/img/favicon.png"; // set icon image
+conf.discord = "https://discord.gg/mcdegensdao"; // set discord invite
+conf.twitter = "https://twitter.com/McDegensDAO"; // set twitter invite
+conf.wallet_name = "McSwap (beta)"; // set display name in wallet
+conf.title = "McSwap"; // set app title
+conf.desc = "McSwap is a trustless P2P cNFT OTC trade contract and interface.";
+conf.cnfts = "YOUR_CNFT_COMPATIBLE_TREASURY_WALLET"; // set wallet you wish to receive nft donations
