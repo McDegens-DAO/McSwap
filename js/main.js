@@ -1,4 +1,4 @@
-conf.version = 1;
+conf.version = 1.1;
 conf.provider = false;
 conf.fee = 25000000;
 conf.billion = 1000000000;
