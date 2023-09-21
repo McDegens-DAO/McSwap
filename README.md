@@ -52,9 +52,10 @@ conf.title = "McSwap"; // set app title
 conf.desc = "McSwap is a trustless P2P cNFT OTC trade contract and interface."; // set app description
 ```
 
-3. 
-
-
+3. Open the robots file: [robots.txt](https://github.com/McDegens-DAO/McSwap/blob/main/config/settings.js)
+```txt
+sdfsdfsdfsdfsdf
+```
 
 
 
