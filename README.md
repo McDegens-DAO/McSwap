@@ -1,5 +1,5 @@
 # McSwap
-<center>The Open Source Compressed NFT Swap Interface</center>
+The Open Source Compressed NFT Swap Interface
 
 ## Demo
 [McSwap.xyz](https://mcswap.xyz)
