@@ -58,7 +58,7 @@ conf.desc = "McSwap is a trustless P2P cNFT OTC swap contract and interface."; /
 ```
 
 3. Open the html template: [index.html](https://github.com/McDegens-DAO/McSwap/blob/main/index.html)
-* Set the Metatag titles, descriptions, and url to match your javascript settings.
+* Set the metatag titles, descriptions, and url to match your javascript settings.
 ```html
 <!-- set and then remove the robots metatag -->
 <meta name="robots" content="noindex,nofollow,noarchive">
