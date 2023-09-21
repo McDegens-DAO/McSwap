@@ -122,6 +122,26 @@ const combos_ = [
 
 ```
 
+7. Open the collections to add collection names: [config/collections.js](https://github.com/McDegens-DAO/McSwap/blob/main/config/collections.js)
+* There are some defaults, but you'll likely want to add your own.
+* 
+```javascript
+async function group_details(id,name) {
+  let rebld = {};
+  let sorter = name.split("#");
+  if(typeof sorter[1]!="undefined"){rebld.sort=parseInt(sorter[1].trim());}
+  if (id == "WoMbiTtXKwUtf4wosoffv45khVF8yA2mPkinGosCFQ4") {
+    rebld.collection = "The Faceless";
+    rebld.publisher = "Drip";
+  }
+  else if (id == "SoLPr7zxggXh9JUt8NGKyxLZGJmyWqgawcs9N9hmatP") {
+    rebld.collection = "Binary Force";
+    rebld.publisher = "Drip";
+  }   
+}
+```
+
+
 ## Create Swap Proposal
 
 ## Execute Swap Proposal
