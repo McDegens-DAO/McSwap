@@ -27,7 +27,7 @@ $whitelist = array("https://your-domain-name.com");
 ```
 
 2. Open the javascript settings file: [config/settings.js](https://github.com/McDegens-DAO/McSwap/blob/main/config/settings.js)
-* Default values are included adjust as neccessary.
+* Default values are included, adjust as neccessary.
 ```javascript
 // config
 let conf = {};
