@@ -9,7 +9,7 @@ The Open Source Compressed NFT Swap Interface
 [Discord](https://discord.com/invite/mcdegensdao)
 
 ## Requirements
-* Registered Domain Name
+* A registered domain name
 * Basic Linux web hosting with PHP
 * [Helius](https://www.helius.dev) or other cNFT compatible RPC endpoint
 
