@@ -122,9 +122,8 @@ const combos_ = [
 
 ```
 
-7. Open the collections to add collection names: [config/collections.js](https://github.com/McDegens-DAO/McSwap/blob/main/config/collections.js)
-* There are some defaults, but you'll likely want to add your own.
-* 
+7. Add collection name support: [config/collections.js](https://github.com/McDegens-DAO/McSwap/blob/main/config/collections.js)
+* There are some defaults, but you'll likely want to add more collection ids and details.
 ```javascript
 async function group_details(id,name) {
   let rebld = {};
@@ -140,7 +139,6 @@ async function group_details(id,name) {
   }   
 }
 ```
-
 
 ## Create Swap Proposal
 
