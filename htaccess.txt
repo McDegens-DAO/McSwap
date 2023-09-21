@@ -11,6 +11,6 @@ RewriteRule ^swap/([^.]*)$ "/index.html" [L,QSA]
 RewriteRule ^propose/([^.]*)/([^.]*)$ "/index.html" [L,QSA]
 # propose requests
 RewriteRule ^propose/([^.]*)$ "/index.html" [L,QSA]
-# redirect images for skinning
+# redirect images and css for skinning support
 RewriteRule ^img/(.*)$ /css/skins/default/img/$1 [L,R=301]
 RewriteRule ^css/custom.css$ "/css/skins/default/default.css" [L,QSA]
