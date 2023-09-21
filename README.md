@@ -9,7 +9,7 @@ The Open Source Compressed NFT Swap Interface
 
 ## Requirements
 * Registered Domain Name
-* Basic Linux Web Hosting
+* Basic Linux Web Hosting with PHP
 * [Helius](https://www.helius.dev) or other cNFT compatible RPC endpoint
 
 ## Install
