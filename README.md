@@ -1,6 +1,6 @@
 # McSwap
 The Open Source Compressed NFT Swap Interface
-Developed by [SolDapper Web3 Studio](https://twitter.com/SolDapper) for [McDegens DAO](https://twitter.com/McDegensDAO)
+...Developed by [SolDapper Web3 Studio](https://twitter.com/SolDapper) for [McDegens DAO](https://twitter.com/McDegensDAO)
 
 ## Demo
 [McSwap.xyz](https://mcswap.xyz)
