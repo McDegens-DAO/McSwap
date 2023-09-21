@@ -20,4 +20,8 @@ The Open Source Compressed NFT Swap Interface
 
 ## Skins
 
-## RPC Proxy
+## Execute Swap Proposal
+
+## Create Swap Proposal
+
+## Execute Swap Proposal
