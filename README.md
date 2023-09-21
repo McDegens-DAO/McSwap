@@ -3,7 +3,7 @@ The Open Source Compressed NFT Swap Interface.
 
 Developed by [SolDapper](https://twitter.com/SolDapper) Web3 Studio in support of [McDegens DAO](https://twitter.com/McDegensDAO)
 
-## Live Demo
+## Live dApp
 [McSwap.xyz](https://mcswap.xyz)
 
 ## Support
