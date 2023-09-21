@@ -17,9 +17,9 @@ The Open Source Compressed NFT Swap Interface
 
 ## Configure
 
-## Deeplinks
-
 ## Skins
+
+## Deeplinks
 
 ## Create Swap Proposal
 
