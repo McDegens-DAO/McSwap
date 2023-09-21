@@ -29,8 +29,8 @@ Create a ticket at our [Discord](https://discord.com/invite/mcdegensdao)
 4. Update htaccess.txt with your folder name.
 ```javascript
 # skinning css and images
-RewriteRule ^img/(.*)$ /css/skins/YOUR_THEME/img/$1 [L,R=301]
-RewriteRule ^css/custom.css$ "/css/skins/YOUR_THEME/default.css" [L,QSA]
+RewriteRule ^img/(.*)$ /css/skins/YOUR_SKIN_FOLDER/img/$1 [L,R=301]
+RewriteRule ^css/custom.css$ "/css/skins/YOUR_SKIN_FOLDER/default.css" [L,QSA]
 ```
 
 ## Configure
