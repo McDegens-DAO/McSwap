@@ -27,7 +27,7 @@ Create a ticket at our [Discord](https://discord.com/invite/mcdegensdao)
 2. Replace images in your new folder as needed.
 3. Add css to default.css file to override css rules.
 4. Update htaccess.txt with your folder name.
-```html
+```javascript
 # skinning css and images
 RewriteRule ^img/(.*)$ /css/skins/YOUR_THEME/img/$1 [L,R=301]
 RewriteRule ^css/custom.css$ "/css/skins/YOUR_THEME/default.css" [L,QSA]
