@@ -19,13 +19,13 @@ The Open Source Compressed NFT Swap Interface.
 1. Open the RPC proxy config file: [config/config.php](https://github.com/McDegens-DAO/McSwap/blob/main/config/config.php)
 * Add your Helius key on line 2.
 * Add your domain to the whitelist.
+⋅⋅⋅At this point you can open web page to test with default settings.
 ```php
 <?php
 $key = "YOUR_HELIUS_KEY";
 $path = "https://rpc.helius.xyz/?api-key=".$key;
 $whitelist = array("https://your-domain-name.com");
 ```
-⋅⋅⋅At this point you can open web page to test with default settings.
 
 2. Open the javascript settings file: [config/settings.js](https://github.com/McDegens-DAO/McSwap/blob/main/config/settings.js)
 * Default values are included adjust as neccessary.
