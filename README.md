@@ -80,6 +80,45 @@ User-agent: *
 Allow: /
 ```
 
+5. Open the combos file to customize combo tags: [config/combos.js](https://github.com/McDegens-DAO/McSwap/blob/main/config/combos.js)
+   ⋅⋅⋅By default the template uses McDegen combos. 
+```javascript
+const combos_ = [
+  {
+    "name": "Calvin",
+    "traits": [
+      {
+        "Headwear": "McDegens"
+      },
+      {
+        "Outfits": "McDegens"
+      },
+      {
+        "Masks": "Clown"
+      }
+    ]
+  },
+  {
+    "name": "Tokers",
+    "traits": [
+      {
+        "Headwear": "McDegens"
+      },
+      {
+        "Outfits": "McDegens"
+      },
+      {
+        "Hoods": "Blue"
+      }
+    ]
+  }
+]
+
+```
+
+
+
+
 ## Skins
 * You can override the default css here: [css/skins/custom.css](https://github.com/McDegens-DAO/McSwap/blob/main/css/skins/custom.css)
 * More options coming soon.
