@@ -1,6 +1,6 @@
 <?php
 // RPC•X PHP JSON RPC PROXY
-require($_SERVER["DOCUMENT_ROOT"]."/config/config.php");
+require($_SERVER["DOCUMENT_ROOT"]."/config/proxy.php");
 if (isset($_SERVER['HTTP_ORIGIN'])) {
   if(!in_array($_SERVER['HTTP_ORIGIN'],$whitelist)){
     header("Location: https://www.google.com/search?rlz=1C1ONGR_enUS1036US1036&sxsrf=AB5stBgOtYYWYM0lRLqCwqiLbb_JWud7iw:1689913872575&q=loser&tbm=isch&sa=X&ved=2ahUKEwj0is3g-56AAxVIQzABHSLCCK4Q0pQJegQIBBAB&biw=2158&bih=1192&dpr=1.1");
