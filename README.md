@@ -13,3 +13,7 @@ The Open Source Compressed NFT Swap Interface
 * [Helius](https://www.helius.dev) or other cNFT compatible RPC endpoint
 
 ## Install
+
+## Configure
+
+## Deeplinks
