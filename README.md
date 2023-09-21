@@ -25,8 +25,7 @@ $key = "YOUR_HELIUS_KEY";
 $path = "https://rpc.helius.xyz/?api-key=".$key;
 $whitelist = array("https://your-domain-name.com");
 ```
-
-
+2. Open the js settings file. [config/config.php](https://github.com/McDegens-DAO/McSwap/blob/main/config/config.php)
 ```javascript
 var s = "JavaScript syntax highlighting";
 alert(s);
