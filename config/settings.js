@@ -1,7 +1,7 @@
 // config
 let conf = {};
 conf.host = window.location.protocol+"//"+window.location.host; // host domain
-conf.cluster = conf.host + "/rpc/"; // proxy folder
+conf.cluster = conf.host + "/rpc/"; // proxy folder (recommended) or full endpoint address
 conf.nft_explorer = "https://solscan.io/token/"; // set path to your preferred nft explorer 
 conf.cnft_explorer = "https://xray.helius.xyz/token/"; // set path to your preferred cnft explorer 
 conf.cnfts = "9kYLegTSs9SVSQvSsHXgWAmKsi27We2d9kEtgbLWkKTY"; // set wallet you wish to receive nft donations
