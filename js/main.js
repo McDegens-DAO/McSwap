@@ -13,6 +13,9 @@ conf.MCSWAP_PROGRAM_ID = "ABDXeLg3NiQKf7xRyEjZ3HTCTP1dWezCAjVmxJ8NdWz1";
 conf.tool = "mcwallet";
 conf.shop_name = "McSwap Shop"; // set disply name of shop
 conf.shop_enabled = false; // set shop status
+conf.logo = conf.host+"/img/logo-300.png"; // set centered logo image
+conf.logo_wallet = conf.host+"/img/logo-300-dim.png"; // set wallet background
+conf.logo_icon = conf.host+"/img/favicon.png"; // set icon image
 
 const BufferLayout = require("@solana/buffer-layout");
 const BN = require("bn.js");
@@ -46,9 +49,9 @@ const SWAP_STATE = BufferLayout.struct([
 let social_1 = new Image();
 let social_2 = new Image();
 let social_3 = new Image();
-social_1.src = conf.host + "/img/discord.png";
-social_2.src = conf.host + "/img/twitter.png";
-social_3.src = conf.host + "/img/sol-black.png";
+social_1.src = "/img/discord.png";
+social_2.src = "/img/twitter.png";
+social_3.src = "/img/sol-black.png";
 social_1.id = "social_discord";
 social_2.id = "social_twitter";
 
