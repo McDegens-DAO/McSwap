@@ -16,7 +16,7 @@ Developed by [SolDapper](https://twitter.com/SolDapper) Web3 Studio in support o
 * A [Helius](https://www.helius.dev) or other cNFT compatible RPC endpoint.
 
 ## Install
-1. Download the .zip package or via git.
+1. [Download](https://github.com/McDegens-DAO/McSwap/archive/refs/heads/main.zip) the .zip package.
 2. Upload the package to your web server.
 3. Extract the contents of the package.
 
