@@ -52,11 +52,31 @@ conf.title = "McSwap"; // set app title
 conf.desc = "McSwap is a trustless P2P cNFT OTC trade contract and interface."; // set app description
 ```
 
-3. Open the robots file: [robots.txt](https://github.com/McDegens-DAO/McSwap/blob/main/config/settings.js)
-```txt
-sdfsdfsdfsdfsdf
+3. Open the html template file: [index.html](https://github.com/McDegens-DAO/McSwap/blob/main/index.html)
+* Set the Metatag titles, descriptions, and domain to match your javascript settings.
+```html
+<!-- set and then remove the robots metatag -->
+<meta name="robots" content="noindex,nofollow,noarchive">
+<title>McSwap</title>
+<meta id="og_title" property="og:title" content="McSwap">
+<meta id="meta_desc" name="description" content="McSwap is a trustless cNFT powered P2P OTC trade contract and interface." />
+<meta id="og_desc" property="og:description" content="McSwap is a trustless cNFT powered P2P OTC trade contract and interface.">
+<meta id="og_url" property="og:url" content="https://mcswap.xyz">
+<!-- set and then remove the robots metatag -->
 ```
 
+4. Open the robots file (optional): [robots.txt](https://github.com/McDegens-DAO/McSwap/blob/main/robots.txt)
+* Do not make this change until you're ready for search engines to index your site.
+Change
+```txt
+User-agent: *
+Disallow: /
+```
+To
+```txt
+User-agent: *
+Allow: /
+```
 
 
 ## Skins
