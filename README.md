@@ -17,7 +17,7 @@ The Open Source Compressed NFT Swap Interface
 
 ## Configure
 1. Open the RPC proxy config file. [config/config.php](https://github.com/McDegens-DAO/McSwap/blob/main/config/config.php)
-2. * edit the
+* edit the
 
 
 ```php
