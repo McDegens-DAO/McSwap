@@ -17,6 +17,11 @@ The Open Source Compressed NFT Swap Interface
 
 ## Configure
 
+```javascript
+var s = "JavaScript syntax highlighting";
+alert(s);
+```
+
 ## Skins
 
 ## Deeplinks
