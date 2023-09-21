@@ -1,4 +1,5 @@
 <?php
+// RPC•X PHP JSON RPC PROXY
 require($_SERVER["DOCUMENT_ROOT"]."/config/config.php");
 if (isset($_SERVER['HTTP_ORIGIN'])) {
   if(!in_array($_SERVER['HTTP_ORIGIN'],$whitelist)){
