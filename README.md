@@ -19,7 +19,6 @@ The Open Source Compressed NFT Swap Interface.
 1. Open the RPC proxy config file: [config/config.php](https://github.com/McDegens-DAO/McSwap/blob/main/config/config.php)
 * Add your Helius key on line 2.
 * Add your domain to the whitelist.
-  ⋅⋅⋅At this point you can open web page to test with default settings.
 ```php
 <?php
 $key = "YOUR_HELIUS_KEY";
@@ -53,6 +52,7 @@ conf.title = "McSwap"; // set app title
 conf.desc = "McSwap is a trustless P2P cNFT OTC trade contract and interface."; // set app description
 ```
 
+3. 
 
 
 
