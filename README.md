@@ -20,6 +20,10 @@ Create a ticket at our [Discord](https://discord.com/invite/mcdegensdao)
 2. Upload the package to your web server.
 3. Extract the contents of the package.
 
+## Skins
+* You can override the default css here: [css/skins/custom.css](https://github.com/McDegens-DAO/McSwap/blob/main/css/skins/custom.css)
+* More theme support coming soon.
+
 ## Configure
 1. Open the RPC proxy config: [config/config.php](https://github.com/McDegens-DAO/McSwap/blob/main/config/config.php)
 * Add your Helius key on line 2.
@@ -66,7 +70,9 @@ conf.desc = "McSwap is a trustless P2P cNFT OTC swap contract and interface."; /
 <!-- set and then remove the robots metatag -->
 ```
 
-4. Open the robots file (optional): [robots.txt](https://github.com/McDegens-DAO/McSwap/blob/main/robots.txt)
+4. Rename [htaccess.txt](https://github.com/McDegens-DAO/McSwap/blob/main/htaccess.txt) to .htaccess
+
+5. Open the robots file (optional): [robots.txt](https://github.com/McDegens-DAO/McSwap/blob/main/robots.txt)
 * Only make this change if you want search engines to index your app.
 
 Change:
@@ -80,7 +86,7 @@ User-agent: *
 Allow: /
 ```
 
-5. Open the combos file to customize combo tags: [config/combos.js](https://github.com/McDegens-DAO/McSwap/blob/main/config/combos.js)
+6. Open the combos file to customize combo tags: [config/combos.js](https://github.com/McDegens-DAO/McSwap/blob/main/config/combos.js)
 * By default the template uses McDegen combos but you can add your own. 
 ```javascript
 const combos_ = [
@@ -115,15 +121,6 @@ const combos_ = [
 ]
 
 ```
-
-
-
-
-## Skins
-* You can override the default css here: [css/skins/custom.css](https://github.com/McDegens-DAO/McSwap/blob/main/css/skins/custom.css)
-* More skinning support coming soon.
-
-## Deeplinks
 
 ## Create Swap Proposal
 
