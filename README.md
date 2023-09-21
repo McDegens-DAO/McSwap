@@ -1,5 +1,5 @@
 # McSwap
-The Open Source Compressed NFT Swap Interface.
+The Trustless cNFT Swapper.
 
 Developed by [SolDapper](https://twitter.com/SolDapper) Web3 Studio for [McDegens DAO](https://twitter.com/McDegensDAO)
 
