@@ -5,4 +5,4 @@ The Open Source Compressed NFT Swap Interface
 [McSwap.xyz](https://mcswap.xyz "Live McSwap Demo")
 
 ## Support
-[Discord](https://discord.com/invite/mcdegensdao "McSwap Support")
+[Duscord](https://discord.com/invite/mcdegensdao)
