@@ -32,6 +32,7 @@ Create a ticket at our [Discord](https://discord.com/invite/mcdegensdao)
 RewriteRule ^img/(.*)$ /css/skins/YOUR_SKIN_FOLDER/img/$1 [L,R=301]
 RewriteRule ^css/custom.css$ "/css/skins/YOUR_SKIN_FOLDER/default.css" [L,QSA]
 ```
+5. Rename [htaccess.txt](https://github.com/McDegens-DAO/McSwap/blob/main/htaccess.txt) to .htaccess
 
 ## Configure
 1. Open the RPC proxy config: [config/proxy.php](https://github.com/McDegens-DAO/McSwap/blob/main/config/proxy.php)
@@ -77,9 +78,7 @@ conf.twitter = "https://twitter.com/McDegensDAO"; // set twitter invite
 <!-- set and then remove the robots metatag -->
 ```
 
-4. Rename [htaccess.txt](https://github.com/McDegens-DAO/McSwap/blob/main/htaccess.txt) to .htaccess
-
-5. Open the robots file (optional): [robots.txt](https://github.com/McDegens-DAO/McSwap/blob/main/robots.txt)
+4. Open the robots file (optional): [robots.txt](https://github.com/McDegens-DAO/McSwap/blob/main/robots.txt)
 * Only make this change if you want search engines to index your app.
 
 Change:
@@ -93,7 +92,7 @@ User-agent: *
 Allow: /
 ```
 
-6. Open the combos file to customize combo tags: [config/combos.js](https://github.com/McDegens-DAO/McSwap/blob/main/config/combos.js)
+5. Open the combos file to customize combo tags: [config/combos.js](https://github.com/McDegens-DAO/McSwap/blob/main/config/combos.js)
 * By default the template uses McDegen combos but you can add your own. 
 ```javascript
 const combos_ = [
@@ -117,7 +116,7 @@ const combos_ = [
 
 ```
 
-7. Add collection name support: [config/collections.js](https://github.com/McDegens-DAO/McSwap/blob/main/config/collections.js)
+6. Add collection name support: [config/collections.js](https://github.com/McDegens-DAO/McSwap/blob/main/config/collections.js)
 * There are some defaults, but you'll likely want to add more collection ids and details.
 ```javascript
 async function group_details(id,name) {
