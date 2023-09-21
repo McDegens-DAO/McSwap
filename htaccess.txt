@@ -1,0 +1,13 @@
+# SSLRequireSSL
+RewriteEngine On
+# force ssl
+RewriteCond %{HTTPS} !=on
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+# rpc requests
+RewriteRule ^rpc/([^.]*)$ "/rpc/rpc.php" [L,QSA]
+# swap requests
+RewriteRule ^swap/([^.]*)$ "/index.html" [L,QSA]
+# propose requests
+RewriteRule ^propose/([^.]*)/([^.]*)$ "/index.html" [L,QSA]
+# propose requests
+RewriteRule ^propose/([^.]*)$ "/index.html" [L,QSA]
