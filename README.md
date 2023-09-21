@@ -23,7 +23,7 @@ Create a ticket at our [Discord](https://discord.com/invite/mcdegensdao)
 3. Extract the contents of the package.
 
 ## Skins
-1. Copy "default" and rename: [css/skins](https://github.com/McDegens-DAO/McSwap/tree/main/css/skins)
+1. Copy "default" folder in skins and rename: [css/skins](https://github.com/McDegens-DAO/McSwap/tree/main/css/skins)
 2. Replace images in your new folder as needed.
 3. Add css to default.css file to override css rules.
 4. Update htaccess.txt with your folder name.
