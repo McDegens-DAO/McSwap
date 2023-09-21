@@ -1,7 +1,7 @@
 # McSwap
 The Trustless cNFT Swapper.
 
-Developed by [SolDapper](https://twitter.com/SolDapper) [McDegens DAO](https://twitter.com/McDegensDAO)
+Developed by [SolDapper](https://twitter.com/SolDapper) for [McDegens DAO](https://twitter.com/McDegensDAO)
 
 ![McSwap](https://mcswap.xyz/img/github-banner.png)
 
