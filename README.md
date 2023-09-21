@@ -81,7 +81,7 @@ Allow: /
 ```
 
 5. Open the combos file to customize combo tags: [config/combos.js](https://github.com/McDegens-DAO/McSwap/blob/main/config/combos.js)
-   ⋅⋅⋅By default the template uses McDegen combos. 
+* By default the template uses McDegen combos. 
 ```javascript
 const combos_ = [
   {
