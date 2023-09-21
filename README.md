@@ -10,7 +10,7 @@ The Open Source Compressed NFT Swap Interface.
 
 ## Requirements
 * A registered domain name.
-* Basic Linux web hosting with PHP.
+* Basic Linux web hosting with PHP7+ & SSL.
 * Apache mod_rewrite module enabled (usually default).
 * A [Helius](https://www.helius.dev) or other cNFT compatible RPC endpoint.
 
