@@ -45,7 +45,7 @@ conf.discord = "https://discord.gg/mcdegensdao"; // set discord invite
 conf.twitter = "https://twitter.com/McDegensDAO"; // set twitter invite
 conf.wallet_name = "McSwap"; // set display name in wallet
 conf.title = "McSwap"; // set app title
-conf.desc = "McSwap is a trustless P2P cNFT OTC trade contract and interface."; // set app description
+conf.desc = "McSwap is a trustless P2P cNFT OTC swap contract and interface."; // set app description
 ```
 
 3. Open the html template file: [index.html](https://github.com/McDegens-DAO/McSwap/blob/main/index.html)
