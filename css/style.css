@@ -1232,13 +1232,13 @@ button.mcprofile_close {
 }
 
 button.mcprofile_open {
-  background-image: url("../img/menu.svg");
+  background-image: url("/img/menu.svg");
   margin: 6px -1px 0 0;
   display: none;
 }
 
 button.mcprofile_close {
-  background-image: url("../img/cross.svg");
+  background-image: url("/img/cross.svg");
 }
 
 #mcprofile_nav {
