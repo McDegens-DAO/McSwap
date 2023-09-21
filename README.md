@@ -26,7 +26,7 @@ Create a ticket at our [Discord](https://discord.com/invite/mcdegensdao)
 1. Create a new skin folder here: [css/skins](https://github.com/McDegens-DAO/McSwap/tree/main/css/skins)
 2. Update .htaccess with your folder name.
 ```htaccess
-# skinning css and imgages
+# skinning css and images
 RewriteRule ^img/(.*)$ /css/skins/default/img/$1 [L,R=301]
 RewriteRule ^css/custom.css$ "/css/skins/default/default.css" [L,QSA]
 ```
