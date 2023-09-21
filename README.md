@@ -29,10 +29,6 @@ $whitelist = array("https://your-domain-name.com");
 2. Open the javascript settings file: [config/settings.js](https://github.com/McDegens-DAO/McSwap/blob/main/config/settings.js)
 * Default values are included, adjust as neccessary.
 ```javascript
-// config
-let conf = {};
-conf.host = window.location.protocol+"//"+window.location.host; // host domain
-// only edit below this line
 conf.cluster = conf.host + "/rpc/"; // proxy folder (recommended) or full endpoint address
 conf.nft_explorer = "https://solscan.io/token/"; // set path to your preferred nft explorer 
 conf.cnft_explorer = "https://xray.helius.xyz/token/"; // set path to your preferred cnft explorer 
