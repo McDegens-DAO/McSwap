@@ -121,7 +121,7 @@ const combos_ = [
 
 ## Skins
 * You can override the default css here: [css/skins/custom.css](https://github.com/McDegens-DAO/McSwap/blob/main/css/skins/custom.css)
-* More options coming soon.
+* More skinning support coming soon.
 
 ## Deeplinks
 
