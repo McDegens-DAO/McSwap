@@ -95,29 +95,17 @@ const combos_ = [
   {
     "name": "Calvin",
     "traits": [
-      {
-        "Headwear": "McDegens"
-      },
-      {
-        "Outfits": "McDegens"
-      },
-      {
-        "Masks": "Clown"
-      }
+      {"Headwear": "McDegens"},
+      {"Outfits": "McDegens"},
+      {"Masks": "Clown"}
     ]
   },
   {
     "name": "Tokers",
     "traits": [
-      {
-        "Headwear": "McDegens"
-      },
-      {
-        "Outfits": "McDegens"
-      },
-      {
-        "Hoods": "Blue"
-      }
+      {"Headwear": "McDegens"},
+      {"Outfits": "McDegens"},
+      {"Hoods": "Blue"}
     ]
   }
 ]
