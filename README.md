@@ -23,7 +23,13 @@ Create a ticket at our [Discord](https://discord.com/invite/mcdegensdao)
 3. Extract the contents of the package.
 
 ## Skins
-1. Create a new skin theme here: [css/skins](https://github.com/McDegens-DAO/McSwap/tree/main/css/skins)
+1. Create a new skin folder here: [css/skins](https://github.com/McDegens-DAO/McSwap/tree/main/css/skins)
+2. Update .htaccess with your folder name.
+```htaccess
+# skinning css and imgages
+RewriteRule ^img/(.*)$ /css/skins/default/img/$1 [L,R=301]
+RewriteRule ^css/custom.css$ "/css/skins/default/default.css" [L,QSA]
+```
 
 ## Configure
 1. Open the RPC proxy config: [config/proxy.php](https://github.com/McDegens-DAO/McSwap/blob/main/config/proxy.php)
