@@ -23,8 +23,7 @@ Create a ticket at our [Discord](https://discord.com/invite/mcdegensdao)
 3. Extract the contents of the package.
 
 ## Skins
-* You can override the default css here: [css/skins/custom.css](https://github.com/McDegens-DAO/McSwap/blob/main/css/skins/custom.css)
-* More theme support coming soon.
+1. Create a new skin theme here: [css/skins](https://github.com/McDegens-DAO/McSwap/tree/main/css/skins)
 
 ## Configure
 1. Open the RPC proxy config: [config/proxy.php](https://github.com/McDegens-DAO/McSwap/blob/main/config/proxy.php)
