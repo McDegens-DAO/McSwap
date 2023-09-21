@@ -7,7 +7,7 @@ Developed by [SolDapper](https://twitter.com/SolDapper) Web3 Studio in support o
 [McSwap.xyz](https://mcswap.xyz)
 
 ## Support
-[Discord](https://discord.com/invite/mcdegensdao)
+Create a ticket at our [Discord](https://discord.com/invite/mcdegensdao)
 
 ## Requirements
 * A registered domain name.
