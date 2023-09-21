@@ -63,7 +63,7 @@ conf.desc = "McSwap is a trustless P2P cNFT OTC swap contract and interface."; /
 ```
 
 4. Open the robots file (optional): [robots.txt](https://github.com/McDegens-DAO/McSwap/blob/main/robots.txt)
-* Do not make this change until you're ready for search engines to index your site.
+* Only make this change if you want search engines to index your app.
 
 Change:
 ```txt
