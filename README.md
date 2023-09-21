@@ -20,8 +20,6 @@ The Open Source Compressed NFT Swap Interface
 
 ## Skins
 
-## Execute Swap Proposal
-
 ## Create Swap Proposal
 
 ## Execute Swap Proposal
