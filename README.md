@@ -15,7 +15,9 @@ The Open Source Compressed NFT Swap Interface.
 * A [Helius](https://www.helius.dev) or other cNFT compatible RPC endpoint.
 
 ## Install
-1. Install via git or simply download the .zip package.
+1. Download the .zip package or via git.
+2. Upload the package to your web server.
+3. Extract the contents of the package.
 
 ## Configure
 1. Open the RPC proxy config: [config/config.php](https://github.com/McDegens-DAO/McSwap/blob/main/config/config.php)
