@@ -1,4 +1,4 @@
-conf.version = 1.2;
+conf.version = 1.3;
 conf.provider = false;
 conf.fee = 25000000;
 conf.billion = 1000000000;
@@ -490,14 +490,21 @@ async function mcswap_balances() {
     accountPublicKey = new solanaWeb3.PublicKey(provider.publicKey.toString());
     mintAccount = new solanaWeb3.PublicKey(conf.pikl);
     resp = await connection.getTokenAccountsByOwner(accountPublicKey, {mint: mintAccount});
+    
+    let multiplier = 1;
+    let display_decimals = "";
+    for (let i = 0; i < conf.pikl_decimals; i++) {
+      multiplier = multiplier * 10;
+      display_decimals += "0";
+    }
     if (resp.value.length === 0) {
-      $(".pikl_balance").html("0.000000000");
+      $(".pikl_balance").html("0."+display_decimals);
     } 
     else {
       let token_acct = new solanaWeb3.PublicKey(resp.value[0].pubkey.toString());
       let resps = await connection.getTokenAccountBalance(token_acct);
       let amount = resps.value.amount;
-      amount = amount / conf.billion;
+      amount = amount / multiplier;
       amount = parseFloat(amount).toFixed(conf.pikl_decimals);
       let ui_split = amount.split(".");
       let formatted = numberWithCommas(ui_split[0]);
@@ -638,7 +645,7 @@ async function send_donation() {
             // console.log(`https://solscan.io/tx/${signature}`);
             $("#cover_message").html("");
             // <img id="thankyouborger" src="/img/borger.jpg" />
-            $("#donation_box").after('<div id="donation_thanks">McDegens appreciates your donation degen! 🍔</div><div id="donation_sig"><a href="https://solscan.io/tx/' + signature + '" target="blank_">View Transaction</a></div><button id="donation_continue">Continue</button>');
+            $("#donation_box").after('<div id="donation_thanks">We appreciate your donation!</div><div id="donation_sig"><a href="https://solscan.io/tx/' + signature + '" target="blank_">View Transaction</a></div><button id="donation_continue">Continue</button>');
           }
         }, 3000);
       } catch (error) {
@@ -695,7 +702,7 @@ $(document).delegate("#wallet_nfts", "click", async function() {
   setTimeout(() => {
     $("#view_cnfts").hide();
     $("#view_nfts").removeClass().addClass("wallet_views animate__animated animate__fadeInLeft").show();
-  }, 500);
+  }, 800);
   if ($("ul[data-type='nft']").length == 0) {
     provider = wallet_provider();
     if (typeof provider == "undefined" || provider.isConnected != true) {
@@ -969,7 +976,7 @@ $(document).delegate("#nft_send_donation", "click", async function() {
             //             console.log("Signature: ", signature);
             // console.log(`https://solscan.io/tx/${signature}`);
             $("#cover_message").html("");
-            $("#nft_donation_box").after('<div id="nft_donation_thanks">McDegens appreciates your donation degen! 🍔</div><div id="nft_donation_sig"><a href="https://solscan.io/tx/' + signature + '" target="blank_">View Transaction</a></div><button id="nft_donation_continue">Continue</button>');
+            $("#nft_donation_box").after('<div id="nft_donation_thanks">We appreciate your donation!</div><div id="nft_donation_sig"><a href="https://solscan.io/tx/' + signature + '" target="blank_">View Transaction</a></div><button id="nft_donation_continue">Continue</button>');
             //             localStorage.setItem("nfts",JSON.stringify([]));          
             $(".asset").remove();
             $("#wallet_nfts").click();
@@ -1067,10 +1074,12 @@ $(document).delegate("#wallet_cnfts", "click", async function() {
     let cnft_groups = [];
     for (let i = 0; i < cnfts.length; i++) {
       let _i = i - 1;
-      if(typeof cnfts[_i] == "undefined" || cnfts[_i].collection != cnfts[i].collection){
-        cnft_groups[cnfts[i].collection] = [];
-      }
-      cnft_groups[cnfts[i].collection].push(cnfts[i]);
+      if(typeof cnft_groups[cnfts[i].collection] == "undefined"
+      ){cnft_groups[cnfts[i].collection]=[];}
+        let collect = cnfts[i].collection;
+        let grouping = cnft_groups[collect];
+        grouping.push(cnfts[i]);
+        cnft_groups[collect] = grouping;
     }
     
     // group by collection, sort sub arrays, and rebuild cnfts array
@@ -1461,7 +1470,7 @@ $(document).delegate("#cnft_send_donation", "click", async function() {
             //             console.log("Signature: ", signature);
             // console.log(`https://solscan.io/tx/${signature}`);
             $("#cover_message").html("");
-            $("#donation_box").after('<div id="donation_thanks">McDegens appreciates your donation degen! 🍔</div><div id="donation_sig"><a href="https://solscan.io/tx/' + signature + '" target="blank_">View Transaction</a></div><button id="donation_continue">Continue</button>');
+            $("#donation_box").after('<div id="donation_thanks">We appreciate your donation!</div><div id="donation_sig"><a href="https://solscan.io/tx/' + signature + '" target="blank_">View Transaction</a></div><button id="donation_continue">Continue</button>');
             $("#wallet_refresh").click();
             $("#cnft_send_donation").attr("id", "nft_send_donation");
           }
@@ -2718,7 +2727,7 @@ async function provision_swap() {
     return;
   }
   
-b}
+}
 $(document).delegate("#fulfil_create", "click", provision_swap);
 
 // execute swap
@@ -3429,6 +3438,21 @@ $(window).on('load', function() {
       },
       railalign: "right"
     });
+  VANTA.FOG({
+    el: "body",
+    mouseControls: true,
+    touchControls: true,
+    gyroControls: false,
+    minHeight: 200.00,
+    minWidth: 200.00,
+    highlightColor: 0x202020,
+    midtoneColor: 0x3e3e3e,
+    lowlightColor: 0x2d2d2d,
+    baseColor: 0x0,
+    blurFactor: 0.47,
+    speed: 0.40,
+    zoom: 0.50
+  });
   const get_mcswap_balances = setInterval(function() {
     mcswap_balances();
   }, 20000);

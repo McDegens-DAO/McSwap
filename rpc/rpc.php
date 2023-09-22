@@ -1,5 +1,5 @@
 <?php
-// RPC•X PHP JSON RPC PROXY
+// RPC•X PHP SOLANA RPC PROXY
 require($_SERVER["DOCUMENT_ROOT"]."/config/proxy.php");
 if (isset($_SERVER['HTTP_ORIGIN'])) {
   if(!in_array($_SERVER['HTTP_ORIGIN'],$whitelist)){

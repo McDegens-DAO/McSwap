@@ -1,8 +1,8 @@
 // config
 let conf = {};
-conf.wallet_name = "McSwap (beta)"; // set display name in wallet
+conf.wallet_name = "McSwap"; // set display name in wallet
 conf.title = "McSwap (beta)"; // set app title
-conf.desc = "McSwap is a trustless P2P cNFT OTC trade contract and interface.";
+conf.desc = "McSwap is a trustless cNFT powered P2P OTC trade contract and interface.";
 conf.host = window.location.protocol+"//"+window.location.host; // host domain
 conf.cluster = conf.host + "/rpc/"; // proxy folder
 conf.nft_explorer = "https://solscan.io/token/"; // set path to your preferred nft explorer 
