@@ -49,7 +49,7 @@ $whitelist = array("https://your-domain.com");
 * Default values are included, adjust as neccessary.
 ```javascript
 conf.wallet_name = "McSwap (beta)"; // set display name in wallet
-conf.title = "McSwap (beta)"; // set app title
+conf.title = "McSwap"; // set app title
 conf.desc = "McSwap is a trustless P2P cNFT OTC trade contract and interface.";
 conf.host = window.location.protocol+"//"+window.location.host; // host domain
 conf.cluster = conf.host + "/rpc/"; // proxy folder
