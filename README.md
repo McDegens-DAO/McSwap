@@ -147,7 +147,7 @@ External apps can use deeplinks as shortcuts to start new proposals using your n
 ```javascript
 https://your-domain.com/propose/ASSET_ID_1
 ```
-Optionally reduce friction by appending a provider name will attempt to log the user in automatically using the given provider.
+Reduce friction by appending a provider name that will connect the user automatically using the given provider.
 ```javascript
 https://your-domain.com/propose/ASSET_ID_1/phantom
 ```
