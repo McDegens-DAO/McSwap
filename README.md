@@ -3,7 +3,7 @@ The Trustless cNFT Swapper.
 
 Developed by [SolDapper](https://twitter.com/SolDapper) for [McDegens DAO](https://twitter.com/McDegensDAO)
 
-![McSwap](https://mcswap.xyz/img/github-banner.png)
+![McSwap](https://mcswap.xyz/img/screenshot-github.png)
 
 ## Live dApp
 [McSwap.xyz](https://mcswap.xyz)
