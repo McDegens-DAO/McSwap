@@ -18,7 +18,7 @@ Create a ticket at our [Discord](https://discord.com/invite/mcdegensdao)
 * A [Helius](https://www.helius.dev) or other cNFT compatible RPC endpoint.
 
 ## Install
-1. [Download](https://github.com/McDegens-DAO/McSwap/releases) the latest official release.
+1. [Download](https://github.com/McDegens-DAO/McSwap/archive/refs/heads/main.zip) McSwap.
 2. Upload the package to your web server.
 3. Extract the contents of the package.
 
