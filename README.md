@@ -25,7 +25,7 @@ Create a ticket at our [Discord](https://discord.com/invite/mcdegensdao)
 ## Skins
 1. Copy "default" folder in skins and rename: [css/skins](https://github.com/McDegens-DAO/McSwap/tree/main/css/skins)
 3. Replace images in your new folder as needed.
-4. Add css to default.css file to override css rules. [custom skin css template](https://github.com/McDegens-DAO/McSwap/blob/main/css/template.css)
+4. Add css to default.css file to override css rules. [css skin template](https://github.com/McDegens-DAO/McSwap/blob/main/css/template.css)
 5. Update htaccess.txt with your folder name.
 ```javascript
 # skinning css and images
