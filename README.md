@@ -133,7 +133,3 @@ async function group_details(id,name) {
   }   
 }
 ```
-
-## Create Swap Proposal
-
-## Execute Swap Proposal
