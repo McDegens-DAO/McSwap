@@ -133,3 +133,15 @@ async function group_details(id,name) {
   }   
 }
 ```
+
+## Deeplinks
+
+### Share Proposal
+These links are automatically generated for you after deploying a new proposal. They are meant to be shared with the party you are trading with via your preferred messaging app.
+https://your-domain.com/swap/ASSET_ID_1-ASSET_ID_2
+
+### Start Proposal
+External apps can use deeplinks as shortcuts to start new proposals using your new swap tool.
+https://your-domain.com/propose/ASSET_ID_1
+Optionally to reduce friction, appending a provider name will attempt to log the user in automatically using the given provider.
+https://your-domain.com/propose/ASSET_ID_1/phantom
