@@ -11,7 +11,7 @@ Developed by [SolDapper](https://twitter.com/SolDapper) for [McDegens DAO](https
 [McSwap.xyz](https://mcswap.xyz)
 
 ## Support
-Create a ticket at our [Discord](https://discord.com/invite/mcdegensdao)
+Create a ticket at our [Discord](https://discord.com/invite/hXXDvYTQhj)
 
 ## Requirements
 * A registered domain name.
