@@ -1,5 +1,5 @@
 # McSwap
-Trustless P2P Swap.
+Trustless P2P Swap dApp.
 
 Version: 1.4 (beta)
 
