@@ -13,8 +13,8 @@
     <meta name="robots" content="noindex,nofollow,noarchive">
     <title>McSwap</title>
     <meta id="og_title" property="og:title" content="McSwap">
-    <meta id="meta_desc" name="description" content="McSwap is a trustless cNFT powered P2P OTC trade contract and interface." />
-    <meta id="og_desc" property="og:description" content="McSwap is a trustless cNFT powered P2P OTC trade contract and interface.">
+    <meta id="meta_desc" name="description" content="McSwap is a trustless cNFT/NFT powered P2P OTC trade contract and interface." />
+    <meta id="og_desc" property="og:description" content="McSwap is a trustless cNFT/NFT powered P2P OTC trade contract and interface.">
     <meta id="og_url" property="og:url" content="https://mcswap.xyz">
     <!-- set and then remove the robots metatag -->
     
@@ -51,8 +51,8 @@
     <div class="mcmodule">
       <img class="sol_icon" src="/img/sol.png" /> <span class="sol_symbol">$SOL</span> <span class="sol_balance connect_me">Connect</span>
     </div>
-    <div class="mcmodule mc_left">
-      <img class="pikl_icon" src="https://pikl.mcdegen.xyz/pictures/PIKL.png" /> <span class="pikl_symbol">$<span class="custom_symbol"></span></span> <span class="pikl_balance"></span>
+    <div id="top_token_choice" class="mcmodule mc_left">
+      <img class="pikl_icon" src="https://updg8.com/imgdata/2rneZKBSHd51LWMFnJYnbgUfPg3q2Ya94KQ7KDnhqAZe" /> <span class="pikl_symbol">$<span class="custom_symbol"></span></span> <span class="pikl_balance"></span>
     </div>
     <div class="mcmodule mc_right">
       <img class="usdc_icon" src="/img/usdc.png" /> <span class="usdc_symbol">$USDC</span> <span class="usdc_balance"></span>
@@ -62,7 +62,7 @@
     <!-- tab nav -->
     <div id="mcprofile_nav">
       <ul>
-        <li><button id="nav_compose" value="mc_swap_create">Swap</button></li><li><button id="nav_view" value="mc_swap_viewer">View</button></li>
+        <li><button id="nav_compose" value="mc_swap_create"><img id="top_swap" src="/img/plus.svg" /> Create</button></li><li><button id="nav_view" value="mc_swap_viewer"><img id="top_review" src="/img/swap.svg" />Execute</button></li>
       </ul>
     </div>
     <!-- tab nav -->
@@ -71,33 +71,29 @@
     <div class="mc_panel" id="mc_swap_create">
       <div class="mc_title">New Proposal</div>
       <div class="swap_a active_swap">
-        <div id="swap_step_1">1. Choose cNFT to send.</div>
-
+        <div id="swap_step_1">1. Select asset to trade.</div>
+        <input disabled class="types_" id="a_type" />
         <div class="proofs_" id="proofs_a"></div><img src="/img/img-placeholder.png" class="swap_img_a" />
         <div class="swap_detail">
-
-          <input disabled id="create_a_id" class="swap_id" type="text" placeholder="1. Choose cNFT to send." />
+          <input disabled id="create_a_id" class="swap_id" type="text" placeholder="1. Select asset to trade." />
           <input disabled id="create_a_owner" class="swap_a_owner" type="text" placeholder="owner" />
-
         </div>
       </div>
       <div class="swap_img"><img src="/img/swap.svg" class="swap_icon" /></div>
       <div class="swap_b">
-        <div id="swap_step_2">2. Enter cNFT to receive.</div>
+        <div id="swap_step_2">2. Enter assets to receive.</div>
+        <input disabled class="types_" id="b_type" />
         <div class="proofs_" id="proofs_b"></div><img src="/img/img-placeholder.png" class="swap_img_b" />
         <div class="swap_detail">
-
-          <input disabled id="create_b_id" class="swap_id id_disabled" type="text"  placeholder="2. Enter cNFT to receive." /><button disabled id="fetch_b"></button>
-          <input disabled id="create_b_owner" class="swap_b_owner" type="text" placeholder="owner" />
-
+          <input disabled id="create_b_id" class="swap_id id_disabled" type="text"  placeholder="mint address" /><button disabled id="fetch_b"></button>
+          <input disabled id="create_b_owner" class="swap_b_owner" type="text" placeholder="request from wallet" />
         </div>
       </div>
 
       <div class="swap_c">
         <div class="swap_c_title">Request $SOL</div><div class="swap_c_value"><img id="token_sol" src="/img/check_default.png"><input disabled id="sol_request" type="text" value="" /></div><div class="swap_c_pikl">Request $<span class="custom_symbol"></span></div><div class="swap_c_token "><img id="token_pikl" src="/img/check_default.png"><input disabled id="pikl_request" type="text" value="" /></div><div class="swap_d">
         <div class="request_left">
-        <div class="swap_c_title">Request $USDC</div><div class="swap_c_value"><img id="token_usdc" src="/img/check_default.png"><input disabled id="usdc_request" type="text" value="" /></div>
-        </div><div class="request_right"><button disabled id="swap_create">Next</button></div>
+        <div class="swap_c_title">Request $USDC</div><div class="swap_c_value"><img id="token_usdc" src="/img/check_default.png"><input disabled id="usdc_request" type="text" value="" /></div></div><div class="request_right"><button disabled id="swap_create">Next</button></div>
         </div>
       </div>
 
@@ -121,7 +117,9 @@
           <div class="swapper_fee fee_total"><span class="swap_label">Total</span><span class="swap_amt">0.03316016 (or less)</span><span class="swap_unit">SOL</span></div>
         </div>
         <div class="swapper">The rent fee will be returned to you upon reversal or fulfilment of proposal.</div>
-        <button id="swap_deploy" disabled>Deploy</button>
+        <div class="centerit">
+        <button disabled class="swap_cancel_b">Back</button> <button id="swap_deploy" disabled>Deploy</button>
+        </div>
       </div>
 
       <div class="swap_g">
@@ -129,7 +127,7 @@
         <div class="swapper">Save and share proposal details.</div>
         <div class="swapper">
           <div class="swapper_fee share_sig"><span class="swap_label">Signature</span><span class="swap_val"></span><button class="swap_copy"><img src="/img/copy.svg" /></button></div>
-          <div class="swapper_fee share_id"><span class="swap_label">McSwap</span><span class="swap_val"></span><button class="swap_copy"><img src="/img/copy.svg" /></button></div>
+          <div class="swapper_fee share_id"><span class="swap_label">Link</span><span class="swap_val"></span><button class="swap_copy"><img src="/img/copy.svg" /></button></div>
         </div>
       </div>
 
@@ -144,7 +142,7 @@
 
       <div class="fulfil_a active_swap">
         <div id="fulfil_step_1">1. Review Proposal.</div>
-
+        <input disabled class="types_" id="c_type" />
         <img src="/img/img-placeholder.png" class="fulfil_img_a" />
         <div class="fulfil_detail">
 
@@ -155,6 +153,7 @@
       </div>
       <div class="fulfil_img"><img src="/img/swap.svg" class="fulfil_icon" /></div>
       <div class="fulfil_b">
+        <input disabled class="types_" id="d_type" />
         <img src="/img/img-placeholder.png" class="fulfil_img_b" />
         <div class="fulfil_detail">
           <input disabled id="fulfil_b_id" class="fulfil_id" type="text" placeholder="asset id" />
@@ -212,7 +211,9 @@
 
   <!-- social footer links -->
   <div id="socials">
-      <a id="set_discord" href="https://discord.gg/mcdegensdao" class="socials" target="_blank"><img id="social_discord" /></a><a id="set_twitter" href="https://twitter.com/McDegensDAO" class="socials" target="_blank"><img id="social_twitter" /></a>
+      <a id="set_discord" href="https://discord.com/invite/hXXDvYTQhj" class="socials" target="_blank"><img id="social_discord" />
+    </a><a id="set_github" href="https://github.com/McDegens-DAO/McSwap" class="socials" target="_blank"><img id="social_github" />
+    </a><a id="set_twitter" href="https://twitter.com/McDegensDAO" class="socials" target="_blank"><img id="social_twitter" /></a>
   </div>
   <!-- social footer links -->
   
@@ -273,6 +274,10 @@
   </div>
   <!-- wallet chooser popup -->
   
+  <!-- proposal token choices -->
+  <div id="swap_token_options"><div id="swap_token_list"></div></div>
+  <!-- proposal token choices -->
+  
   <!-- imports -->
   <script src="/js/web3/buffer.js"></script>
   <script>let Buffer_=require("buffer");const Buffer=Buffer_.Buffer;</script>
@@ -298,6 +303,7 @@
   <script src="/config/settings.js"></script>
   <script src="/config/combos.js"></script>
   <script src="/config/collections.js"></script>
+  <script src="/config/tokens.js"></script>
   <script src="/js/main.js"></script>
   <!-- js -->
   
