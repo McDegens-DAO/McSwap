@@ -5,7 +5,7 @@ Version: 1.4 (beta)
 
 Developed by [SolDapper](https://twitter.com/SolDapper) for [McDegens DAO](https://discord.com/invite/hXXDvYTQhj)
 
-![McSwap](https://mcswap.xyz/img/banner-github.png)
+![McSwap](css/skins/default/img/banner-github.png)
 
 ## Live dApp
 [McSwap.xyz](https://mcswap.xyz)
