@@ -1,6 +1,6 @@
 # McSwap
 Trustless P2P Swap.
-
+Version: 1.4 (beta)
 Developed by [SolDapper](https://twitter.com/SolDapper) for [McDegens DAO](https://twitter.com/McDegensDAO)
 
 ![McSwap](https://mcswap.xyz/img/banner-github.png)
