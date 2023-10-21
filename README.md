@@ -1,5 +1,5 @@
 # McSwap
-The Trustless cNFT Swapper.
+Trustless P2P Swap.
 
 Developed by [SolDapper](https://twitter.com/SolDapper) for [McDegens DAO](https://twitter.com/McDegensDAO)
 
