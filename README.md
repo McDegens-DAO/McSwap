@@ -118,7 +118,7 @@ const combos_ = [
 
 ```
 
-6. Add collection name support: [config/collections.js](https://github.com/McDegens-DAO/McSwap/blob/main/config/collections.js)
+6. Define Collection Names: [config/collections.js](https://github.com/McDegens-DAO/McSwap/blob/main/config/collections.js)
 * There are some defaults, but you'll likely want to add more collection ids and details.
 ```javascript
 async function group_details(id,name) {
@@ -134,6 +134,28 @@ async function group_details(id,name) {
     rebld.publisher = "Drip";
   }   
 }
+```
+
+7. Define Supported SPL Tokens: [config/tokens.js](https://github.com/McDegens-DAO/McSwap/blob/main/config/tokens.js)
+* There are some defaults, but you'll likely want to add more collection ids and details.
+```javascript
+// custom spl tokens list for proposal token requests
+const spl_tokens = [
+   {
+     "name": "Pickle",
+     "symbol": "PIKL",
+     "address": "AVm6WLmMuzdedAMjpXLYmSGjLLPPjjVWNuR6JJhJLWn3",
+     "image": "https://piklme.com/pictures/PIKL.png",
+     "decimals": 9
+   },
+  {
+    "name": "BlazeStake Staked SOL",
+    "symbol": "bSOL",
+    "address": "bSo13r4TkiE4KumL71LsHTPpL2euBYLFx6h9HP3piy1",
+    "image": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/bSo13r4TkiE4KumL71LsHTPpL2euBYLFx6h9HP3piy1/logo.png",
+    "decimals": 9
+  }
+];
 ```
 
 ## Deeplinks
