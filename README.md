@@ -15,7 +15,7 @@ Create a ticket at our [Discord](https://discord.com/invite/hXXDvYTQhj)
 
 ## Requirements
 * A registered domain name.
-* Basic Linux web hosting with PHP7+ & SSL.
+* Basic Linux web hosting with PHP8+ & SSL.
 * Apache mod_rewrite enabled (usually default).
 * A [Helius](https://www.helius.dev) or other cNFT compatible RPC endpoint.
 
