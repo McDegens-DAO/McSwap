@@ -10,6 +10,9 @@ Developed by [SolDapper](https://twitter.com/SolDapper) for [McDegens DAO](https
 ## Live dApp
 [McSwap.xyz](https://mcswap.xyz)
 
+## ATTN
+pNFTs are not yet supported by McSwap.
+
 ## Support
 Create a ticket at our [Discord](https://discord.com/invite/hXXDvYTQhj)
 
@@ -50,21 +53,28 @@ $whitelist = array("https://your-domain.com");
 2. Open the javascript settings: [config/settings.js](https://github.com/McDegens-DAO/McSwap/blob/main/config/settings.js)
 * Default values are included, adjust as neccessary.
 ```javascript
+// config
+let conf = {};
 conf.wallet_name = "McSwap (beta)"; // set display name in wallet
 conf.title = "McSwap"; // set app title
-conf.desc = "McSwap is a trustless P2P cNFT OTC trade contract and interface.";
+conf.desc = "McSwap is a Trustless P2P OTC NFT/cNFT trade contract and interface.";
 conf.host = window.location.protocol+"//"+window.location.host; // host domain
 conf.cluster = conf.host + "/rpc/"; // proxy folder
 conf.nft_explorer = "https://solscan.io/token/"; // set path to your preferred nft explorer 
 conf.cnft_explorer = "https://xray.helius.xyz/token/"; // set path to your preferred cnft explorer 
 conf.cnfts = "9kYLegTSs9SVSQvSsHXgWAmKsi27We2d9kEtgbLWkKTY"; // set wallet you wish to receive nft donations
 conf.sol = "GUFxwDrsLzSQ27xxTVe4y9BARZ6cENWmjzwe8XPy7AKu"; // set wallet you wish to receive sol donations
-// conf.pikl = "AVm6WLmMuzdedAMjpXLYmSGjLLPPjjVWNuR6JJhJLWn3"; // set custom token mint for proposals
-// conf.pikl_image = "https://pikl.mcdegen.xyz/pictures/PIKL.png"; // set custom token image for proposals
-// conf.pikl_symbol = "PIKL"; // set custom token symbol for proposals
-// conf.pikl_decimals = 9; // set custom token decimals for proposals
-conf.discord = "https://discord.gg/mcdegensdao"; // set discord invite
+conf.discord = "https://discord.com/invite/hXXDvYTQhj"; // set discord invite
 conf.twitter = "https://twitter.com/McDegensDAO"; // set twitter invite
+conf.default = "nft"; // which list initially loads after connecting
+conf.scrollbar = "#333333"; // set the color for scroll bars
+conf.vanta = "WAVES"; // vanta animated background plugin, false boolean will exclude vanta
+conf.vanta_color = 0x111111;
+conf.vanta_mouseControls = true;
+conf.vanta_touchControls = true;
+conf.vanta_waveSpeed = 0.10;
+conf.vanta_waveHeight = 30.00;
+conf.vanta_shininess = 0.00;
 ```
 
 3. Open the html template: [index.html](https://github.com/McDegens-DAO/McSwap/blob/main/index.html)
