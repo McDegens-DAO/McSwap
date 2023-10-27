@@ -1,4 +1,4 @@
-conf.version = 1.4;
+conf.version = 1.5;
 conf.provider = false;
 conf.fee = 25000000;
 conf.billion = 1000000000;
@@ -19,6 +19,8 @@ conf.logo = conf.host+"/img/logo-300.png"; // set centered logo image
 conf.logo_wallet = conf.host+"/img/logo-300-dim.png"; // set wallet background
 conf.logo_icon = conf.host+"/img/favicon.png"; // set icon image
 conf.max_proofs = 18; // max proofs for tx size
+conf.sell_nft = "https://magiceden.io/item-details/"; // set path to your preferred nft explorer 
+conf.sell_cnft = "https://app.stache.io/home/assetsdetails"; // set sell link for cnfts
 
 const BufferLayout = require("@solana/buffer-layout");
 const BN = require("bn.js");
@@ -259,7 +261,12 @@ async function master_connect() {
             $("#wallet_disconnect").show().css({
               "display": "block"
             });
-            $("#wallet_cnfts").prop("disabled", false).click();
+            if(conf.default == "cnft"){
+              $("#wallet_cnfts").prop("disabled", false).click();
+            }
+            else if(conf.default == "nft"){
+              $("#wallet_nfts").prop("disabled", false).click();
+            }
             $("#nav_compose, #nav_view").prop("disabled", false);
           }
           swap_viewer();
@@ -308,6 +315,18 @@ $(document).delegate("#wallet_disconnect", "click", async function() {
   $(".sol_balance").addClass("connect_me").html("Connect");
   $("#fulfil_create").prop("disabled", true);
   $(".fulfil_g").hide();
+  
+  $(".swap_img_a, .swap_img_b").attr("src", "/img/img-placeholder.png");
+  $("#a_type, #b_type").val("");
+  $("#create_a_id, #create_b_id, #create_a_owner, #create_b_owner").val("");
+  $("#sol_request, #pikl_request, #usdc_request").val("");
+  $("#fetch_b").click();
+  $(".active_swap").removeClass("active_swap");
+  $(".swap_a").addClass("active_swap");
+  $("#token_sol, #token_pikl, #token_usdc").attr("src", "/img/check_default.png");
+  $("#proofs_a").hide();
+  $("#create_b_id, #fetch_b, #create_b_owner").prop("disabled", true);
+  
   $(".fulfil_d, .fulfil_e").removeClass("active_swap");
   setTimeout(() => {
     $(".pikl_balance, .usdc_balance").html("");
@@ -363,7 +382,12 @@ $(document).delegate("#chooser_backpack, #chooser_solflare, #chooser_phantom", "
             $("#cover_message").html("");
             $("#donation_box").show().addClass("animate__animated animate__zoomInDown");
             $("#donation_amount").focus();
-            $("#wallet_cnfts").click();
+            if(conf.default == "cnft"){
+              $("#wallet_cnfts").click();
+            }
+            else if(conf.default == "nft"){
+              $("#wallet_nfts").click();
+            }
             conf.tool = "mcwallet";
           }
         })
@@ -592,6 +616,7 @@ $(document).delegate("#wallet_view", "click", async function() {
       $("#wallet_box").removeClass().addClass("animate__animated animate__slideInLeft").show();
       setTimeout(() => {
         $(".loader").hide();
+        $("#wallet_list").getNiceScroll().resize();
       }, 1200);
     });
 });
@@ -773,71 +798,130 @@ $(document).delegate("#wallet_nfts", "click", async function() {
             let account = new solanaWeb3.PublicKey(response);
             let res = Metadata_.Metadata.fromAccountAddress(connection, account)
               .then(function(meta) {
-                if (meta.data.name.includes("BobbleHeads") || typeof meta.collection != null && typeof meta.collection != undefined && typeof meta.collection.key != undefined) {
-                  if (meta.data.name.includes("BobbleHeads") || meta.collection.verified === true) {
-                    let asset = {};
-                    asset.name = meta.data.name.replace(/\0/g, '');
-                    asset.symbol = meta.data.symbol.replace(/\0/g, '');
-                    asset.uri = meta.data.uri.replace(/\0/g, '');
-                    asset.mint = meta.mint.toString();
-                    asset.data = false;
-                    const get_data = fetch(asset.uri)
-                      .then((response) => response.json())
-                      .then((nft_dat) => {
-                        return nft_dat;
-                      })
-                      .catch(function(err) {
-                        //                           console.log(err);
-                      });
-                    const fetch_data = async () => {
-                      const b = await get_data;
-                      asset.data = b;
-                      let found = false;
-                      for (var i = 0; i < assets.length; i++) {
-                        if (assets[i].mint == asset.mint) {
-                          found = true;
-                          break;
-                        }
-                      }
-                      if (found === false) {
-                        assets.push(asset);
-                      }
-                    };
-                    fetch_data();
-                  }
+                let asset = {};
+                if(meta.tokenStandard === null){
+                  asset.pnft = true;
                 }
+                else{
+                  asset.pnft = false;
+                }
+                asset.name = meta.data.name.replace(/\0/g, '');
+                asset.symbol = meta.data.symbol.replace(/\0/g, '');
+                asset.uri = meta.data.uri.replace(/\0/g, '');
+                asset.mint = meta.mint.toString();
+                asset.data = false;
+                const get_data = fetch(asset.uri)
+                  .then((response) => response.json())
+                  .then((nft_dat) => {
+                    return nft_dat;
+                  })
+                  .catch(function(err) {});
+                const fetch_data = async () => {
+                  const b = await get_data;
+                  asset.data = b;
+                  let found = false;
+                  for (var i = 0; i < assets.length; i++) {
+                    if (assets[i].mint == asset.mint) {
+                      found = true;
+                      break;
+                    }
+                  }
+                  if (found === false) {
+                    assets.push(asset);
+                  }
+                };
+                fetch_data();
               })
               .catch(function(err) {});
           })
           .catch(function(err) {});
+        
         if (i == (nfts.length - 1)) {
           /////////////////////////////////////////////////////////////
-          setTimeout(function() {
-            assets.sort(function(a, b) {
-              if (a.data.name > b.data.name) return 1;
-              if (a.data.name < b.data.name) return -1;
-              return 0;
-            });
-            let items = "";
-            for (let i = 0; i < assets.length; i++) {
-              let ass = assets[i];
+            setTimeout(function() {
+            for (let nm = 0; nm < assets.length; nm++) {
+              let ass = assets[nm];
               if (ass.data.name.includes("BobbleHeads")) {
-                ass.data.collection = {};
-                ass.data.collection.name = "BobbleHeads";
+                assets[nm].data.collection = {};
+                assets[nm].data.collection.name = "BobbleHeads";
               }
-              if (!$("ul[data-id='" + ass.mint + "']").length) {
-                let item = '<ul data-id="' + ass.mint + '" data-type="nft" class="asset">';
-                item += '<li class="ass_name">' + ass.data.name + '</li>';
-                if (typeof ass.data.collection === 'undefined') {
-                  ass.data.collection = {};
-                  ass.data.collection.name = "Unknown";
+              else if (ass.data.name.includes("BONIES")) {
+                assets[nm].data.collection = {};
+                assets[nm].data.collection.name = "BONIES";
+              }
+            }
+            let collections = [];
+            let collects = [];
+            for (let s = 0; s < assets.length; s++) {
+              let ass = assets[s];
+              if(typeof ass.data.collection == "undefined" || typeof ass.data.collection.name == "undefined"){
+                ass.data.collection = {};
+                ass.data.collection.name = "Unknown";
+              }
+              collects.push(ass.data.collection.name);
+            }
+            function onlyUnique(value, index, array) {
+              return array.indexOf(value) === index;
+            }
+            collects = collects.filter(onlyUnique);
+            collects.sort();
+            for (let c = 0; c < collects.length; c++) {
+              let obj = {};
+              obj.name = collects[c];
+              obj.data = [];
+              collections.push(obj);
+            }
+            for (let a = 0; a < assets.length; a++) {
+              for (let col = 0; col < collections.length; col++) {
+                if(assets[a].data.collection.name == collections[col].name){
+                  let x = assets[a].data.name.split("#");
+                  if(typeof x[1] != "undefined"){
+                    assets[a].sort = parseInt(x[1]);
+                  }
+                  else{
+                    assets[a].sort = false;
+                  }
+                  collections[col].data.push(assets[a]);
                 }
-                item += '<li class="ass_collection">' + ass.data.collection.name + '</li>';
-                item += '<li class="ass_options"><button class="ass_meta">Meta</button><button disabled class="ass_donate">Donate</button><button disabled data-wallet="' + provider.publicKey.toString() + '" data-mint="' + ass.mint + '" class="ass_sell">Sell</button><button disabled data-wallet="' + provider.publicKey.toString() + '" data-mint="' + ass.mint + '" class="ass_swap">Swap</button></li>';
-                item += '<li><img src="' + ass.data.image + '" class="ass_img" /></li>';
-                item += '<li class="clear"></li>';
-                item += '</ul>';
-                items += item;
+              }
+            }
+            for (let col = 0; col < collections.length; col++) {
+              let items = collections[col].data;
+              if(items[0].sort === false){
+                items.sort(function(a, b) {
+                  if (a.name > b.name) return 1;
+                  if (a.name < b.name) return -1;
+                  return 0;
+                });
+              }
+              else{
+                items.sort(function(a, b) {
+                  if (a.sort > b.sort) return 1;
+                  if (a.sort < b.sort) return -1;
+                  return 0;
+                });
+              }
+              collections[col].data = items;
+            }
+            let items = "";
+            for (let a = 0; a < collections.length; a++) {
+              let collection = collections[a].data;
+              for (let b = 0; b < collection.length; b++) {
+                let ass = collection[b];
+                if (!$("ul[data-id='" + ass.mint + "']").length) {
+                  let item = '<ul data-id="' + ass.mint + '" data-type="nft" class="asset">';
+                  item += '<li class="ass_name">' + ass.data.name + '</li>';
+                  if (typeof ass.data.collection === 'undefined') {
+                    ass.data.collection = {};
+                    ass.data.collection.name = "Unknown";
+                  }
+                  item += '<li class="ass_collection">' + ass.data.collection.name + '</li>';
+                  item += '<li class="ass_options"><button class="ass_meta">Meta</button><button disabled class="ass_donate">Donate</button><button disabled data-wallet="' + provider.publicKey.toString() + '" data-mint="' + ass.mint + '" class="ass_sell">Sell</button><button disabled data-wallet="' + provider.publicKey.toString() + '" data-pnft="' + ass.pnft + '" data-mint="' + ass.mint + '" class="ass_swap">Swap</button></li>';
+                  item += '<li><img src="' + ass.data.image + '" class="ass_img" /></li>';
+                  item += '<li class="clear"></li>';
+                  item += '</ul>';
+                  items += item;
+                }
               }
             }
             $("#wallet_refresh").removeClass("refresh_rotate").prop("disabled", false);
@@ -845,33 +929,45 @@ $(document).delegate("#wallet_nfts", "click", async function() {
             $("#view_nfts").append(items);
             $("#view_nfts ul.asset").show();
             $(".loader").hide();
-            $("#wallet_nfts span.count").html('(' + $("ul[data-type='nft']:visible").length + ')');
-            // only allow txs to initialize after all images have loaded into the browser
+            $("#wallet_list").getNiceScroll().resize();
+              // only allow txs to initialize after all images have loaded into the browser
             Promise.all(Array.from(document.images).filter(img => !img.complete).map(img => new Promise(resolve => {
               img.onload = img.onerror = resolve;
             }))).then(() => {
               $('ul[data-type="nft"] li.ass_options button.ass_donate, ul[data-type="nft"] li.ass_options button.ass_swap, ul[data-type="nft"] li.ass_options button.ass_sell').prop("disabled", false);
+              $("#wallet_nfts span.count").html('(' + $("ul[data-type='nft']:visible").length + ')');
             });
-          }, 3000);
+          }, 4000);
           /////////////////////////////////////////////////////////////
         }
+        
       }
       if (nfts.length == 0) {
         $("#wallet_refresh").removeClass("refresh_rotate").prop("disabled", false);
         $("#wallet_nfts, #wallet_cnfts").prop("disabled", false);
         $(".loader").hide();
       }
-})
+  })
     .catch(function(err) {
       $("#wallet_refresh").removeClass("refresh_rotate").prop("disabled", false);
       $("#wallet_nfts, #wallet_cnfts").prop("disabled", false);
       $(".loader").hide();
     });
-  } else {
+  } 
+  else {
     setTimeout(() => {
       $("#wallet_refresh").removeClass("refresh_rotate").prop("disabled", false);
       $(".loader").hide();
     }, 500);
+    setTimeout(() => {
+    $("#wallet_list").getNiceScroll().resize();
+    if($("ul[data-type='nft']:visible").length > 0){
+      $("#wallet_nfts span.count").html('(' + $("ul[data-type='nft']:visible").length + ')');
+    }
+    if($("ul[data-type='cnft']:visible").length > 0){
+      $("#wallet_cnfts span.count").html('(' + $("ul[data-type='cnft']:visible").length + ')');
+    }
+    },1700);
   }
 });
 $(document).delegate("#view_nfts button.ass_meta", "click", async function() {
@@ -1029,10 +1125,17 @@ $(document).delegate("#nft_donation_continue", "click", async function() {
   $("#nft_send_donation").prop("disabled", false).val("Donate NFT");
 });
 $(document).delegate("#view_nfts button.ass_sell", "click", async function() {
-  window.open("https://app.stache.io/home/assetsdetails?walletAddress=" + $(this).data("wallet") + "&collectibleMint=" + $(this).data("mint") + "&screenType=STASHING");
+  window.open(conf.sell_nft+$(this).data("mint"));
 });
 $(document).delegate("#view_nfts button.ass_swap", "click", async function() {
-  $("#a_type").val("NFT");
+  if($(this).attr("data-pnft") == "true"){
+    alert("Sorry, you've selected a pNFT which is not currently supported by this dApp.");
+    return;
+//     $("#a_type").val("pNFT");
+  }
+  else{
+    $("#a_type").val("NFT");
+  }
   $("#proofs_a").hide();
   $("#create_a_owner").val("");
   $(".swap_img_a").attr("src","/img/img-placeholder.png");
@@ -1050,15 +1153,6 @@ $(document).delegate("#view_nfts button.ass_swap", "click", async function() {
   $("#mc_swap_create img.swap_img_a").attr("src", img_src);
   $("#create_a_owner").val(provider.publicKey.toString());
   if($(".mcprofile_open").length){$(".mcprofile_open").click();}
-  const axiosInstance = axios.create({
-    baseURL: conf.cluster
-  });
-  let response = await axiosInstance.post(conf.cluster, {
-    jsonrpc: "2.0",
-    method: "getAsset",
-    id: "rpd-op-123",
-    params: {id: item_id},
-  });
   $("#create_b_id").prop("disabled", false).removeClass("id_disabled");
   $("#create_b_owner").prop("disabled", false);
   $("#sol_request, #pikl_request, #usdc_request").prop("disabled", false);
@@ -1130,6 +1224,7 @@ $(document).delegate("#wallet_cnfts", "click", async function() {
     $("#view_cnfts").removeClass().addClass("wallet_views animate__animated animate__fadeInRight").show();
   }, 500);
   if ($("ul[data-type='cnft']").length == 0) {
+    
     let has_filter = $("#wallet_filters .wallet_filter").html();
     let rarity_tags = $("#wallet_filters .wallet_rarity");
     let connection = new solanaWeb3.Connection(conf.cluster, "confirmed");
@@ -1283,6 +1378,7 @@ $(document).delegate("#wallet_cnfts", "click", async function() {
           }, 500);
           // only allow txs to initialize after all images have loaded into the browser
           setTimeout(() => {
+            $("#wallet_cnfts span.count").html('(' + $("ul[data-type='cnft']:visible").length + ')');
             $("#wallet_nfts, #wallet_cnfts").prop("disabled", false);
             Promise.all(Array.from(document.images).filter(img => !img.complete).map(img => new Promise(resolve => {
               img.onload = img.onerror = resolve;
@@ -1293,7 +1389,8 @@ $(document).delegate("#wallet_cnfts", "click", async function() {
           return false;
         }
       });
-    } else if (rarity_tags.length) {
+    } 
+    else if (rarity_tags.length) {
       let rarity = rarity_tags.attr("class");
       rarity = rarity.replace("wallet_rarity ", "ass_rarity ");
       $(".ass_rarity").each(function() {
@@ -1328,7 +1425,6 @@ $(document).delegate("#wallet_cnfts", "click", async function() {
       }, 500);
       // only allow txs to initialize after all images have loaded into the browser
       setTimeout(() => {
-
         Promise.all(Array.from(document.images).filter(img => !img.complete).map(img => new Promise(resolve => {
           img.onload = img.onerror = resolve;
         }))).then(() => {
@@ -1336,20 +1432,29 @@ $(document).delegate("#wallet_cnfts", "click", async function() {
         });
       }, 5000);
     }
+    setTimeout(() => {
+      $("#wallet_list").getNiceScroll().resize();
+    }, 1500);
     
-  } else {
+  } 
+  else {
     setTimeout(() => {
       $("#wallet_refresh").removeClass("refresh_rotate").prop("disabled", false);
       $(".loader").hide();
     }, 500);
+    setTimeout(() => {
+      $("#wallet_list").getNiceScroll().resize();
+      $("#wallet_cnfts span.count").html('(' + $("ul[data-type='cnft']:visible").length + ')');
+    },1500);
   }
+  
 });
 $(document).delegate("#view_cnfts button.ass_meta", "click", async function() {
   let mint = $(this).parent().parent().attr("data-id");
   window.open(conf.cnft_explorer + mint);
 });
 $(document).delegate("#view_cnfts button.ass_sell", "click", async function() {
-  window.open("https://app.stache.io/home/assetsdetails?walletAddress=" + $(this).data("wallet") + "&collectibleMint=" + $(this).data("mint") + "&screenType=STASHING");
+  window.open(conf.sell_cnft+"?walletAddress=" + $(this).data("wallet") + "&collectibleMint=" + $(this).data("mint") + "&screenType=STASHING");
 });
 $(document).delegate("#view_cnfts button.ass_donate", "click", async function() {
   $(".ass_donate").prop("disabled", true);
@@ -1696,6 +1801,9 @@ async function load_asset_b() {
   if(typeof response.data.result.compression != "undefined" && response.data.result.compression.compressed===true){
     $("#b_type").val("cNFT");
   }
+  else if(response.data.result.content.metadata.token_standard == "ProgrammableNonFungible"){
+    $("#b_type").val("pNFT");
+  }
   else{
     $("#b_type").val("NFT");
   }
@@ -1705,7 +1813,7 @@ async function load_asset_b() {
     $("#swap_img_b").attr("src","/img/img-placeholder.png");
     $("#create_b_id").val("");
     $("#b_type").val("");
-    alert("Mixmatched cNFT/NFT");
+    alert("Mixmatched NFT Types Not Allowed!");
     validate_details();
     return;
   }
@@ -1895,6 +2003,11 @@ $(document).delegate("#swap_create", "click", async function() {
     $("#swap_deploy").prop("disabled",false);
     $(".swap_cancel_b").prop("disabled",false);
   }
+  else if($("#a_type").val()=="pNFT"){
+    $(".swap_f").addClass("active_swap");
+    $("#swap_deploy").prop("disabled",false);
+    $(".swap_cancel_b").prop("disabled",false);
+  }
 });
 
 // back two steps
@@ -1947,13 +2060,13 @@ async function provision_proposal() {
     swapLamports = parseInt(swapLamports);
     
     if($("#usdc_request").val()>0){
-      console.log("usdc request");
+      //console.log("usdc request");
       swapTokenMint = new solanaWeb3.PublicKey(conf.usdc);
       swapTokens = $("#usdc_request").val() * 1000000;
       swapTokens = parseInt(swapTokens);
     }
     else if($("#pikl_request").val()>0){
-      console.log("token request");
+      //console.log("token request");
       swapTokenMint = new solanaWeb3.PublicKey($(".swap_c_pikl").attr("data-id"));
       let decimals = 9;
       for (let i = 0; i < spl_tokens.length; i++) {
@@ -1971,16 +2084,16 @@ async function provision_proposal() {
       swapTokens = parseInt(swapTokens);
     }
     else{
-      console.log("default request");
+      //console.log("default request");
       swapTokenMint = new solanaWeb3.PublicKey("11111111111111111111111111111111");
       swapTokens = 0;
     }
     
-    console.log("assetId ", assetId);
-    console.log("swapAssetId ", swapAssetId);
-    console.log("swapLamports ", swapLamports);
-    console.log("swapTokenMint ", swapTokenMint);
-    console.log("swapTokens ", swapTokens);
+    //console.log("assetId ", assetId);
+    //console.log("swapAssetId ", swapAssetId);
+    //console.log("swapLamports ", swapLamports);
+    //console.log("swapTokenMint ", swapTokenMint);
+    //console.log("swapTokens ", swapTokens);
     
     swapAssetId = $("#create_b_id").val();
     if (swapAssetId == "") {
@@ -2006,10 +2119,10 @@ async function provision_proposal() {
         id: assetId
       },
     });
-    console.log("getAsset ", getAsset);
-    console.log("data_hash ", getAsset.data.result.compression.data_hash);
-    console.log("creator_hash ", getAsset.data.result.compression.creator_hash);
-    console.log("leaf_id ", getAsset.data.result.compression.leaf_id);
+    //console.log("getAsset ", getAsset);
+    //console.log("data_hash ", getAsset.data.result.compression.data_hash);
+    //console.log("creator_hash ", getAsset.data.result.compression.creator_hash);
+    //console.log("leaf_id ", getAsset.data.result.compression.leaf_id);
     
     let getAssetProof = await axiosInstance.post(heliusUrl, {
       jsonrpc: "2.0",
@@ -2019,16 +2132,16 @@ async function provision_proposal() {
         id: assetId
       },
     });
-    console.log("getAssetProof ", getAssetProof);
-    console.log("tree_id ", getAssetProof.data.result.tree_id);
-    console.log("proof ", getAssetProof.data.result.proof);
-    console.log("root ", getAssetProof.data.result.root);
+    //console.log("getAssetProof ", getAssetProof);
+    //console.log("tree_id ", getAssetProof.data.result.tree_id);
+    //console.log("proof ", getAssetProof.data.result.proof);
+    //console.log("root ", getAssetProof.data.result.root);
     
     let treeAccount = await splAccountComp.ConcurrentMerkleTreeAccount.fromAccountAddress(connection, new solanaWeb3.PublicKey(getAssetProof.data.result.tree_id),);
     let treeAuthorityPDA = treeAccount.getAuthority();
     let canopyDepth = treeAccount.getCanopyDepth();
-    console.log("treeAuthorityPDA ", treeAuthorityPDA.toString());
-    console.log("canopyDepth ", canopyDepth);
+    //console.log("treeAuthorityPDA ", treeAuthorityPDA.toString());
+    //console.log("canopyDepth ", canopyDepth);
     
     // parse the list of proof addresses into a valid AccountMeta[]
     let proof = getAssetProof.data.result.proof.slice(0, getAssetProof.data.result.proof.length - (!!canopyDepth ? canopyDepth : 0)).map((node) => ({
@@ -2036,7 +2149,7 @@ async function provision_proposal() {
         isWritable: false,
         isSigner: false,
       }));
-    console.log("proof ", proof);
+    //console.log("proof ", proof);
     
     let taker = $("#create_b_owner").val();
     let swapAssetOwner = taker;
@@ -2048,65 +2161,65 @@ async function provision_proposal() {
     let swapProof = null;  
     if (isSwap === true) {
       
-      console.log("swap asset detected");
+      //console.log("swap asset detected");
       let getSwapAsset = await axiosInstance.post(heliusUrl, {jsonrpc: "2.0",
       method: "getAsset",id: "rpd-op-123",params: {id: swapAssetId},});
-      console.log("getSwapAsset ", getSwapAsset);
+      //console.log("getSwapAsset ", getSwapAsset);
 
       swapAssetOwner = getSwapAsset.data.result.ownership.owner;
       swapDatahash = getSwapAsset.data.result.compression.data_hash;
       swapCreatorhash = getSwapAsset.data.result.compression.creator_hash;
       swapLeafId = getSwapAsset.data.result.compression.leaf_id;
-      console.log("swap data_hash ", swapDatahash);
-      console.log("swap creator_hash ", swapCreatorhash);
-      console.log("swap leaf_id ", swapLeafId);
+      //console.log("swap data_hash ", swapDatahash);
+      //console.log("swap creator_hash ", swapCreatorhash);
+      //console.log("swap leaf_id ", swapLeafId);
 
       let getSwapAssetProof = await axiosInstance.post(heliusUrl, {jsonrpc: "2.0",
       method: "getAssetProof",id: "rpd-op-123",params: {id: swapAssetId},});
-      console.log("getSwapAssetProof ", getSwapAssetProof);
+      //console.log("getSwapAssetProof ", getSwapAssetProof);
       
       swapTreeId =  getSwapAssetProof.data.result.tree_id;
       let swapProofTotal = getSwapAssetProof.data.result.proof;
       swapRoot = getSwapAssetProof.data.result.root;
-      console.log("swap tree_id ", swapTreeId);
-      console.log("swap proof total ", swapProofTotal);
-      console.log("swap root ", swapRoot);
+      //console.log("swap tree_id ", swapTreeId);
+      //console.log("swap proof total ", swapProofTotal);
+      //console.log("swap root ", swapRoot);
 
       let swapTreeAccount = await splAccountComp.ConcurrentMerkleTreeAccount.fromAccountAddress(connection,
       new solanaWeb3.PublicKey(getSwapAssetProof.data.result.tree_id),);
-      console.log("swapTreeAccount ", swapTreeAccount);  
+      //console.log("swapTreeAccount ", swapTreeAccount);  
       let swapCanopyDepth = swapTreeAccount.getCanopyDepth();
-      console.log("swap canopyDepth ", swapCanopyDepth);
+      //console.log("swap canopyDepth ", swapCanopyDepth);
       
       // parse the list of proof addresses into a valid AccountMeta[]
       swapProof = getSwapAssetProof.data.result.proof
       .slice(0, getSwapAssetProof.data.result.proof.length - (!!swapCanopyDepth ? swapCanopyDepth : 0))
       .map((node) => ({pubkey: new solanaWeb3.PublicKey(node),isWritable: false,isSigner: false,}));
-      console.log("swapProof ", swapProof);
+      //console.log("swapProof ", swapProof);
       
     }
     else{
-      console.log("swap asset not detected");
+      //console.log("swap asset not detected");
     }
     
     let swapVaultPDA = solanaWeb3.PublicKey.findProgramAddressSync([Buffer.from("cNFT-vault")],cNFTSwapProgramId);
-    console.log("Swap Vault PDA: ", swapVaultPDA[0].toString());
+    //console.log("Swap Vault PDA: ", swapVaultPDA[0].toString());
     
-    console.log("assetId", assetId);
-    console.log("swapAssetId", swapAssetId);
+    //console.log("assetId", assetId);
+    //console.log("swapAssetId", swapAssetId);
     
     let swapStatePDA = solanaWeb3.PublicKey.findProgramAddressSync([Buffer.from("cNFT-swap"), 
     new solanaWeb3.PublicKey(assetId).toBytes(), new solanaWeb3.PublicKey(swapAssetId).toBytes()],cNFTSwapProgramId);
-    console.log("Swap State PDA: ", swapStatePDA[0].toString());
+    //console.log("Swap State PDA: ", swapStatePDA[0].toString());
     
     let cNFTProgramStatePDA = solanaWeb3.PublicKey.findProgramAddressSync([Buffer.from("cNFT-program-state")],cNFTSwapProgramId);
-    console.log("cNFT Program State PDA: ", cNFTProgramStatePDA[0].toString());    
+    //console.log("cNFT Program State PDA: ", cNFTProgramStatePDA[0].toString());    
     
     let tempFeeAccount = new solanaWeb3.Keypair();
-    console.log("Temp Fee Account: ", tempFeeAccount.publicKey.toString());
+    //console.log("Temp Fee Account: ", tempFeeAccount.publicKey.toString());
     createTempFeeAccountIx = solanaWeb3.SystemProgram.createAccount({programId: cNFTSwapProgramId,space: 0,
     lamports: feeLamports,fromPubkey: provider.publicKey,newAccountPubkey: tempFeeAccount.publicKey,});    
-    console.log("Create Temp Fee Account Tx: ", createTempFeeAccountIx);    
+    //console.log("Create Temp Fee Account Tx: ", createTempFeeAccountIx);    
     tempFeeAccountSaved = tempFeeAccount;
     
     let tokenATA = null;
@@ -2131,7 +2244,7 @@ async function provision_proposal() {
         swapTokenMint,
         splToken.TOKEN_PROGRAM_ID,
         splToken.ASSOCIATED_TOKEN_PROGRAM_ID,);
-        console.log("Create Token ATA Ix: ", createTokenATAIx);    
+        //console.log("Create Token ATA Ix: ", createTokenATAIx);    
       }
       else{
         createTokenATA = false;
@@ -2141,7 +2254,7 @@ async function provision_proposal() {
     }
     
     let totalSize = 1 + 1 + 32 + 32 + 32 + 32 + 8 + 32 + 32 + 32 + 32 + 8 + 1 + 8 + 32 + 8;
-    console.log("totalSize", totalSize);    
+    //console.log("totalSize", totalSize);    
     
     let uarray = new Uint8Array(totalSize);
     let counter = 0;    
@@ -2227,7 +2340,7 @@ async function provision_proposal() {
       uarray[counter++] = byteArray[i];
     }    
     
-    console.log("Contract Data: ", uarray);
+    //console.log("Contract Data: ", uarray);
     
     let keys = [
       { pubkey: provider.publicKey, isSigner: true, isWritable: true }, // 0
@@ -2247,24 +2360,24 @@ async function provision_proposal() {
       { pubkey: mcDegensTreasury, isSigner: false, isWritable: true }, // 14 
     ];
     for (let i = 0; i < proof.length; i++) {keys.push(proof[i]);}
-    console.log("keys ", keys);
+    //console.log("keys ", keys);
     
     initializeSwapIx = new solanaWeb3.TransactionInstruction({
     programId: cNFTSwapProgramId,data: Buffer.from(uarray),keys: keys,});
-    console.log("Initialize Swap Ix: ", initializeSwapIx);    
+    //console.log("Initialize Swap Ix: ", initializeSwapIx);    
     
     let slot = await connection.getSlot();
     let [createALTIx, lookupTableAddress] =
     solanaWeb3.AddressLookupTableProgram.createLookupTable({
     authority: provider.publicKey,payer: provider.publicKey,recentSlot: slot,});
-    console.log("Lookup Table Address", lookupTableAddress.toBase58(), lookupTableAddress);    
+    //console.log("Lookup Table Address", lookupTableAddress.toBase58(), lookupTableAddress);    
     lookupTableAddressSaved = lookupTableAddress;
     
     let proofPubkeys = [];
     for (let i = 0; i < proof.length; i++) {
       proofPubkeys.push(proof[i].pubkey);
     }
-    console.log("proofPubkeys ", proofPubkeys);    
+    //console.log("proofPubkeys ", proofPubkeys);    
     
     extendALTIx = solanaWeb3.AddressLookupTableProgram.extendLookupTable({
       payer: provider.publicKey,
@@ -2282,14 +2395,14 @@ async function provision_proposal() {
         ...proofPubkeys,
       ],
     });
-    console.log("extendALTIx ", extendALTIx);
+    //console.log("extendALTIx ", extendALTIx);
     
     lookupTable = new solanaWeb3.PublicKey(conf.system_alt);  
     lookupTableAccount = await connection
     .getAddressLookupTable(lookupTable)
     .then((res) => res.value);
     if (!lookupTableAccount) {
-        console.log("Could not fetch McSwap ALT!");
+        //console.log("Could not fetch McSwap ALT!");
         alert("Could not fetch McSwap ALT!");
         return;
     }
@@ -2306,8 +2419,8 @@ async function provision_proposal() {
       $("#cover_message").html("Requesting Approval...");
       let signedTx = await provider.signTransaction(createALTTx);
       let signature = await connection.sendTransaction(signedTx);
-      console.log("Signature: ", signature)
-      console.log(`https://solscan.io/tx/${signature}`);
+      //console.log("Signature: ", signature)
+      //console.log(`https://solscan.io/tx/${signature}`);
       $(".fee_prov_sig span.swap_val").html(signature);
       
       $("#cover_message").html("Finalizing Transaction...");
@@ -2322,7 +2435,7 @@ async function provision_proposal() {
           clearInterval(createID);
           lookupTableAccount = await connection.getAddressLookupTable(lookupTableAddress).then((res) => res.value);
           if (!lookupTableAccount) {
-            console.log("Could not fetch ALT!");
+            //console.log("Could not fetch ALT!");
             alert("Could not fetch ALT!");
           }
           console.log("ALT:");
@@ -2339,10 +2452,10 @@ async function provision_proposal() {
       
     }
     catch(error) {
-      console.log("Error: ", error);
+      //console.log("Error: ", error);
       error = JSON.stringify(error);
       error = JSON.parse(error);
-      console.log("Error Logs: ", error);
+      //console.log("Error Logs: ", error);
       $("#cover_message").html("Error!<br /><br />Canceling Transaction...");
       setTimeout(() => {
         $("#cover_message").html("");
@@ -2400,7 +2513,7 @@ async function deploy_proposal() {
           }
         }
         swapTokens = $("#pikl_request").val();
-        console.log("pikl request");
+        //console.log("pikl request");
         for (let i = 0; i < decimals; i++) {
           multiplier = multiplier * 10;
         }
@@ -2408,7 +2521,7 @@ async function deploy_proposal() {
       else if($("#usdc_request").val()>0){
         swapTokenMint = new solanaWeb3.PublicKey(conf.usdc);
         swapTokens = $("#usdc_request").val();
-        console.log("usdc request");
+        //console.log("usdc request");
         for (let i = 0; i < 6; i++) {
           multiplier = multiplier * 10;
         }
@@ -2417,53 +2530,53 @@ async function deploy_proposal() {
         console.log("requesting none");
         swapTokenMint = new solanaWeb3.PublicKey("11111111111111111111111111111111");
       }
-
+      
       swapTokens = swapTokens * multiplier;
       swapTokens = parseInt(swapTokens);
-
-      console.log("mint ", mint);
-      console.log("swapMint ", swapMint);
-      console.log("taker ", taker);
-      console.log("isSwap ", isSwap);
-      console.log("swapLamports ", swapLamports);
-      console.log("swapTokenMint ", swapTokenMint);
-      console.log("swapTokens ", swapTokens);
+      
+      //console.log("mint ", mint);
+      //console.log("swapMint ", swapMint);
+      //console.log("taker ", taker);
+      //console.log("isSwap ", isSwap);
+      //console.log("swapLamports ", swapLamports);
+      //console.log("swapTokenMint ", swapTokenMint);
+      //console.log("swapTokens ", swapTokens);
 
       let NFTSwapProgramId = new solanaWeb3.PublicKey(conf.MCSWAP_NFT_PROGRAM);
       let devTreasury = new solanaWeb3.PublicKey(conf.treasury_studio_nft);
       let mcDegensTreasury = new solanaWeb3.PublicKey(conf.treasury);
       let feeLamports = conf.fee;
-      console.log("feeLamports ", feeLamports);
+      //console.log("feeLamports ", feeLamports);
 
       let programStatePDA = solanaWeb3.PublicKey.findProgramAddressSync([Buffer.from("program-state")],NFTSwapProgramId);
-      console.log("Program State PDA: ", programStatePDA[0].toString());      
+      //console.log("Program State PDA: ", programStatePDA[0].toString());      
 
       let swapVaultPDA = solanaWeb3.PublicKey.findProgramAddressSync([Buffer.from("swap-vault")],NFTSwapProgramId);
-      console.log("Swap Vault PDA: ", swapVaultPDA[0].toString());
+      //console.log("Swap Vault PDA: ", swapVaultPDA[0].toString());
 
       let swapStatePDA = solanaWeb3.PublicKey.findProgramAddressSync([Buffer.from("swap-state"), new solanaWeb3.PublicKey(mint).toBytes(), new solanaWeb3.PublicKey(swapMint).toBytes()],NFTSwapProgramId);
-      console.log("Swap State PDA: ", swapStatePDA[0].toString());
+      //console.log("Swap State PDA: ", swapStatePDA[0].toString());
       
       let tempFeeAccount = new solanaWeb3.Keypair();
-      console.log("Temp Fee Account: ", tempFeeAccount.publicKey.toString());
+      //console.log("Temp Fee Account: ", tempFeeAccount.publicKey.toString());
       createTempFeeAccountIx = solanaWeb3.SystemProgram.createAccount({
       programId: NFTSwapProgramId,space: 0,lamports: feeLamports,
       fromPubkey: provider.publicKey, newAccountPubkey: tempFeeAccount.publicKey,});
-      console.log("Create Temp Fee Account Tx: ", createTempFeeAccountIx);      
+      //console.log("Create Temp Fee Account Tx: ", createTempFeeAccountIx);      
             
       const tempMintAccount = new solanaWeb3.Keypair();
-      console.log("Temp Mint Account: ", tempMintAccount.publicKey.toString());
+      //console.log("Temp Mint Account: ", tempMintAccount.publicKey.toString());
 
       let rent = await connection.getMinimumBalanceForRentExemption(splToken.AccountLayout.span);
       let createTempMintAccountIx = solanaWeb3.SystemProgram.createAccount({
       programId: splToken.TOKEN_PROGRAM_ID,space: splToken.AccountLayout.span,lamports: rent,
       fromPubkey: provider.publicKey,newAccountPubkey: tempMintAccount.publicKey,});    
-      console.log("Create Temp Mint Account Ix: ", createTempMintAccountIx);          
+      //console.log("Create Temp Mint Account Ix: ", createTempMintAccountIx);          
 
       let initTempMintAccountIx = splToken.createInitializeAccountInstruction(
       tempMintAccount.publicKey,new solanaWeb3.PublicKey(mint),
       tempMintAccount.publicKey,splToken.TOKEN_PROGRAM_ID);
-      console.log("Init Temp Mint Account Ix: ", initTempMintAccountIx);
+      //console.log("Init Temp Mint Account Ix: ", initTempMintAccountIx);
 
       let providerMintATA = await splToken.getAssociatedTokenAddress(
       new solanaWeb3.PublicKey(mint),provider.publicKey,false,
@@ -2471,7 +2584,7 @@ async function deploy_proposal() {
       let transferMintIx = splToken.createTransferInstruction(
       providerMintATA,tempMintAccount.publicKey,provider.publicKey,
       1,provider.publicKey,splToken.TOKEN_PROGRAM_ID,)
-      console.log("Transfer Mint Ix: ", transferMintIx);
+      //console.log("Transfer Mint Ix: ", transferMintIx);
 
       // ******************************************************************
       let swapMintATA = null;
@@ -2481,7 +2594,7 @@ async function deploy_proposal() {
         swapMintATA = await splToken.getAssociatedTokenAddress(
         new solanaWeb3.PublicKey(swapMint),provider.publicKey,false,
         splToken.TOKEN_PROGRAM_ID,splToken.ASSOCIATED_TOKEN_PROGRAM_ID,);
-        console.log("Swap Mint ATA: ", swapMintATA.toString());
+        //console.log("Swap Mint ATA: ", swapMintATA.toString());
         let swapState = null;
         await connection.getAccountInfo(swapMintATA)
         .then(function(response) {swapState = response;})
@@ -2496,14 +2609,17 @@ async function deploy_proposal() {
           createSwapMintATAIx = splToken.createAssociatedTokenAccountInstruction(
           provider.publicKey,swapMintATA,provider.publicKey,new solanaWeb3.PublicKey(swapMint),
           splToken.TOKEN_PROGRAM_ID,splToken.ASSOCIATED_TOKEN_PROGRAM_ID,);
-          console.log("Create Swap Mint ATA Ix: ", createSwapMintATAIx); 
+          //console.log("Create Swap Mint ATA Ix: ", createSwapMintATAIx); 
         } 
         else {
           createSwapMintATA = false;
         }
       }
-      console.log("swapMintATA: ", swapMintATA);          
-      console.log("createSwapMintATA: ", createSwapMintATA);          
+      else{
+        //console.log("debug", swapMint);
+      }
+      //console.log("swapMintATA: ", swapMintATA);          
+      //console.log("createSwapMintATA: ", createSwapMintATA);          
       // ******************************************************************
       
       // ******************************************************************
@@ -2512,7 +2628,7 @@ async function deploy_proposal() {
       let createSwapTokenATAIx = null;
       swapTokenATA = await splToken.getAssociatedTokenAddress(
       swapTokenMint,provider.publicKey,false,splToken.TOKEN_PROGRAM_ID,splToken.ASSOCIATED_TOKEN_PROGRAM_ID,);
-      console.log("Swap Token ATA: ", swapTokenATA.toString());
+      //console.log("Swap Token ATA: ", swapTokenATA.toString());
       let swapTokenState = null;
       await connection.getAccountInfo(swapTokenATA)
       .then(function(response) {swapTokenState = response;})
@@ -2522,26 +2638,28 @@ async function deploy_proposal() {
         return;
       });
       if (swapTokenState == null) {
-        createSwapTokenATA = true;
-        createSwapTokenATAIx = splToken.createAssociatedTokenAccountInstruction(
-        provider.publicKey,
-        swapTokenATA,
-        provider.publicKey,
-        swapTokenMint,
-        splToken.TOKEN_PROGRAM_ID,
-        splToken.ASSOCIATED_TOKEN_PROGRAM_ID,)
-        console.log("Create Swap Token ATA Ix: ", createSwapTokenATAIx); 
+        if(swapTokens > 0){
+          createSwapTokenATA = true;
+          createSwapTokenATAIx = splToken.createAssociatedTokenAccountInstruction(
+          provider.publicKey,
+          swapTokenATA,
+          provider.publicKey,
+          swapTokenMint,
+          splToken.TOKEN_PROGRAM_ID,
+          splToken.ASSOCIATED_TOKEN_PROGRAM_ID,)
+          //console.log("Create Swap Token ATA Ix: ", createSwapTokenATAIx); 
+        }
       } 
       else {
         createSwapTokenATA = false;
       }        
-      console.log("swapTokenATA: ", swapTokenATA);          
-      console.log("createSwapTokenATA: ", createSwapTokenATA);
+      //console.log("swapTokenATA: ", swapTokenATA);          
+      //console.log("createSwapTokenATA: ", createSwapTokenATA);
       // ******************************************************************
       
       // ******************************************************************
       var totalSize = 1 + 1 + 32 + 32 + 32 + 8 + 32 + 8;
-      console.log("totalSize", totalSize);
+      //console.log("totalSize", totalSize);
       var uarray = new Uint8Array(totalSize);
       let counter = 0;    
       uarray[counter++] = 0; // 0 = nft_swap InitializeSwap instruction
@@ -2596,7 +2714,7 @@ async function deploy_proposal() {
       for (let i = 0; i < byteArray.length; i++) {
           uarray[counter++] = byteArray[i];
       }
-      console.log("Contract Data: ", uarray);
+      //console.log("Contract Data: ", uarray);
 
       initializeSwapIx = new solanaWeb3.TransactionInstruction({
         programId: NFTSwapProgramId,data: Buffer.from(uarray),
@@ -2613,12 +2731,13 @@ async function deploy_proposal() {
             { pubkey: mcDegensTreasury, isSigner: false, isWritable: true }, // 9
         ]
       });
-      console.log("Initialize Swap Ix: ", initializeSwapIx);
+      //console.log("Initialize Swap Ix: ", initializeSwapIx);
 
       let messageV0 = null;
       if (isSwap == true) {
         if (createSwapMintATA == true && createSwapTokenATA == true) {
-              messageV0 = new solanaWeb3.TransactionMessage({
+          //console.log("Debug: 1");
+          messageV0 = new solanaWeb3.TransactionMessage({
                   payerKey: provider.publicKey,
                   recentBlockhash: (await connection.getRecentBlockhash('confirmed')).blockhash,
                   instructions: [
@@ -2631,8 +2750,9 @@ async function deploy_proposal() {
                       initializeSwapIx
                   ],
               }).compileToV0Message([]);
-          } 
+        } 
         else if (createSwapMintATA == true) {
+          //console.log("Debug: 2");
               messageV0 = new solanaWeb3.TransactionMessage({
                   payerKey: provider.publicKey,
                   recentBlockhash: (await connection.getRecentBlockhash('confirmed')).blockhash,
@@ -2647,6 +2767,7 @@ async function deploy_proposal() {
               }).compileToV0Message([]);
           } 
         else if (createSwapTokenATA == true) {
+          //console.log("Debug: 3");
               messageV0 = new solanaWeb3.TransactionMessage({
                   payerKey: provider.publicKey,
                   recentBlockhash: (await connection.getRecentBlockhash('confirmed')).blockhash,
@@ -2661,6 +2782,7 @@ async function deploy_proposal() {
               }).compileToV0Message([]);
           } 
         else {
+          //console.log("Debug: 4");
               messageV0 = new solanaWeb3.TransactionMessage({
                   payerKey: provider.publicKey,
                   recentBlockhash: (await connection.getRecentBlockhash('confirmed')).blockhash,
@@ -2676,10 +2798,12 @@ async function deploy_proposal() {
       } 
       else {
 
-        console.log(createSwapTokenATA);
+        //console.log("Not a Swap!");
+        
+        //console.log(createSwapTokenATA);
 
         if (createSwapTokenATA == true) {
-              console.log("1 - debug");
+              //console.log("1 - debug");
               messageV0 = new solanaWeb3.TransactionMessage({
                   payerKey: provider.publicKey,
                   recentBlockhash: (await connection.getRecentBlockhash('confirmed')).blockhash,
@@ -2694,7 +2818,7 @@ async function deploy_proposal() {
               }).compileToV0Message([]);
           } 
         else {
-              console.log("2 - debug");
+              //console.log("2 - debug");
               messageV0 = new solanaWeb3.TransactionMessage({
                   payerKey: provider.publicKey,
                   recentBlockhash: (await connection.getRecentBlockhash('confirmed')).blockhash,
@@ -2709,7 +2833,7 @@ async function deploy_proposal() {
           }
       }
 
-      console.log("messageV0: ", messageV0);
+      //console.log("messageV0: ", messageV0);
       // ******************************************************************
       
       // ******************************************************************
@@ -2719,8 +2843,8 @@ async function deploy_proposal() {
         let signedTx = await provider.signTransaction(initializeSwapTx);
         signedTx.sign([tempFeeAccount, tempMintAccount]);
         let signature = await connection.sendTransaction(signedTx);
-        console.log("Signature: ", signature);
-        console.log(`https://solscan.io/tx/${signature}?cluster=devnet`);
+        //console.log("Signature: ", signature);
+        //console.log(`https://solscan.io/tx/${signature}?cluster=devnet`);
         $(".share_sig span.swap_val").html(signature);
         $("#cover_message").html("Finalizing Transaction...");
         let deployID = setInterval(async function() {
@@ -2749,10 +2873,10 @@ async function deploy_proposal() {
       }, 3000);
       } 
       catch(error) {
-        console.log("Error Logs: ", error);
+        //console.log("Error Logs: ", error);
         error = JSON.stringify(error);
         error = JSON.parse(error);
-        console.log("Error Logs: ", error);
+        //console.log("Error Logs: ", error);
         $(".swap_cancel_b, #swap_deploy").prop("disabled",false);
         $("#swap_deploying").removeClass("provisioning").html("4. Deploy Proposal");
         $("#cover_message").html("Error!<br /><br />Canceling Transaction...");
@@ -2767,85 +2891,85 @@ async function deploy_proposal() {
 
     }
 
-    if($("#a_type").val()=="cNFT"){
+//     if($("#a_type").val()=="cNFT"){
 
-      lookupTableAccount = await connection.getAddressLookupTable(lookupTableAddressSaved).then((res) => res.value);    
-      if (!lookupTableAccount) {
-        console.log("Could not fetch ALT!");
-        alert("Could not fetch ALT!");
-        return;
-      }
+//       lookupTableAccount = await connection.getAddressLookupTable(lookupTableAddressSaved).then((res) => res.value);    
+//       if (!lookupTableAccount) {
+//         console.log("Could not fetch ALT!");
+//         alert("Could not fetch ALT!");
+//         return;
+//       }
       
-      console.log("lookupTableAccount", lookupTableAccount);
-      console.log("createTokenATA", createTokenATASaved);
-      console.log("lookupTableAddress", lookupTableAddressSaved);
-      console.log("createTempFeeAccountIx", createTempFeeAccountIx);
-      console.log("createTokenATAIx", createTokenATAIx);
-      console.log("initializeSwapIx", initializeSwapIx);
-      console.log("tempFeeAccountSaved", tempFeeAccountSaved);
+//       console.log("lookupTableAccount", lookupTableAccount);
+//       console.log("createTokenATA", createTokenATASaved);
+//       console.log("lookupTableAddress", lookupTableAddressSaved);
+//       console.log("createTempFeeAccountIx", createTempFeeAccountIx);
+//       console.log("createTokenATAIx", createTokenATAIx);
+//       console.log("initializeSwapIx", initializeSwapIx);
+//       console.log("tempFeeAccountSaved", tempFeeAccountSaved);
       
-      let messageV0 = null;
-      if (createTokenATASaved === true) {
-        messageV0 = new solanaWeb3.TransactionMessage({payerKey: provider.publicKey,
-        recentBlockhash: (await connection.getRecentBlockhash('confirmed')).blockhash,
-        instructions: [createTempFeeAccountIx, createTokenATAIx, initializeSwapIx],
-        }).compileToV0Message([lookupTableAccount]);
-      } 
-      else {
-        messageV0 = new solanaWeb3.TransactionMessage({payerKey: provider.publicKey,
-        recentBlockhash: (await connection.getRecentBlockhash('confirmed')).blockhash,
-        instructions: [createTempFeeAccountIx, initializeSwapIx],
-        }).compileToV0Message([lookupTableAccount]);
-      }
-      console.log("messageV0 ", messageV0);
+//       let messageV0 = null;
+//       if (createTokenATASaved === true) {
+//         messageV0 = new solanaWeb3.TransactionMessage({payerKey: provider.publicKey,
+//         recentBlockhash: (await connection.getRecentBlockhash('confirmed')).blockhash,
+//         instructions: [createTempFeeAccountIx, createTokenATAIx, initializeSwapIx],
+//         }).compileToV0Message([lookupTableAccount]);
+//       } 
+//       else {
+//         messageV0 = new solanaWeb3.TransactionMessage({payerKey: provider.publicKey,
+//         recentBlockhash: (await connection.getRecentBlockhash('confirmed')).blockhash,
+//         instructions: [createTempFeeAccountIx, initializeSwapIx],
+//         }).compileToV0Message([lookupTableAccount]);
+//       }
+//       console.log("messageV0 ", messageV0);
       
-      let tx = new solanaWeb3.VersionedTransaction(messageV0);
+//       let tx = new solanaWeb3.VersionedTransaction(messageV0);
       
-      try {
-        let signedTx = await provider.signTransaction(tx);
-        signedTx.sign([tempFeeAccountSaved]);
-        let txId = await connection.sendTransaction(signedTx);
-        console.log("Signature: ", txId);
-        console.log(`https://solscan.io/tx/${txId}`);
-        $(".share_sig span.swap_val").html(txId);
-        $("#cover_message").html("Finalizing Transaction...");
-        let deployID = setInterval(async function() {
-          let tx_status = await connection.getSignatureStatuses([txId], {searchTransactionHistory:true,});
-          if (tx_status.value[0].confirmationStatus == undefined) {} 
-          else if (tx_status.value[0].confirmationStatus == "finalized") {
-            clearInterval(deployID);
-            $(".types_").val("");
-            $(".share_id .swap_val").html(conf.host+"/swap/"+$("#create_a_id").val()+"-"+$("#create_b_id").val());
-            $("#swap_deploying").removeClass("provisioning").html("4. Deploy Proposal");
-            $(".swap_f").removeClass("active_swap");
-            $(".swap_g").addClass("active_swap");
-            $("#nav_shop, #nav_view, .ass_donate, .ass_swap, .ass_sell, #wallet_disconnect, #wallet_refresh, #wallet_nfts, #wallet_cnfts, .mcprofile_close").prop("disabled",false);
-            $("#donate_sol, .mcprofile_close, #wallet_refresh").show();
-            $("ul[data-id='"+$("#create_a_id").val()+"']").remove();
-            $("#wallet_cnfts span.count").html('(' + $("ul[data-type='cnft']:visible").length + ')');
-            $("#create_a_id, #sol_request, #pikl_request, #usdc_request, #create_a_owner, #create_b_owner, #create_b_id").val("");
-            $(".swap_img_a, .swap_img_b").attr("src","/img/img-placeholder.png");
-            $("#cover").fadeOut(400);
-            $("#cover_message").html("");
-            $("#token_sol, #token_pikl, #token_usdc").attr("src", "/img/check_default.png");
-            $(".proofs_").hide();
-          }
-        }, 3000);  
-      } 
-      catch(error) {
-        console.log("Error Logs: ", error);
-        $(".swap_cancel_b, #swap_deploy").prop("disabled",false);
-        $("#swap_deploying").removeClass("provisioning").html("4. Deploy Proposal");
-        $("#cover_message").html("Error!<br /><br />Canceling Transaction...");
-        setTimeout(() => { 
-          $("#cover").fadeOut(400);
-          $("#cover_message").html("");
-          $(".share_id .swap_value").html(conf.host+"/swap/"+$("#create_a_id").val()+"-"+$("#create_b_id").val());
-        },3000);
-        return;
-      }
+//       try {
+//         let signedTx = await provider.signTransaction(tx);
+//         signedTx.sign([tempFeeAccountSaved]);
+//         let txId = await connection.sendTransaction(signedTx);
+//         console.log("Signature: ", txId);
+//         console.log(`https://solscan.io/tx/${txId}`);
+//         $(".share_sig span.swap_val").html(txId);
+//         $("#cover_message").html("Finalizing Transaction...");
+//         let deployID = setInterval(async function() {
+//           let tx_status = await connection.getSignatureStatuses([txId], {searchTransactionHistory:true,});
+//           if (tx_status.value[0].confirmationStatus == undefined) {} 
+//           else if (tx_status.value[0].confirmationStatus == "finalized") {
+//             clearInterval(deployID);
+//             $(".types_").val("");
+//             $(".share_id .swap_val").html(conf.host+"/swap/"+$("#create_a_id").val()+"-"+$("#create_b_id").val());
+//             $("#swap_deploying").removeClass("provisioning").html("4. Deploy Proposal");
+//             $(".swap_f").removeClass("active_swap");
+//             $(".swap_g").addClass("active_swap");
+//             $("#nav_shop, #nav_view, .ass_donate, .ass_swap, .ass_sell, #wallet_disconnect, #wallet_refresh, #wallet_nfts, #wallet_cnfts, .mcprofile_close").prop("disabled",false);
+//             $("#donate_sol, .mcprofile_close, #wallet_refresh").show();
+//             $("ul[data-id='"+$("#create_a_id").val()+"']").remove();
+//             $("#wallet_cnfts span.count").html('(' + $("ul[data-type='cnft']:visible").length + ')');
+//             $("#create_a_id, #sol_request, #pikl_request, #usdc_request, #create_a_owner, #create_b_owner, #create_b_id").val("");
+//             $(".swap_img_a, .swap_img_b").attr("src","/img/img-placeholder.png");
+//             $("#cover").fadeOut(400);
+//             $("#cover_message").html("");
+//             $("#token_sol, #token_pikl, #token_usdc").attr("src", "/img/check_default.png");
+//             $(".proofs_").hide();
+//           }
+//         }, 3000);  
+//       } 
+//       catch(error) {
+//         console.log("Error Logs: ", error);
+//         $(".swap_cancel_b, #swap_deploy").prop("disabled",false);
+//         $("#swap_deploying").removeClass("provisioning").html("4. Deploy Proposal");
+//         $("#cover_message").html("Error!<br /><br />Canceling Transaction...");
+//         setTimeout(() => { 
+//           $("#cover").fadeOut(400);
+//           $("#cover_message").html("");
+//           $(".share_id .swap_value").html(conf.host+"/swap/"+$("#create_a_id").val()+"-"+$("#create_b_id").val());
+//         },3000);
+//         return;
+//       }
 
-    }
+//     }
 
 } 
 else {return;}
@@ -3301,8 +3425,8 @@ async function provision_swap() {
     if(swapAssetId==""){
       swapAssetId = "11111111111111111111111111111111";
     }
-    console.log("assetId ", assetId);
-    console.log("swapAssetId ", swapAssetId);    
+    //console.log("assetId ", assetId);
+    //console.log("swapAssetId ", swapAssetId);    
     
     // console.log("assetId ", assetId);
     // console.log("swapAssetId ", swapAssetId);    
@@ -3312,10 +3436,10 @@ async function provision_swap() {
     let devTreasury = new solanaWeb3.PublicKey(conf.treasury_studio_cnft);
     let mcDegensTreasury = new solanaWeb3.PublicKey(conf.treasury);
     let feeLamports = conf.fee;
-    console.log("feeLamports ", feeLamports);    
+    //console.log("feeLamports ", feeLamports);    
     
     let swapStatePDA = solanaWeb3.PublicKey.findProgramAddressSync([Buffer.from("cNFT-swap"), new solanaWeb3.PublicKey(assetId).toBytes(), new solanaWeb3.PublicKey(swapAssetId).toBytes()],cNFTSwapProgramId);
-    console.log("Swap State PDA: ", swapStatePDA[0].toString());
+    //console.log("Swap State PDA: ", swapStatePDA[0].toString());
     
     let swapState = null;
     await connection.getAccountInfo(swapStatePDA[0])
@@ -3336,26 +3460,26 @@ async function provision_swap() {
     let encodedSwapStateData = swapState.data;
     let decodedSwapStateData = SWAP_CNFT_STATE.decode(encodedSwapStateData);
     
-    console.log("swapState - is_initialized: ", decodedSwapStateData.is_initialized);    
-    console.log("swapState - initializer: ", new solanaWeb3.PublicKey(decodedSwapStateData.initializer).toString());
-    console.log("swapState - is_swap: ", new BN(decodedSwapStateData.is_swap, 10, "le").toString()); // HERE
-    console.log("swapState - asset_id: ", new solanaWeb3.PublicKey(decodedSwapStateData.asset_id).toString());
-    console.log("swapState - merkle_tree: ", new solanaWeb3.PublicKey(decodedSwapStateData.merkle_tree).toString());
-    console.log("swapState - root: ", new solanaWeb3.PublicKey(decodedSwapStateData.root).toString());
-    console.log("swapState - data_hash: ", new solanaWeb3.PublicKey(decodedSwapStateData.data_hash).toString());
-    console.log("swapState - creator_hash: ", new solanaWeb3.PublicKey(decodedSwapStateData.creator_hash).toString());
-    console.log("swapState - nonce", new BN(decodedSwapStateData.nonce, 10, "le").toString());
+    //console.log("swapState - is_initialized: ", decodedSwapStateData.is_initialized);    
+    //console.log("swapState - initializer: ", new solanaWeb3.PublicKey(decodedSwapStateData.initializer).toString());
+    //console.log("swapState - is_swap: ", new BN(decodedSwapStateData.is_swap, 10, "le").toString()); // HERE
+    //console.log("swapState - asset_id: ", new solanaWeb3.PublicKey(decodedSwapStateData.asset_id).toString());
+    //console.log("swapState - merkle_tree: ", new solanaWeb3.PublicKey(decodedSwapStateData.merkle_tree).toString());
+    //console.log("swapState - root: ", new solanaWeb3.PublicKey(decodedSwapStateData.root).toString());
+    //console.log("swapState - data_hash: ", new solanaWeb3.PublicKey(decodedSwapStateData.data_hash).toString());
+    //console.log("swapState - creator_hash: ", new solanaWeb3.PublicKey(decodedSwapStateData.creator_hash).toString());
+    //console.log("swapState - nonce", new BN(decodedSwapStateData.nonce, 10, "le").toString());
 
-    console.log("swapState - swap_asset_id: ", new solanaWeb3.PublicKey(decodedSwapStateData.swap_asset_id).toString());
-    console.log("swapState - swap_merkle_tree: ", new solanaWeb3.PublicKey(decodedSwapStateData.swap_merkle_tree).toString());
-    console.log("swapState - swap_root: ", new solanaWeb3.PublicKey(decodedSwapStateData.swap_root).toString());
-    console.log("swapState - swap_data_hash: ", new solanaWeb3.PublicKey(decodedSwapStateData.swap_data_hash).toString());
-    console.log("swapState - swap_creator_hash: ", new solanaWeb3.PublicKey(decodedSwapStateData.swap_creator_hash).toString());
-    console.log("swapState - swap_nonce", new BN(decodedSwapStateData.swap_nonce, 10, "le").toString());
-    console.log("swapState - swap_leaf_owner: ", new solanaWeb3.PublicKey(decodedSwapStateData.swap_leaf_owner).toString());
-    console.log("swapState - swap_lamports", new BN(decodedSwapStateData.swap_lamports, 10, "le").toString());
-    console.log("swapState - swap_token_mint", new solanaWeb3.PublicKey(decodedSwapStateData.swap_token_mint).toString());
-    console.log("swapState - swap_tokens", new BN(decodedSwapStateData.swap_tokens, 10, "le").toString());
+    //console.log("swapState - swap_asset_id: ", new solanaWeb3.PublicKey(decodedSwapStateData.swap_asset_id).toString());
+    //console.log("swapState - swap_merkle_tree: ", new solanaWeb3.PublicKey(decodedSwapStateData.swap_merkle_tree).toString());
+    //console.log("swapState - swap_root: ", new solanaWeb3.PublicKey(decodedSwapStateData.swap_root).toString());
+    //console.log("swapState - swap_data_hash: ", new solanaWeb3.PublicKey(decodedSwapStateData.swap_data_hash).toString());
+    //console.log("swapState - swap_creator_hash: ", new solanaWeb3.PublicKey(decodedSwapStateData.swap_creator_hash).toString());
+    //console.log("swapState - swap_nonce", new BN(decodedSwapStateData.swap_nonce, 10, "le").toString());
+    //console.log("swapState - swap_leaf_owner: ", new solanaWeb3.PublicKey(decodedSwapStateData.swap_leaf_owner).toString());
+    //console.log("swapState - swap_lamports", new BN(decodedSwapStateData.swap_lamports, 10, "le").toString());
+    //console.log("swapState - swap_token_mint", new solanaWeb3.PublicKey(decodedSwapStateData.swap_token_mint).toString());
+    //console.log("swapState - swap_tokens", new BN(decodedSwapStateData.swap_tokens, 10, "le").toString());
       
     if (new BN(decodedSwapStateData.is_swap, 10, "le") == 0) {isSwap = false}
     swapInitializer = new solanaWeb3.PublicKey(decodedSwapStateData.initializer);
@@ -3366,34 +3490,34 @@ async function provision_swap() {
     
   } 
     else {
-    console.log("Swap Not Initialized");    
+    //console.log("Swap Not Initialized");    
     return;
   }    
   
     let axiosInstance = axios.create({baseURL: heliusUrl,});
     let getAsset = await axiosInstance.post(heliusUrl, {jsonrpc: "2.0",
     method: "getAsset",id: "rpd-op-123",params: {id: assetId},});
-    console.log("data_hash ", getAsset.data.result.compression.data_hash);
-    console.log("creator_hash ", getAsset.data.result.compression.creator_hash);
-    console.log("leaf_id ", getAsset.data.result.compression.leaf_id);    
+    //console.log("data_hash ", getAsset.data.result.compression.data_hash);
+    //console.log("creator_hash ", getAsset.data.result.compression.creator_hash);
+    //console.log("leaf_id ", getAsset.data.result.compression.leaf_id);    
 
     let getAssetProof = await axiosInstance.post(heliusUrl, {jsonrpc: "2.0",
     method: "getAssetProof",id: "rpd-op-123",params: {id: assetId},});
-    console.log("tree_id ", getAssetProof.data.result.tree_id);
-    console.log("proof ", getAssetProof.data.result.proof);
-    console.log("root ", getAssetProof.data.result.root);    
+    //console.log("tree_id ", getAssetProof.data.result.tree_id);
+    //console.log("proof ", getAssetProof.data.result.proof);
+    //console.log("root ", getAssetProof.data.result.root);    
 
     let treeAccount = await splAccountComp.ConcurrentMerkleTreeAccount.fromAccountAddress(connection,
     new solanaWeb3.PublicKey(getAssetProof.data.result.tree_id),);  
     let treeAuthorityPDA = treeAccount.getAuthority();
     let canopyDepth = treeAccount.getCanopyDepth();
-    console.log("treeAuthorityPDA ", treeAuthorityPDA.toString());
-    console.log("canopyDepth ", canopyDepth);
+    //console.log("treeAuthorityPDA ", treeAuthorityPDA.toString());
+    //console.log("canopyDepth ", canopyDepth);
 
     let proof = getAssetProof.data.result.proof
     .slice(0, getAssetProof.data.result.proof.length - (!!canopyDepth ? canopyDepth : 0))
     .map((node) => ({pubkey: new solanaWeb3.PublicKey(node),isWritable: false,isSigner: false,}));
-    console.log("proof ", proof);    
+    //console.log("proof ", proof);    
 
     // HERE
     let swapDatahash = "11111111111111111111111111111111";
@@ -3411,57 +3535,57 @@ async function provision_swap() {
       swapDatahash = getSwapAsset.data.result.compression.data_hash;
       swapCreatorhash = getSwapAsset.data.result.compression.creator_hash;
       swapLeafId = getSwapAsset.data.result.compression.leaf_id;
-      console.log("swap data_hash ", swapDatahash);
-      console.log("swap creator_hash ", swapCreatorhash);
-      console.log("swap leaf_id ", swapLeafId);
+      //console.log("swap data_hash ", swapDatahash);
+      //console.log("swap creator_hash ", swapCreatorhash);
+      //console.log("swap leaf_id ", swapLeafId);
 
       let getSwapAssetProof = await axiosInstance.post(heliusUrl, {
       jsonrpc: "2.0",method: "getAssetProof",id: "rpd-op-123",params: {id: swapAssetId},});
 
       swapTreeId = getSwapAssetProof.data.result.tree_id;
       swapRoot = getSwapAssetProof.data.result.root;
-      console.log("swap proof total ", getSwapAssetProof.data.result.proof);
-      console.log("swap tree_id ", swapTreeId);
-      console.log("swap root ", swapRoot);
+      //console.log("swap proof total ", getSwapAssetProof.data.result.proof);
+      //console.log("swap tree_id ", swapTreeId);
+      //console.log("swap root ", swapRoot);
 
       let swapTreeAccount = await splAccountComp.ConcurrentMerkleTreeAccount.fromAccountAddress(connection,
       new solanaWeb3.PublicKey(getSwapAssetProof.data.result.tree_id),);
 
-      console.log("swapTreeAccount ", swapTreeAccount);  
+      //console.log("swapTreeAccount ", swapTreeAccount);  
       swapTreeAuthorityPDA = swapTreeAccount.getAuthority();
       let swapCanopyDepth = swapTreeAccount.getCanopyDepth();
-      console.log("swap treeAuthorityPDA ", swapTreeAuthorityPDA.toString());
-      console.log("swap canopyDepth ", swapCanopyDepth);
+      //console.log("swap treeAuthorityPDA ", swapTreeAuthorityPDA.toString());
+      //console.log("swap canopyDepth ", swapCanopyDepth);
 
       swapProof = getSwapAssetProof.data.result.proof
       .slice(0, getSwapAssetProof.data.result.proof.length - (!!swapCanopyDepth ? swapCanopyDepth : 0))
       .map((node) => ({pubkey: new solanaWeb3.PublicKey(node),isWritable: false,isSigner: false,}));        
-      console.log("swapProof ", swapProof);
+      //console.log("swapProof ", swapProof);
 
     }
 
     let swapVaultPDA = solanaWeb3.PublicKey.findProgramAddressSync([Buffer.from("cNFT-vault")],cNFTSwapProgramId);
-    console.log("Swap Vault PDA: ", swapVaultPDA[0].toString());
+    //console.log("Swap Vault PDA: ", swapVaultPDA[0].toString());
 
     if (getAsset.data.result.ownership.owner == swapVaultPDA || swapLeafOwner == swapVaultPDA) { // HERE
-      console.log("One or both cNFTs are already in the Swap Vault");
+      //console.log("One or both cNFTs are already in the Swap Vault");
       return;
     }    
 
     let cNFTProgramStatePDA = solanaWeb3.PublicKey.findProgramAddressSync([Buffer.from("cNFT-program-state")],cNFTSwapProgramId);
-    console.log("cNFT Program State PDA: ", cNFTProgramStatePDA[0].toString());     
+    //console.log("cNFT Program State PDA: ", cNFTProgramStatePDA[0].toString());     
 
     let totalFee = parseInt(feeLamports) + parseInt(swapLamports);
-    console.log("totalFee ", totalFee);
+    //console.log("totalFee ", totalFee);
     tempFeeAccount = new solanaWeb3.Keypair();
-    console.log("Temp Fee Account: ", tempFeeAccount.publicKey.toString());
+    //console.log("Temp Fee Account: ", tempFeeAccount.publicKey.toString());
     createTempFeeAccountIx = solanaWeb3.SystemProgram.createAccount({programId: cNFTSwapProgramId,
     space: 0,lamports: totalFee,fromPubkey: provider.publicKey,newAccountPubkey: tempFeeAccount.publicKey,});    
-    console.log("Create Temp Fee Account Ix: ", createTempFeeAccountIx);
+    //console.log("Create Temp Fee Account Ix: ", createTempFeeAccountIx);
     
     let providerTokenATA = await splToken.getAssociatedTokenAddress(swapTokenMint,
     provider.publicKey,false,splToken.TOKEN_PROGRAM_ID,splToken.ASSOCIATED_TOKEN_PROGRAM_ID,);
-    console.log("Provider Token ATA: ", providerTokenATA.toString());    
+    //console.log("Provider Token ATA: ", providerTokenATA.toString());    
     
     tempTokenAccount = new solanaWeb3.Keypair();
     createTempTokenAccountIx = null;
@@ -3469,28 +3593,28 @@ async function provision_swap() {
     transferTokenIx = null;    
     if (swapTokens > 0) {
       
-      console.log("Temp Token Account: ", tempTokenAccount.publicKey.toString());
+      //console.log("Temp Token Account: ", tempTokenAccount.publicKey.toString());
       let rent = await connection.getMinimumBalanceForRentExemption(splToken.AccountLayout.span);
       createTempTokenAccountIx = solanaWeb3.SystemProgram.createAccount({programId: splToken.TOKEN_PROGRAM_ID,space: 
       splToken.AccountLayout.span,lamports: rent,fromPubkey: provider.publicKey,newAccountPubkey: tempTokenAccount.publicKey,});    
-      console.log("Create Temp Token Account Ix: ", createTempFeeAccountIx);    
+      //console.log("Create Temp Token Account Ix: ", createTempFeeAccountIx);    
       
       initTempTokenAccountIx = splToken.createInitializeAccountInstruction(tempTokenAccount.publicKey,
       swapTokenMint,tempTokenAccount.publicKey,splToken.TOKEN_PROGRAM_ID);
-      console.log("Init Temp Token Account Ix: ", initTempTokenAccountIx)
+      //console.log("Init Temp Token Account Ix: ", initTempTokenAccountIx)
       
       transferTokenIx = splToken.createTransferInstruction(providerTokenATA,tempTokenAccount.publicKey,
       provider.publicKey,parseInt(swapTokens),provider.publicKey,splToken.TOKEN_PROGRAM_ID,);
-      console.log("Transfer Token Ix: ", transferTokenIx);
+      //console.log("Transfer Token Ix: ", transferTokenIx);
       
     }
     
     let initializerTokenATA = await splToken.getAssociatedTokenAddress(swapTokenMint,swapInitializer,
     false,splToken.TOKEN_PROGRAM_ID,splToken.ASSOCIATED_TOKEN_PROGRAM_ID,);
-    console.log("Initializer Token ATA: ", initializerTokenATA.toString());
+    //console.log("Initializer Token ATA: ", initializerTokenATA.toString());
  
     let totalSize = 1 + 32 + 32 + 1 + 1;
-    console.log("totalSize", totalSize);
+    //console.log("totalSize", totalSize);
 
     let uarray = new Uint8Array(totalSize);
     let counter = 0;    
@@ -3510,29 +3634,7 @@ async function provision_swap() {
     if (isSwap == true) {uarray[counter++] = swapProof.length;} 
     else {uarray[counter++] = 0;}
     
-    console.log("Contract Data: ", uarray);    
-    
-//     let keys = [
-//       { pubkey: provider.publicKey, isSigner: true, isWritable: true }, // 0
-//       { pubkey:new solanaWeb3.PublicKey(swapInitializer), isSigner: false, isWritable: true }, // 1
-//       { pubkey: swapVaultPDA[0], isSigner: false, isWritable: true }, // 2
-//       { pubkey: swapStatePDA[0], isSigner: false, isWritable: true }, // 3
-//       { pubkey: treeAuthorityPDA, isSigner: false, isWritable: false }, // 4
-//       { pubkey: new solanaWeb3.PublicKey(getAssetProof.data.result.tree_id), isSigner: false, isWritable: true }, // 5
-//       { pubkey: swapTreeAuthorityPDA, isSigner: false, isWritable: false }, // 6
-//       { pubkey: new solanaWeb3.PublicKey(getSwapAssetProof.data.result.tree_id), isSigner: false, isWritable: true }, // 7
-//       { pubkey: mplBubble.PROGRAM_ID, isSigner: false, isWritable: false }, // 8
-//       { pubkey: splAccountComp.PROGRAM_ID, isSigner: false, isWritable: false }, // 9
-//       { pubkey: splAccountComp.SPL_NOOP_PROGRAM_ID, isSigner: false, isWritable: false }, // 10
-//       { pubkey: solanaWeb3.SystemProgram.programId, isSigner: false, isWritable: false }, // 11
-//       { pubkey: splToken.TOKEN_PROGRAM_ID, isSigner: false, isWritable: false }, // 12
-//       { pubkey: cNFTProgramStatePDA[0], isSigner: false, isWritable: false }, // 13
-//       { pubkey: tempFeeAccount.publicKey, isSigner: true, isWritable: true }, // 14
-//       { pubkey: tempTokenAccount.publicKey, isSigner: true, isWritable: true }, // 15
-//       { pubkey: initializerTokenATA, isSigner: false, isWritable: true }, // 16
-//       { pubkey: devTreasury, isSigner: false, isWritable: true }, // 19
-//       { pubkey: mcDegensTreasury, isSigner: false, isWritable: true }, // 20
-//     ];
+    //console.log("Contract Data: ", uarray);    
     
     let keys = [
         { pubkey: provider.publicKey, isSigner: true, isWritable: true }, // 0
@@ -3560,27 +3662,27 @@ async function provision_swap() {
     if (isSwap == true) {
       for (let i = 0; i < swapProof.length; i++) {keys.push(swapProof[i]);}
     }
-    console.log("keys ", keys);    
+    //console.log("keys ", keys);    
     
     swapcNFTsIx = new solanaWeb3.TransactionInstruction({programId: cNFTSwapProgramId,data: Buffer.from(uarray),keys: keys,});
-    console.log("Swap NFTs Ix: ", swapcNFTsIx);
+    //console.log("Swap NFTs Ix: ", swapcNFTsIx);
     
     let slot = await connection.getSlot();
     let [createALTIx, lookupTableAddress] =
     solanaWeb3.AddressLookupTableProgram.createLookupTable({
     authority: provider.publicKey,payer: provider.publicKey,recentSlot: slot,});
-    console.log("Lookup Table Address", lookupTableAddress.toBase58(), lookupTableAddress);
+    //console.log("Lookup Table Address", lookupTableAddress.toBase58(), lookupTableAddress);
     lookupTableAddressSaved = lookupTableAddress;
     
     let proofPubkeys = [];
     for (let i = 0; i < proof.length; i++) {proofPubkeys.push(proof[i].pubkey);}
-    console.log("proofPubkeys ", proofPubkeys);
+    //console.log("proofPubkeys ", proofPubkeys);
     
     let swapProofPubkeys = [];
     if (isSwap == true) {
       for (let i = 0; i < swapProof.length; i++) {swapProofPubkeys.push(swapProof[i].pubkey);}
     }
-    console.log("swapProofPubkeys ", swapProofPubkeys);    
+    //console.log("swapProofPubkeys ", swapProofPubkeys);    
     
     extendALTIx = null;
     if (isSwap == true) {
@@ -3624,14 +3726,14 @@ async function provision_swap() {
           ...proofPubkeys,
         ],});
       }
-    console.log("extendALTIx ", extendALTIx);
+    //console.log("extendALTIx ", extendALTIx);
     
     let msLookupTable = new solanaWeb3.PublicKey(conf.system_alt);
     let msLookupTableAccount = await connection
     .getAddressLookupTable(msLookupTable)
     .then((res) => res.value);
     if (!msLookupTable) {
-      console.log("Could not fetch McSwap ALT!");
+      //console.log("Could not fetch McSwap ALT!");
       return;
     }    
     
@@ -3647,8 +3749,8 @@ async function provision_swap() {
         let signedTx = await provider.signTransaction(createALTTx);
         let signature = await connection.sendTransaction(signedTx);
 
-        console.log("Signature: ", signature);
-        console.log(`https://solscan.io/tx/${signature}`); 
+        //console.log("Signature: ", signature);
+        //console.log(`https://solscan.io/tx/${signature}`); 
         $(".fee_fulfil_sig span.swap_val").html(signature);
 
         $("#cover_message").html("Finalizing Transaction...");
@@ -3723,7 +3825,7 @@ async function execute_swap() {
     // check balances before going any further!
     
     if(balance_error===false){}else{
-      console.log(balance_error);
+      //console.log(balance_error);
       $("#cover_message").html("Error<br /><br />"+balance_error);
       $("#swap_execute").prop("disabled", false);
       $("#swap_executing").removeClass("provisioning").html("3. Execute Proposal.");
@@ -3743,8 +3845,8 @@ async function execute_swap() {
       let mint = $("#fulfil_a_id").val();
       let swapMint = "11111111111111111111111111111111";
       if($("#fulfil_b_id").val()!=""){swapMint = $("#fulfil_b_id").val();}
-      console.log("mint ", mint);
-      console.log("swapMint ", swapMint);
+      //console.log("mint ", mint);
+      //console.log("swapMint ", swapMint);
       
       let NFTSwapProgramId = new solanaWeb3.PublicKey(conf.MCSWAP_NFT_PROGRAM);
       let feeLamports = conf.fee;
@@ -3752,14 +3854,14 @@ async function execute_swap() {
       let mcDegensTreasury = new solanaWeb3.PublicKey(conf.treasury);
       
       let programStatePDA = solanaWeb3.PublicKey.findProgramAddressSync([Buffer.from("program-state")],NFTSwapProgramId);
-      console.log("Program State PDA: ", programStatePDA[0].toString());
+      //console.log("Program State PDA: ", programStatePDA[0].toString());
       
       let swapVaultPDA = solanaWeb3.PublicKey.findProgramAddressSync( [Buffer.from("swap-vault")],NFTSwapProgramId);
-      console.log("Swap Vault PDA: ", swapVaultPDA[0].toString());
+      //console.log("Swap Vault PDA: ", swapVaultPDA[0].toString());
 
       let swapStatePDA = solanaWeb3.PublicKey.findProgramAddressSync([Buffer.from("swap-state"), 
       new solanaWeb3.PublicKey(mint).toBytes(),new solanaWeb3.PublicKey(swapMint).toBytes()],NFTSwapProgramId);
-      console.log("Swap State PDA: ", swapStatePDA[0].toString());      
+      //console.log("Swap State PDA: ", swapStatePDA[0].toString());      
       
       let swapState = null;
       await connection.getAccountInfo(swapStatePDA[0])
@@ -3769,7 +3871,7 @@ async function execute_swap() {
       .catch(function(error) {
         error = JSON.stringify(error);
         error = JSON.parse(error);
-        console.log("Error: ", error);
+        //console.log("Error: ", error);
       });
       
       let isSwap = true;
@@ -3781,19 +3883,19 @@ async function execute_swap() {
       swapTokens = null;
       
       if (swapState != null) {
-        console.log("swapState = not null");
+        //console.log("swapState = not null");
         let encodedSwapStateData = swapState.data;
         let decodedSwapStateData = SWAP_NFT_STATE.decode(encodedSwapStateData);
-        console.log("swapState - is_initialized: ", decodedSwapStateData.is_initialized);
-        console.log("swapState - is_swap: ", new BN(decodedSwapStateData.is_swap, 10, "le").toString());
-        console.log("swapState - initializer: ", new solanaWeb3.PublicKey(decodedSwapStateData.initializer).toString());
-        console.log("swapState - initializer_mint: ", new solanaWeb3.PublicKey(decodedSwapStateData.initializer_mint).toString());
-        console.log("swapState - temp_mint_account: ", new solanaWeb3.PublicKey(decodedSwapStateData.temp_mint_account).toString());
-        console.log("swapState - taker: ", new solanaWeb3.PublicKey(decodedSwapStateData.taker).toString());
-        console.log("swapState - swap_mint: ", new solanaWeb3.PublicKey(decodedSwapStateData.swap_mint).toString());
-        console.log("swapState - swap_lamports", new BN(decodedSwapStateData.swap_lamports, 10, "le").toString());
-        console.log("swapState - swap_token_mint", new solanaWeb3.PublicKey(decodedSwapStateData.swap_token_mint).toString());
-        console.log("swapState - swap_tokens", new BN(decodedSwapStateData.swap_tokens, 10, "le").toString());
+        //console.log("swapState - is_initialized: ", decodedSwapStateData.is_initialized);
+        //console.log("swapState - is_swap: ", new BN(decodedSwapStateData.is_swap, 10, "le").toString());
+        //console.log("swapState - initializer: ", new solanaWeb3.PublicKey(decodedSwapStateData.initializer).toString());
+        //console.log("swapState - initializer_mint: ", new solanaWeb3.PublicKey(decodedSwapStateData.initializer_mint).toString());
+        //console.log("swapState - temp_mint_account: ", new solanaWeb3.PublicKey(decodedSwapStateData.temp_mint_account).toString());
+        //console.log("swapState - taker: ", new solanaWeb3.PublicKey(decodedSwapStateData.taker).toString());
+        //console.log("swapState - swap_mint: ", new solanaWeb3.PublicKey(decodedSwapStateData.swap_mint).toString());
+        //console.log("swapState - swap_lamports", new BN(decodedSwapStateData.swap_lamports, 10, "le").toString());
+        //console.log("swapState - swap_token_mint", new solanaWeb3.PublicKey(decodedSwapStateData.swap_token_mint).toString());
+        //console.log("swapState - swap_tokens", new BN(decodedSwapStateData.swap_tokens, 10, "le").toString());
         if (new BN(decodedSwapStateData.is_swap, 10, "le") == 0) {isSwap = false}
         initializer = new solanaWeb3.PublicKey(decodedSwapStateData.initializer);
         initializer_mint = new solanaWeb3.PublicKey(decodedSwapStateData.initializer_mint);
@@ -3803,9 +3905,9 @@ async function execute_swap() {
         swapTokens = new BN(decodedSwapStateData.swap_tokens, 10, "le");
       } 
       else {
-        console.log("swapState = null");
+        //console.log("swapState = null");
         $("#cover_message").html("Error - Swap Not Initialized!");
-        console.log("Swap Not Initialized");
+        //console.log("Swap Not Initialized");
         return;
       }
       
@@ -3813,25 +3915,25 @@ async function execute_swap() {
       let createInitializerMintATAIx = null;
       let initializerMintATA = await splToken.getAssociatedTokenAddress(initializer_mint,provider.publicKey,
       false,splToken.TOKEN_PROGRAM_ID,splToken.ASSOCIATED_TOKEN_PROGRAM_ID,);
-      console.log("Initializer Mint ATA: ", initializerMintATA.toString());
+      //console.log("Initializer Mint ATA: ", initializerMintATA.toString());
       
       let response = null;
       response = await connection.getAccountInfo(initializerMintATA);
       if (response == null) {
-        console.log("response = null");
+        //console.log("response = null");
         createInitializerMintATA = true;
         createInitializerMintATAIx = splToken.createAssociatedTokenAccountInstruction(provider.publicKey,initializerMintATA,
         provider.publicKey,initializer_mint,splToken.TOKEN_PROGRAM_ID,splToken.ASSOCIATED_TOKEN_PROGRAM_ID,)
-        console.log("Create Initializer Mint ATA Ix: ", createInitializerMintATAIx);
+        //console.log("Create Initializer Mint ATA Ix: ", createInitializerMintATAIx);
       } 
       else {
-        console.log("response = not null");
+        //console.log("response = not null");
         createInitializerMintATA = false;
       }
-      console.log("createInitializerMintATA ", createInitializerMintATA);
+      //console.log("createInitializerMintATA ", createInitializerMintATA);
       
       const tempSwapMintAccount = new solanaWeb3.Keypair();
-      console.log("Temp Swap Mint Account: ", tempSwapMintAccount.publicKey.toString());
+      //console.log("Temp Swap Mint Account: ", tempSwapMintAccount.publicKey.toString());
       
       let createTempSwapMintAccount = false;
       let createTempSwapMintAccountIx = null;
@@ -3844,7 +3946,7 @@ async function execute_swap() {
         let rent = await connection.getMinimumBalanceForRentExemption(splToken.AccountLayout.span);
         createTempSwapMintAccountIx = solanaWeb3.SystemProgram.createAccount({programId: splToken.TOKEN_PROGRAM_ID,
         space: splToken.AccountLayout.span,lamports: rent,fromPubkey: provider.publicKey,newAccountPubkey: tempSwapMintAccount.publicKey,});    
-        console.log("Create Temp Swap Mint Account Ix: ", createTempSwapMintAccountIx);    
+        //console.log("Create Temp Swap Mint Account Ix: ", createTempSwapMintAccountIx);    
         
         initTempSwapMintAccountIx = splToken.createInitializeAccountInstruction(
             tempSwapMintAccount.publicKey,
@@ -3852,7 +3954,7 @@ async function execute_swap() {
             tempSwapMintAccount.publicKey,
             splToken.TOKEN_PROGRAM_ID
         );
-        console.log("Init Temp Swap Mint Account Ix: ", initTempSwapMintAccountIx)
+        //console.log("Init Temp Swap Mint Account Ix: ", initTempSwapMintAccountIx)
 
         let providerSwapMintATA = await splToken.getAssociatedTokenAddress(
             new solanaWeb3.PublicKey(swapMint),
@@ -3869,7 +3971,7 @@ async function execute_swap() {
             provider.publicKey,
             splToken.TOKEN_PROGRAM_ID,
         )
-        console.log("Transfer Swap Mint Ix: ", transferSwapMintIx);
+        //console.log("Transfer Swap Mint Ix: ", transferSwapMintIx);
         
         swapMintATA = await splToken.getAssociatedTokenAddress(
             new solanaWeb3.PublicKey(swapMint),
@@ -3878,24 +3980,24 @@ async function execute_swap() {
             splToken.TOKEN_PROGRAM_ID,
             splToken.ASSOCIATED_TOKEN_PROGRAM_ID,
         );
-        console.log("Swap Mint ATA: ", swapMintATA.toString()); 
+        //console.log("Swap Mint ATA: ", swapMintATA.toString()); 
         
       }   
       
       let totalFee = parseInt(feeLamports) + parseInt(swapLamports);
-      console.log("totalFee ", totalFee);
+      //console.log("totalFee ", totalFee);
       tempFeeAccount = new solanaWeb3.Keypair();
-      console.log("Temp Fee Account: ", tempFeeAccount.publicKey.toString());
+      //console.log("Temp Fee Account: ", tempFeeAccount.publicKey.toString());
       createTempFeeAccountIx = solanaWeb3.SystemProgram.createAccount({programId: NFTSwapProgramId,
       space: 0,lamports: totalFee,fromPubkey: provider.publicKey,newAccountPubkey: tempFeeAccount.publicKey,});    
-      console.log("Create Temp Fee Account Tx: ", createTempFeeAccountIx);      
+      //console.log("Create Temp Fee Account Tx: ", createTempFeeAccountIx);      
       
       let providerTokenATA = await splToken.getAssociatedTokenAddress(swapTokenMint,
       provider.publicKey,false,splToken.TOKEN_PROGRAM_ID,splToken.ASSOCIATED_TOKEN_PROGRAM_ID,);
-      console.log("Provider Token ATA: ", providerTokenATA.toString());
+      //console.log("Provider Token ATA: ", providerTokenATA.toString());
       
       const tempTokenAccount = new solanaWeb3.Keypair();
-      console.log("Temp Token Account: ", tempTokenAccount.publicKey.toString());
+      //console.log("Temp Token Account: ", tempTokenAccount.publicKey.toString());
       createTempTokenAccount = false;
       createTempTokenAccountIx = null;
       initTempTokenAccountIx = null;
@@ -3910,29 +4012,29 @@ async function execute_swap() {
             fromPubkey: provider.publicKey,
             newAccountPubkey: tempTokenAccount.publicKey,
         });    
-        console.log("Create Temp Token Account Ix: ", createTempTokenAccountIx);    
+        //console.log("Create Temp Token Account Ix: ", createTempTokenAccountIx);    
         initTempTokenAccountIx = splToken.createInitializeAccountInstruction(tempTokenAccount.publicKey,
         swapTokenMint,tempTokenAccount.publicKey,splToken.TOKEN_PROGRAM_ID);
-        console.log("Init Temp Token Account Ix: ", initTempTokenAccountIx);
+        //console.log("Init Temp Token Account Ix: ", initTempTokenAccountIx);
         transferTokenIx = splToken.createTransferInstruction(providerTokenATA,
         tempTokenAccount.publicKey,
         provider.publicKey,
         parseInt(swapTokens),
         provider.publicKey,
         splToken.TOKEN_PROGRAM_ID,);
-        console.log("Transfer Token Ix: ", transferTokenIx);
+        //console.log("Transfer Token Ix: ", transferTokenIx);
       }      
       
       let initializerTokenATA = await splToken.getAssociatedTokenAddress(swapTokenMint,
       initializer,false,splToken.TOKEN_PROGRAM_ID,splToken.ASSOCIATED_TOKEN_PROGRAM_ID,);      
-      console.log("Initializer Token ATA: ", initializerTokenATA.toString());
+      //console.log("Initializer Token ATA: ", initializerTokenATA.toString());
       
       let totalSize = 1;
-      console.log("totalSize", totalSize);
+      //console.log("totalSize", totalSize);
       let uarray = new Uint8Array(totalSize);    
       let counter = 0;    
       uarray[counter++] = 1; // 1 = nft_swap SwapNFTs instruction
-      console.log("Data: ", uarray);
+      //console.log("Data: ", uarray);
       
       let swapNFTsIx = new solanaWeb3.TransactionInstruction({
           programId: NFTSwapProgramId,
@@ -3955,19 +4057,19 @@ async function execute_swap() {
               { pubkey: mcDegensTreasury, isSigner: false, isWritable: true }, // 14
           ]
       });
-      console.log("Swap NFTs Ix: ", swapNFTsIx);      
+      //console.log("Swap NFTs Ix: ", swapNFTsIx);      
       
       let lookupTable = new solanaWeb3.PublicKey("BT4AUPXSxvbDrzSt3LLkE3Jd5s8R3fBSxJuyicyEMYH3"); // mainnet    
       let lookupTableAccount = await connection.getAddressLookupTable(lookupTable).then((res) => res.value);
       if (!lookupTableAccount) {
-        console.log("Could not fetch ALT!");
+        //console.log("Could not fetch ALT!");
         return;
       }
       
       let messageV0 = null;
       if (isSwap == true) {
           if (createInitializerMintATA == true && createTempTokenAccount == true) {        
-              console.log("1");
+              //console.log("1");
               messageV0 = new solanaWeb3.TransactionMessage({
                   payerKey: provider.publicKey,
                   recentBlockhash: (await connection.getRecentBlockhash('confirmed')).blockhash,
@@ -3984,7 +4086,7 @@ async function execute_swap() {
                   ],
               }).compileToV0Message([lookupTableAccount]);
           } else if (createInitializerMintATA == true) {
-              console.log("2");
+              //console.log("2");
               messageV0 = new solanaWeb3.TransactionMessage({
                   payerKey: provider.publicKey,
                   recentBlockhash: (await connection.getRecentBlockhash('confirmed')).blockhash,
@@ -3998,7 +4100,7 @@ async function execute_swap() {
                   ],
               }).compileToV0Message([lookupTableAccount]);
           } else if (createTempTokenAccount == true) {
-              console.log("3");
+              //console.log("3");
               messageV0 = new solanaWeb3.TransactionMessage({
                   payerKey: provider.publicKey,
                   recentBlockhash: (await connection.getRecentBlockhash('confirmed')).blockhash,
@@ -4014,7 +4116,7 @@ async function execute_swap() {
                   ],
               }).compileToV0Message([lookupTableAccount]);
           } else {
-              console.log("4");
+              //console.log("4");
               messageV0 = new solanaWeb3.TransactionMessage({
                   payerKey: provider.publicKey,
                   recentBlockhash: (await connection.getRecentBlockhash('confirmed')).blockhash,
@@ -4030,7 +4132,7 @@ async function execute_swap() {
       } 
       else {
           if (createInitializerMintATA == true && createTempTokenAccount == true) {
-              console.log("5");    
+              //console.log("5");    
               messageV0 = new solanaWeb3.TransactionMessage({
                   payerKey: provider.publicKey,
                   recentBlockhash: (await connection.getRecentBlockhash('confirmed')).blockhash,
@@ -4044,7 +4146,7 @@ async function execute_swap() {
                   ],
               }).compileToV0Message([lookupTableAccount]);
           } else if (createInitializerMintATA == true) {
-              console.log("6");
+              //console.log("6");
               messageV0 = new solanaWeb3.TransactionMessage({
                   payerKey: provider.publicKey,
                   recentBlockhash: (await connection.getRecentBlockhash('confirmed')).blockhash,
@@ -4055,7 +4157,7 @@ async function execute_swap() {
                   ],
               }).compileToV0Message([lookupTableAccount]);
           } else if (createTempTokenAccount == true) {
-              console.log("7");
+              //console.log("7");
               messageV0 = new solanaWeb3.TransactionMessage({
                   payerKey: provider.publicKey,
                   recentBlockhash: (await connection.getRecentBlockhash('confirmed')).blockhash,
@@ -4068,7 +4170,7 @@ async function execute_swap() {
                   ],
               }).compileToV0Message([lookupTableAccount]);
           } else {
-              console.log("8");
+              //console.log("8");
               messageV0 = new solanaWeb3.TransactionMessage({
                   payerKey: provider.publicKey,
                   recentBlockhash: (await connection.getRecentBlockhash('confirmed')).blockhash,
@@ -4079,15 +4181,15 @@ async function execute_swap() {
               }).compileToV0Message([lookupTableAccount]);
           }
       }
-      console.log("messageV0 ", messageV0);      
+      //console.log("messageV0 ", messageV0);      
       
       let swapNFTSTx = new solanaWeb3.VersionedTransaction(messageV0);
       try {
         let signedTx = await provider.signTransaction(swapNFTSTx);
         signedTx.sign([tempSwapMintAccount, tempFeeAccount, tempTokenAccount]);
         let signature = await connection.sendTransaction(signedTx);
-        console.log("Signature: ", signature);
-        console.log(`https://solscan.io/tx/${signature}`);
+        //console.log("Signature: ", signature);
+        //console.log(`https://solscan.io/tx/${signature}`);
         $(".share_fulfil_sig .swap_val").html(signature);
         $("#cover_message").html("Finalizing Transaction...");
         
@@ -4116,10 +4218,10 @@ async function execute_swap() {
         }, 3000);
               
       } catch(error) {
-        console.log("Error: ", error);
+        //console.log("Error: ", error);
         error = JSON.stringify(error);
         error = JSON.parse(error);
-        console.log("Error Logs: ", error);
+        //console.log("Error Logs: ", error);
         $("#cover_message").html("");
         $("#cover").fadeOut(400);
         $("#swap_execute").prop("disabled", false);
@@ -4133,7 +4235,7 @@ async function execute_swap() {
     if($("#c_type").val()=="cNFT"){
       let lookupTableAccount = await connection.getAddressLookupTable(lookupTableAddressSaved).then((res) => res.value);
       if (!lookupTableAccount) {
-        console.log("Could not fetch ALT!");
+        //console.log("Could not fetch ALT!");
       }
       
       // console.log("lookupTableAddress", lookupTableAddress.toString());
@@ -4156,13 +4258,13 @@ async function execute_swap() {
       } 
       else {
           let blockhash = (await connection.getRecentBlockhash('confirmed')).blockhash;
-          console.log("createTempFeeAccountIx", createTempFeeAccountIx);
-          console.log("swapcNFTsIx", swapcNFTsIx);
-          console.log("lookupTableAddressSaved", lookupTableAddressSaved);
-          console.log("lookupTableAccount", lookupTableAccount);
-          console.log("provider.publicKey", provider.publicKey);
-          console.log("publicKey tostring", provider.publicKey.toString());
-          console.log("blockhash", blockhash);
+          //console.log("createTempFeeAccountIx", createTempFeeAccountIx);
+          //console.log("swapcNFTsIx", swapcNFTsIx);
+          //console.log("lookupTableAddressSaved", lookupTableAddressSaved);
+          //console.log("lookupTableAccount", lookupTableAccount);
+          //console.log("provider.publicKey", provider.publicKey);
+          //console.log("publicKey tostring", provider.publicKey.toString());
+          //console.log("blockhash", blockhash);
           // console.log("preview: no alt tokens");
           messageV0 = new solanaWeb3.TransactionMessage({
               payerKey: provider.publicKey,
@@ -4210,10 +4312,10 @@ async function execute_swap() {
 
       } 
       catch(error) {
-        console.log("Error: ", error);
+        //console.log("Error: ", error);
         error = JSON.stringify(error);
         error = JSON.parse(error);
-        console.log("Error: ", error);
+        //console.log("Error: ", error);
         $("#cover_message").html("");
         $("#cover").fadeOut(400);
         $("#swap_execute").prop("disabled", false);
@@ -4437,34 +4539,34 @@ async function swap_viewer() {
     }
     
     // check for compression
-    console.log("checking for compression");
+    //console.log("checking for compression");
     
     if(getswapAsset != null && type_b === true){
       let cNFTSwapProgramId = new solanaWeb3.PublicKey(conf.MCSWAP_CNFT_PROGRAM);
       swapStatePDA = solanaWeb3.PublicKey.findProgramAddressSync([Buffer.from("cNFT-swap"), 
       new solanaWeb3.PublicKey(assetId).toBytes(), new solanaWeb3.PublicKey(swapAssetId).toBytes()], cNFTSwapProgramId);
-      console.log("cNFT Swap State PDA: ", swapStatePDA[0].toString());
+      //console.log("cNFT Swap State PDA: ", swapStatePDA[0].toString());
       $("#c_type, #d_type").val("cNFT");
     }
     else if(getswapAsset != null && type_b === false){
       let NFTSwapProgramId = new solanaWeb3.PublicKey(conf.MCSWAP_NFT_PROGRAM);
       swapStatePDA = solanaWeb3.PublicKey.findProgramAddressSync([Buffer.from("swap-state"), 
       new solanaWeb3.PublicKey(assetId).toBytes(), new solanaWeb3.PublicKey(swapAssetId).toBytes()], NFTSwapProgramId);
-      console.log("NFT Swap State PDA: ", swapStatePDA[0].toString());
+      //console.log("NFT Swap State PDA: ", swapStatePDA[0].toString());
       $("#c_type, #d_type").val("NFT");      
     }
     else if(getswapAsset == null && type_a === true){
       let cNFTSwapProgramId = new solanaWeb3.PublicKey(conf.MCSWAP_CNFT_PROGRAM);
       swapStatePDA = solanaWeb3.PublicKey.findProgramAddressSync([Buffer.from("cNFT-swap"), 
       new solanaWeb3.PublicKey(assetId).toBytes(), new solanaWeb3.PublicKey("11111111111111111111111111111111").toBytes()], cNFTSwapProgramId);
-      console.log("cNFT Swap State PDA: ", swapStatePDA[0].toString());
+      //console.log("cNFT Swap State PDA: ", swapStatePDA[0].toString());
       $("#c_type").val("cNFT");
     }
     else if(getswapAsset == null && type_a === false){
       let NFTSwapProgramId = new solanaWeb3.PublicKey(conf.MCSWAP_NFT_PROGRAM);
       swapStatePDA = solanaWeb3.PublicKey.findProgramAddressSync([Buffer.from("swap-state"), 
       new solanaWeb3.PublicKey(assetId).toBytes(), new solanaWeb3.PublicKey("11111111111111111111111111111111").toBytes()], NFTSwapProgramId);
-      console.log("NFT Swap State PDA: ", swapStatePDA[0].toString());
+      //console.log("NFT Swap State PDA: ", swapStatePDA[0].toString());
       $("#c_type").val("NFT");
     }
     
@@ -4476,7 +4578,7 @@ async function swap_viewer() {
     .catch(function(error) {
       error = JSON.stringify(error);
       error = JSON.parse(error);
-      console.log("Error: ", error);
+      //console.log("Error: ", error);
     });
     
     swapInitializer = null;
@@ -4601,8 +4703,8 @@ async function swap_viewer() {
         return;
       }
       
-      console.log("initializer: ", initializer);
-      console.log("provider.publicKey: ", provider.publicKey.toString());
+      //console.log("initializer: ", initializer);
+      //console.log("provider.publicKey: ", provider.publicKey.toString());
       
       if (initializer == provider.publicKey.toString()) {
         $(".fulfil_g").show().addClass("active_swap");
@@ -4651,7 +4753,7 @@ async function swap_viewer() {
       
     } 
     else {
-      console.log("Invalid Proposal");
+      //console.log("Invalid Proposal");
       reset_viewer("Invalid Proposal");
     }
 
@@ -4923,12 +5025,12 @@ $(document).delegate("#swap_reverse", "click", async function() {
     let NFTSwapProgramId = new solanaWeb3.PublicKey(conf.MCSWAP_NFT_PROGRAM);
     
     let swapVaultPDA = solanaWeb3.PublicKey.findProgramAddressSync([Buffer.from("swap-vault")],NFTSwapProgramId);
-    console.log("Swap Vault PDA: ", swapVaultPDA[0].toString());
+    //console.log("Swap Vault PDA: ", swapVaultPDA[0].toString());
     
     let swapStatePDA = solanaWeb3.PublicKey.findProgramAddressSync(
     [Buffer.from("swap-state"), new solanaWeb3.PublicKey(assetId).toBytes(), 
     new solanaWeb3.PublicKey(swapAssetId).toBytes()],NFTSwapProgramId);
-    console.log("Swap State PDA: ", swapStatePDA[0].toString());
+    //console.log("Swap State PDA: ", swapStatePDA[0].toString());
     
     let swapState = null;
     await connection.getAccountInfo(swapStatePDA[0])
@@ -4936,7 +5038,7 @@ $(document).delegate("#swap_reverse", "click", async function() {
     .catch(function(error) {
       error = JSON.stringify(error);
       error = JSON.parse(error);
-      console.log("Error: ", error);
+      //console.log("Error: ", error);
       return;
     });
     
@@ -4944,18 +5046,18 @@ $(document).delegate("#swap_reverse", "click", async function() {
     if (swapState != null) {
         let encodedSwapStateData = swapState.data;
         let decodedSwapStateData = SWAP_NFT_STATE.decode(encodedSwapStateData);
-        console.log("swapState - is_initialized: ", decodedSwapStateData.is_initialized);
-        console.log("swapState - initializer: ", new solanaWeb3.PublicKey(decodedSwapStateData.initializer).toString());
-        console.log("swapState - initializer_mint: ", new solanaWeb3.PublicKey(decodedSwapStateData.initializer_mint).toString());
-        console.log("swapState - temp_mint_account: ", new solanaWeb3.PublicKey(decodedSwapStateData.temp_mint_account).toString());
-        console.log("swapState - swap_mint: ", new solanaWeb3.PublicKey(decodedSwapStateData.swap_mint).toString());
-        console.log("swapState - swap_lamports", new BN(decodedSwapStateData.swap_lamports, 10, "le").toString());
-        console.log("swapState - swap_token_mint", new solanaWeb3.PublicKey(decodedSwapStateData.swap_token_mint).toString());
-        console.log("swapState - swap_tokens", new BN(decodedSwapStateData.swap_tokens, 10, "le").toString());
+        //console.log("swapState - is_initialized: ", decodedSwapStateData.is_initialized);
+        //console.log("swapState - initializer: ", new solanaWeb3.PublicKey(decodedSwapStateData.initializer).toString());
+        //console.log("swapState - initializer_mint: ", new solanaWeb3.PublicKey(decodedSwapStateData.initializer_mint).toString());
+        //console.log("swapState - temp_mint_account: ", new solanaWeb3.PublicKey(decodedSwapStateData.temp_mint_account).toString());
+        //console.log("swapState - swap_mint: ", new solanaWeb3.PublicKey(decodedSwapStateData.swap_mint).toString());
+        //console.log("swapState - swap_lamports", new BN(decodedSwapStateData.swap_lamports, 10, "le").toString());
+        //console.log("swapState - swap_token_mint", new solanaWeb3.PublicKey(decodedSwapStateData.swap_token_mint).toString());
+        //console.log("swapState - swap_tokens", new BN(decodedSwapStateData.swap_tokens, 10, "le").toString());
         tempMintAccount = new solanaWeb3.PublicKey(decodedSwapStateData.temp_mint_account);
     } 
     else {
-        console.log("Swap Not Initialized");    
+        //console.log("Swap Not Initialized");    
         return;
     }
     
@@ -4964,12 +5066,12 @@ $(document).delegate("#swap_reverse", "click", async function() {
     splToken.TOKEN_PROGRAM_ID,splToken.ASSOCIATED_TOKEN_PROGRAM_ID,);
     
     let totalSize = 1;
-    console.log("totalSize", totalSize);
+    //console.log("totalSize", totalSize);
     
     let uarray = new Uint8Array(totalSize);    
     let counter = 0;    
     uarray[counter++] = 2; // 2 = nft_swap ReverseSwap instruction
-    console.log("Data: ", uarray);
+    //console.log("Data: ", uarray);
 
     let reverseSwapIx = new solanaWeb3.TransactionInstruction({
     programId: NFTSwapProgramId,data: Buffer.from(uarray),keys: [
@@ -4980,21 +5082,21 @@ $(document).delegate("#swap_reverse", "click", async function() {
           { pubkey: initializerMintATA, isSigner: false, isWritable: true }, // 4
           { pubkey: splToken.TOKEN_PROGRAM_ID, isSigner: false, isWritable: false }, // 5
       ]});
-    console.log("Reverse Swap Ix: ", reverseSwapIx);
+    //console.log("Reverse Swap Ix: ", reverseSwapIx);
     
     let messageV0 = new solanaWeb3.TransactionMessage({payerKey: provider.publicKey,
     recentBlockhash: (await connection.getRecentBlockhash('confirmed')).blockhash,
     instructions: [reverseSwapIx],}).compileToV0Message([]);
     
     let reverseSwapTx = new solanaWeb3.VersionedTransaction(messageV0);    
-    console.log("reverseSwapTx: ", reverseSwapTx);
+    //console.log("reverseSwapTx: ", reverseSwapTx);
     
     try {
       $("#cover_message").html("Requesting Approval...");
       let signedTx = await provider.signTransaction(reverseSwapTx);
       let signature = await connection.sendTransaction(signedTx);
-      console.log("Signature: ", signature)
-      console.log(`https://solscan.io/tx/${signature}`);
+      //console.log("Signature: ", signature)
+      //console.log(`https://solscan.io/tx/${signature}`);
       let reverseID = setInterval(async function() {
         $("#cover_message").html("Finalizing...");
         let tx_status = await connection.getSignatureStatuses([signature], {
@@ -5019,10 +5121,10 @@ $(document).delegate("#swap_reverse", "click", async function() {
       }, 3000);      
     } 
     catch(error) {
-      console.log("Error: ", error);
+      //console.log("Error: ", error);
       error = JSON.stringify(error);
       error = JSON.parse(error);
-      console.log("Error Logs: ", error);
+      //console.log("Error Logs: ", error);
       swap_viewer();
       $("#cover").fadeOut(400);
       $("#cover_message").html("");
@@ -5041,7 +5143,7 @@ $(window).on('load', function() {
   $("#social_twitter").parent().html(social_3);
   $("#social_discord, #social_github, #social_twitter").hide().fadeIn(400);
   $("#scroll_wrapper").niceScroll({
-      cursorcolor: "#111",
+      cursorcolor: conf.scrollbar,
       cursoropacitymin: 1,
       cursoropacitymax: 1,
       cursorwidth: "7px",
@@ -5059,6 +5161,25 @@ $(window).on('load', function() {
       },
       railalign: "right"
     });
+  $("#wallet_list").niceScroll({
+      cursorcolor: conf.scrollbar,
+      cursoropacitymin: 1,
+      cursoropacitymax: 1,
+      cursorwidth: "7px",
+      cursorborder: 0,
+      cursorborderradius: "7px",
+      zindex: 5,
+      autohidemode: false,
+      bouncescroll: false,
+      horizrailenabled: false,
+      railpadding: {
+        top: 1,
+        right: 3,
+        left: 0,
+        bottom: 1
+      },
+      railalign: "right"
+  });
   $("#swap_token_options").niceScroll({
       cursorcolor: "#fff",
       cursoropacitymin: 1,
@@ -5078,21 +5199,6 @@ $(window).on('load', function() {
       },
       railalign: "right"
     });
-  VANTA.FOG({
-    el: "body",
-    mouseControls: false,
-    touchControls: false,
-    gyroControls: false,
-    minHeight: 200.00,
-    minWidth: 200.00,
-    highlightColor: 0x202020,
-    midtoneColor: 0x3e3e3e,
-    lowlightColor: 0x2d2d2d,
-    baseColor: 0x0,
-    blurFactor: 0.47,
-    speed: 0.40,
-    zoom: 0.50
-  });
   const get_mcswap_balances = setInterval(function() {
     mcswap_balances();
   }, 20000);
