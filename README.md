@@ -174,6 +174,7 @@ const spl_tokens = [
 
 ### Share Proposal
 These links are automatically generated for you after deploying a new proposal. They are meant to be shared with the party you are trading with via your preferred messaging app.
+
 P2P Trades
 ```javascript
 https://your-domain.com/swap/ASSET_ID_1-ASSET_ID_2
