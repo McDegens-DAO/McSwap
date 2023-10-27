@@ -1,7 +1,7 @@
 # McSwap
-Trustless P2P Swap dApp.
+Trustless P2P NFT/cNFT Trade dApp.
 
-Version: 1.4 (beta)
+Version: 1.5 (beta)
 
 Developed by [SolDapper](https://twitter.com/SolDapper) for [McDegens DAO](https://discord.com/invite/hXXDvYTQhj)
 
