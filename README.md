@@ -131,6 +131,7 @@ const combos_ = [
 
 6. Define Collection Names: [config/collections.js](https://github.com/McDegens-DAO/McSwap/blob/main/config/collections.js)
 * There are some defaults, but you'll likely want to add more collection ids and details.
+* For cNFT collections only. We're looking into automating this via onchain lookup as we do with traditional NFTs.
 ```javascript
 async function group_details(id,name) {
   let rebld = {};
