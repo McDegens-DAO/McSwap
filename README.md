@@ -84,8 +84,8 @@ conf.vanta_shininess = 0.00;
 <meta name="robots" content="noindex,nofollow,noarchive">
 <title>McSwap</title>
 <meta id="og_title" property="og:title" content="McSwap">
-<meta id="meta_desc" name="description" content="McSwap is a trustless P2P cNFT OTC swap contract and interface.">
-<meta id="og_desc" property="og:description" content="McSwap is a trustless P2P cNFT OTC swap contract and interface.">
+<meta id="meta_desc" name="description" content="McSwap is a Trustless P2P OTC NFT/cNFT trade contract and interface." />
+<meta id="og_desc" property="og:description" content="McSwap is a Trustless P2P OTC NFT/cNFT trade contract and interface.">
 <meta id="og_url" property="og:url" content="https://mcswap.xyz">
 <!-- set and then remove the robots metatag -->
 ```
