@@ -528,7 +528,7 @@ ul.nav_seventh li:hover {
 #socials #social_github {
   width: 26px;
   height: 20px;
-  margin: 6px auto 1px 0;
+  margin: 6px auto 1px 1px;
 }
 
 #socials #social_twitter {
@@ -585,6 +585,7 @@ button#wallet_view img {
   font-family: 'Oxygen', sans-serif;
   background-repeat: no-repeat;
   background-position: center;
+  background-size: 250px 250px;
 }
 
 #wallet_title {
@@ -1175,19 +1176,19 @@ button.refresh_rotate {
 }
 
 #center_logo {
-  width: 300px;
-  height: 300px;
+  width: 250px;
+  height: 250px;
   margin: 0 auto;
   display: block;
   position: fixed;
-  top: calc(50% - 165px);
-  left: calc(50% - 150px);
+  top: calc(50% - 145px);
+  left: calc(50% - 145px);
   cursor: pointer;
 }
 
 #center_logo img {
-  width: 300px;
-  height: 300px;
+  width: 280px;
+  height: 280px;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
   -webkit-tap-highlight-color: transparent;
 }
@@ -1201,7 +1202,7 @@ button.refresh_rotate {
   /*   background: #f1ec95; */
   background: none;
   border-radius: 0 0 12px 12px;
-  background: linear-gradient(180deg, rgba(17, 17, 17, 0.1) 0%, rgba(17, 17, 17, 0.1) 100%);
+  background: linear-gradient(180deg, rgba(17, 17, 17, 0.5) 0%, rgba(17, 17, 17, 0.5) 100%);
 }
 
 .body_default {
@@ -1212,8 +1213,7 @@ button.refresh_rotate {
 }
 
 .body_mcprofile {
-  background: #111111;
-  background: linear-gradient(180deg, rgba(155, 25, 25, 1) 0%, #3c0000 100%);
+  background: none;
 }
 
 button.mcprofile_open,
@@ -1222,8 +1222,6 @@ button.mcprofile_close {
   top: -8px;
   right: 1px;
   display: block;
-  width: 44px;
-  height: 44px;
   background: none;
   border-radius: 0;
   cursor: pointer;
@@ -1232,17 +1230,21 @@ button.mcprofile_close {
   background-position: center;
   background-size: auto;
   background-repeat: no-repeat;
-  background-size: 35px 35px;
+  background-size: 31px 31px;
 }
 
 button.mcprofile_open {
+  width: 44px;
+  height: 44px;
   background-image: url("/img/menu.svg");
-  margin: 6px -1px 0 0;
+  margin: 6px 0 0 0;
   display: none;
 }
 
 button.mcprofile_close {
   background-image: url("/img/cross.svg");
+  width: 47px;
+  height: 52px;
 }
 
 #mcprofile_nav {
@@ -1279,9 +1281,9 @@ button.mcprofile_close {
   background: none;
   border-radius: 12px;
   padding: 14px 18px 14px 18px;
-  border: 1px solid rgb(120 0 0);
-  background: rgb(155, 25, 25);
-  background: linear-gradient(180deg, rgba(155, 25, 25, 1) 0%, #7f0000 100%);
+  border: 1px solid #6e0c0c8f;
+  background: #4914146e;
+  background: linear-gradient(180deg, #9b1919db 0%, #7f00009c 100%);
   cursor: pointer;
   text-shadow: 1px 1px 1px #000;
   font-family: 'Oxygen', sans-serif;
@@ -1290,7 +1292,7 @@ button.mcprofile_close {
 }
 
 #mcprofile_nav ul li button:hover {
-  background: #7f0000;
+  background: #7f0000a3;
 }
 
 #mcprofile_nav ul li button:disabled {
@@ -1302,7 +1304,7 @@ button.mcprofile_close {
 
 #mcprofile_nav ul li button.active_mcpanel {
   background: #1d1d1d;
-  border: 1px solid #232323;
+  border: 1px solid #181818;
 }
 
 img#donate_sol {
@@ -1345,7 +1347,7 @@ img#donate_sol {
   border-radius: 12px;
   margin: 0 0 15px 0;
   padding: 18px 18px 18px 18px;
-  border: 1px solid #232323;
+  border: 1px solid #181818;
   background: rgb(29, 29, 29);
   background: linear-gradient(40deg, rgba(29, 29, 29, 1) 0%, rgba(35, 35, 35, 1) 100%);
 }
@@ -1426,13 +1428,17 @@ img#donate_sol {
 
 .connect_me {
   border: 0;
-  background: rgb(155, 25, 25);
-  background: linear-gradient(180deg, rgba(155, 25, 25, 1) 0%, #7f0000 100%);
+  background: #4914146e;
+  background: linear-gradient(180deg, #9b1919db 0%, #7f00009c 100%);
   padding: 10px 25px 10px 25px;
   border-radius: 7px;
   margin: -6px -6px 0 0;
   font-size: 14px;
   font-weight: bold;
+}
+
+.connect_me:hover{
+  background: #7f0000a3;
 }
 
 .usdc_icon {
@@ -2966,6 +2972,7 @@ img#donate_sol {
 
 #wallet_chooser button#chooser_cancel span {
   color: #000;
+  margin-left: 110px;
 }
 
 #wallet_chooser button#chooser_backpack:hover span,
