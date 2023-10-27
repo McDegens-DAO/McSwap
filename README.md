@@ -148,7 +148,7 @@ async function group_details(id,name) {
 ```
 
 7. Define Supported SPL Tokens: [config/tokens.js](https://github.com/McDegens-DAO/McSwap/blob/main/config/tokens.js)
-* You can add any SPL Tokens details to the list.
+* You can add any additional SPL Tokens details to the list.
 ```javascript
 // custom spl tokens list for proposal token requests
 const spl_tokens = [
