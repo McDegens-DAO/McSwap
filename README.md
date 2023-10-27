@@ -11,7 +11,8 @@ Developed by [SolDapper](https://twitter.com/SolDapper) for [McDegens DAO](https
 [McSwap.xyz](https://mcswap.xyz)
 
 ## ATTN
-pNFTs are not yet supported by McSwap.
+McSwap supports trades for NFTs and cNFTs. 
+pNFTs are not yet supported.
 
 ## Support
 Create a ticket at our [Discord](https://discord.com/invite/hXXDvYTQhj)
