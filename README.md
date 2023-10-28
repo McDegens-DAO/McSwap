@@ -32,10 +32,15 @@ Create a ticket at our [Discord](https://discord.com/invite/hXXDvYTQhj)
 The following skins are included for convenience. 
 
 * default
+
 ![McSwap](https://mcswap.xyz/img/screen-mcswap.png)
+
 * mycelium
-![McSwap](https://mcswap.xyz/img/screen-mycelium.png)
+
+![Mycelium](https://mcswap.xyz/img/screen-mycelium.png)
+
 * ducktrader
+
 ![McSwap](https://mcswap.xyz/img/screen-ducktrader.png)
 
 1. Copy your preferred skin folder in [css/skins](https://github.com/McDegens-DAO/McSwap/tree/main/css/skins) and give it a new name.
