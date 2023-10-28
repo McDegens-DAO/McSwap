@@ -48,7 +48,7 @@ The following skins are included for convenience.
 
 1. Copy your preferred skin folder in [css/skins](https://github.com/McDegens-DAO/McSwap/tree/main/css/skins) and give it a new name.
 2. Replace images in your new folder as needed.
-3. Add css to default.css file to override css rules. [css skin template](https://github.com/McDegens-DAO/McSwap/blob/main/css/template.css)
+3. Add css rules to the default.css file in your new folder to override the default css rules. [css skin template](https://github.com/McDegens-DAO/McSwap/blob/main/css/template.css)
 4. Update htaccess.txt with your folder name.
 ```javascript
 # skinning css and images
