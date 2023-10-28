@@ -10,6 +10,9 @@ Developed by [SolDapper](https://twitter.com/SolDapper) for [McDegens DAO](https
 ## Live dApp
 [McSwap.xyz](https://mcswap.xyz)
 
+## White Label
+You are welcome to use our dApp at mcswap.xyz, or follow the instructions below to spin one up with your community or project branding.
+
 ## ATTN
 McSwap supports trades for NFTs and cNFTs. 
 pNFTs are not yet supported.
