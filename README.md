@@ -3,7 +3,7 @@ The Trustless P2P NFT/cNFT/SPL Trade dApp.
 
 Version: 1.5 (beta)
 
-Developed by [SolDapper](https://twitter.com/SolDapper) for [McDegens DAO](https://discord.com/invite/hXXDvYTQhj)
+Developed by [Dapper](https://twitter.com/SolDapper) for [McDegens DAO](https://discord.com/invite/hXXDvYTQhj)
 
 ![McSwap](https://mcswap.xyz/img/bannergithub.png)
 
