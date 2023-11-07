@@ -1,5 +1,5 @@
 # McSwap
-The Trustless P2P NFT/cNFT Trade dApp.
+The Trustless P2P NFT/cNFT/SPL Trade dApp.
 
 Version: 1.5 (beta)
 
