@@ -34,7 +34,7 @@ Create a ticket at our [Discord](https://discord.com/invite/hXXDvYTQhj)
 3. Extract the contents of the package.
 
 ## Skins
-The following skins are included for convenience. 
+The following skins are included as examples. 
 
 * default
 
