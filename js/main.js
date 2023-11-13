@@ -2891,85 +2891,85 @@ async function deploy_proposal() {
 
     }
 
-//     if($("#a_type").val()=="cNFT"){
+    if($("#a_type").val()=="cNFT"){
 
-//       lookupTableAccount = await connection.getAddressLookupTable(lookupTableAddressSaved).then((res) => res.value);    
-//       if (!lookupTableAccount) {
-//         console.log("Could not fetch ALT!");
-//         alert("Could not fetch ALT!");
-//         return;
-//       }
+      lookupTableAccount = await connection.getAddressLookupTable(lookupTableAddressSaved).then((res) => res.value);    
+      if (!lookupTableAccount) {
+        console.log("Could not fetch ALT!");
+        alert("Could not fetch ALT!");
+        return;
+      }
       
-//       console.log("lookupTableAccount", lookupTableAccount);
-//       console.log("createTokenATA", createTokenATASaved);
-//       console.log("lookupTableAddress", lookupTableAddressSaved);
-//       console.log("createTempFeeAccountIx", createTempFeeAccountIx);
-//       console.log("createTokenATAIx", createTokenATAIx);
-//       console.log("initializeSwapIx", initializeSwapIx);
-//       console.log("tempFeeAccountSaved", tempFeeAccountSaved);
+      console.log("lookupTableAccount", lookupTableAccount);
+      console.log("createTokenATA", createTokenATASaved);
+      console.log("lookupTableAddress", lookupTableAddressSaved);
+      console.log("createTempFeeAccountIx", createTempFeeAccountIx);
+      console.log("createTokenATAIx", createTokenATAIx);
+      console.log("initializeSwapIx", initializeSwapIx);
+      console.log("tempFeeAccountSaved", tempFeeAccountSaved);
       
-//       let messageV0 = null;
-//       if (createTokenATASaved === true) {
-//         messageV0 = new solanaWeb3.TransactionMessage({payerKey: provider.publicKey,
-//         recentBlockhash: (await connection.getRecentBlockhash('confirmed')).blockhash,
-//         instructions: [createTempFeeAccountIx, createTokenATAIx, initializeSwapIx],
-//         }).compileToV0Message([lookupTableAccount]);
-//       } 
-//       else {
-//         messageV0 = new solanaWeb3.TransactionMessage({payerKey: provider.publicKey,
-//         recentBlockhash: (await connection.getRecentBlockhash('confirmed')).blockhash,
-//         instructions: [createTempFeeAccountIx, initializeSwapIx],
-//         }).compileToV0Message([lookupTableAccount]);
-//       }
-//       console.log("messageV0 ", messageV0);
+      let messageV0 = null;
+      if (createTokenATASaved === true) {
+        messageV0 = new solanaWeb3.TransactionMessage({payerKey: provider.publicKey,
+        recentBlockhash: (await connection.getRecentBlockhash('confirmed')).blockhash,
+        instructions: [createTempFeeAccountIx, createTokenATAIx, initializeSwapIx],
+        }).compileToV0Message([lookupTableAccount]);
+      } 
+      else {
+        messageV0 = new solanaWeb3.TransactionMessage({payerKey: provider.publicKey,
+        recentBlockhash: (await connection.getRecentBlockhash('confirmed')).blockhash,
+        instructions: [createTempFeeAccountIx, initializeSwapIx],
+        }).compileToV0Message([lookupTableAccount]);
+      }
+      console.log("messageV0 ", messageV0);
       
-//       let tx = new solanaWeb3.VersionedTransaction(messageV0);
+      let tx = new solanaWeb3.VersionedTransaction(messageV0);
       
-//       try {
-//         let signedTx = await provider.signTransaction(tx);
-//         signedTx.sign([tempFeeAccountSaved]);
-//         let txId = await connection.sendTransaction(signedTx);
-//         console.log("Signature: ", txId);
-//         console.log(`https://solscan.io/tx/${txId}`);
-//         $(".share_sig span.swap_val").html(txId);
-//         $("#cover_message").html("Finalizing Transaction...");
-//         let deployID = setInterval(async function() {
-//           let tx_status = await connection.getSignatureStatuses([txId], {searchTransactionHistory:true,});
-//           if (tx_status.value[0].confirmationStatus == undefined) {} 
-//           else if (tx_status.value[0].confirmationStatus == "finalized") {
-//             clearInterval(deployID);
-//             $(".types_").val("");
-//             $(".share_id .swap_val").html(conf.host+"/swap/"+$("#create_a_id").val()+"-"+$("#create_b_id").val());
-//             $("#swap_deploying").removeClass("provisioning").html("4. Deploy Proposal");
-//             $(".swap_f").removeClass("active_swap");
-//             $(".swap_g").addClass("active_swap");
-//             $("#nav_shop, #nav_view, .ass_donate, .ass_swap, .ass_sell, #wallet_disconnect, #wallet_refresh, #wallet_nfts, #wallet_cnfts, .mcprofile_close").prop("disabled",false);
-//             $("#donate_sol, .mcprofile_close, #wallet_refresh").show();
-//             $("ul[data-id='"+$("#create_a_id").val()+"']").remove();
-//             $("#wallet_cnfts span.count").html('(' + $("ul[data-type='cnft']:visible").length + ')');
-//             $("#create_a_id, #sol_request, #pikl_request, #usdc_request, #create_a_owner, #create_b_owner, #create_b_id").val("");
-//             $(".swap_img_a, .swap_img_b").attr("src","/img/img-placeholder.png");
-//             $("#cover").fadeOut(400);
-//             $("#cover_message").html("");
-//             $("#token_sol, #token_pikl, #token_usdc").attr("src", "/img/check_default.png");
-//             $(".proofs_").hide();
-//           }
-//         }, 3000);  
-//       } 
-//       catch(error) {
-//         console.log("Error Logs: ", error);
-//         $(".swap_cancel_b, #swap_deploy").prop("disabled",false);
-//         $("#swap_deploying").removeClass("provisioning").html("4. Deploy Proposal");
-//         $("#cover_message").html("Error!<br /><br />Canceling Transaction...");
-//         setTimeout(() => { 
-//           $("#cover").fadeOut(400);
-//           $("#cover_message").html("");
-//           $(".share_id .swap_value").html(conf.host+"/swap/"+$("#create_a_id").val()+"-"+$("#create_b_id").val());
-//         },3000);
-//         return;
-//       }
+      try {
+        let signedTx = await provider.signTransaction(tx);
+        signedTx.sign([tempFeeAccountSaved]);
+        let txId = await connection.sendTransaction(signedTx);
+        console.log("Signature: ", txId);
+        console.log(`https://solscan.io/tx/${txId}`);
+        $(".share_sig span.swap_val").html(txId);
+        $("#cover_message").html("Finalizing Transaction...");
+        let deployID = setInterval(async function() {
+          let tx_status = await connection.getSignatureStatuses([txId], {searchTransactionHistory:true,});
+          if (tx_status.value[0].confirmationStatus == undefined) {} 
+          else if (tx_status.value[0].confirmationStatus == "finalized") {
+            clearInterval(deployID);
+            $(".types_").val("");
+            $(".share_id .swap_val").html(conf.host+"/swap/"+$("#create_a_id").val()+"-"+$("#create_b_id").val());
+            $("#swap_deploying").removeClass("provisioning").html("4. Deploy Proposal");
+            $(".swap_f").removeClass("active_swap");
+            $(".swap_g").addClass("active_swap");
+            $("#nav_shop, #nav_view, .ass_donate, .ass_swap, .ass_sell, #wallet_disconnect, #wallet_refresh, #wallet_nfts, #wallet_cnfts, .mcprofile_close").prop("disabled",false);
+            $("#donate_sol, .mcprofile_close, #wallet_refresh").show();
+            $("ul[data-id='"+$("#create_a_id").val()+"']").remove();
+            $("#wallet_cnfts span.count").html('(' + $("ul[data-type='cnft']:visible").length + ')');
+            $("#create_a_id, #sol_request, #pikl_request, #usdc_request, #create_a_owner, #create_b_owner, #create_b_id").val("");
+            $(".swap_img_a, .swap_img_b").attr("src","/img/img-placeholder.png");
+            $("#cover").fadeOut(400);
+            $("#cover_message").html("");
+            $("#token_sol, #token_pikl, #token_usdc").attr("src", "/img/check_default.png");
+            $(".proofs_").hide();
+          }
+        }, 3000);  
+      } 
+      catch(error) {
+        console.log("Error Logs: ", error);
+        $(".swap_cancel_b, #swap_deploy").prop("disabled",false);
+        $("#swap_deploying").removeClass("provisioning").html("4. Deploy Proposal");
+        $("#cover_message").html("Error!<br /><br />Canceling Transaction...");
+        setTimeout(() => { 
+          $("#cover").fadeOut(400);
+          $("#cover_message").html("");
+          $(".share_id .swap_value").html(conf.host+"/swap/"+$("#create_a_id").val()+"-"+$("#create_b_id").val());
+        },3000);
+        return;
+      }
 
-//     }
+    }
 
 } 
 else {return;}
