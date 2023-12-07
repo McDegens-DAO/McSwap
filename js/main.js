@@ -4083,6 +4083,7 @@ async function swap_viewer() {
     $("#fulfil_b_id").val(ids[1]);
     $("#nav_view").click();
     $(".mcprofile_open").show().click();
+    $("#mode_spl").click();
     
     provider = wallet_provider();
     let connection = new solanaWeb3.Connection(conf.cluster, "confirmed");
@@ -4999,6 +5000,15 @@ $(document).delegate(".mode_switch", "click", async function() {
     $("#scroll_wrapper").getNiceScroll().resize();
   }
   else if(id == "mode_spl"){
+    if($("#wallet_view").is(":visible")){
+      let pathArray = window.location.pathname.split('/swap/');
+      if (typeof pathArray[1] == "undefined") {
+        $("#wallet_view").click();
+      }
+      else{
+        console.log("testing");
+      }
+    }
     $("#mode_spl").hide();
     $("#mode_nft").show();
     $(".mc_panel_spl").hide();
