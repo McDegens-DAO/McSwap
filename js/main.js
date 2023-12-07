@@ -1,6 +1,6 @@
-conf.version = 1.5;
+conf.version = 1.6;
 conf.provider = false;
-conf.fee = 25000000;
+conf.txfee = 30000;
 conf.billion = 1000000000;
 conf.usdc = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v";
 conf.vault = "HieZydxjXUxTJRRvj4ovNPWzTKgxcGo1jLsPdXCiith2";
@@ -12,15 +12,17 @@ conf.METADATA_PROGRAM_ID = "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s";
 conf.BUBBLEGUM_PROGRAM_ID = "BGUMAp9Gq7iTEuizy4pqaxsTyUCBK68MDfK752saRPUY";
 conf.MCSWAP_CNFT_PROGRAM = "8Tg1SpWz9JNr5praJssiALNs3G6GQU5qvuoxf85aRh74";
 conf.MCSWAP_NFT_PROGRAM = "AyJBbGQzUQSvhivZnHMDCCk6eSLupkeBh4fvMAD8T4Xx";
-conf.tool = "mcwallet";
-conf.shop_name = "McSwap Shop"; // set disply name of shop
-conf.shop_enabled = false; // set shop status
+conf.MCSWAP_SPL_PROGRAM = "GbowtzP1XpAK2as84UgGWTpn4o7QoiAeFNM8yRRBjeSk";
+conf.spl_alt = "DnDkh579fNnBFUwLDeQWgfW6ukLMyt8DgLaVDVwecxmj";
 conf.logo = conf.host+"/img/logo-300.png"; // set centered logo image
 conf.logo_wallet = conf.host+"/img/logo-300-dim.png"; // set wallet background
 conf.logo_icon = conf.host+"/img/favicon.png"; // set icon image
 conf.max_proofs = 18; // max proofs for tx size
-conf.sell_nft = "https://magiceden.io/item-details/"; // set path to your preferred nft explorer 
-conf.sell_cnft = "https://app.stache.io/home/assetsdetails"; // set sell link for cnfts
+conf.sell_nft = "https://www.tensor.trade/item/"; // set path to your preferred nft explorer 
+conf.sell_cnft = "https://www.tensor.trade/item/"; // set sell link for cnfts
+conf.tool = "mcwallet";
+// conf.sell_nft = "https://magiceden.io/item-details/"; // set path to your preferred nft explorer 
+// conf.sell_cnft = "https://app.stache.io/home/assetsdetails"; // set sell link for cnfts
 
 const BufferLayout = require("@solana/buffer-layout");
 const BN = require("bn.js");
@@ -62,6 +64,29 @@ const SWAP_NFT_STATE = BufferLayout.struct([
   publicKey("swap_token_mint"),
   uint64("swap_tokens"),
 ]);
+const SWAP_SPL_STATE = BufferLayout.struct([
+    BufferLayout.u8("is_initialized"),
+    publicKey("initializer"),
+    publicKey("token1_mint"),
+    uint64("token1_amount"),    
+    publicKey("temp_token1_account"),
+    publicKey("token2_mint"),
+    uint64("token2_amount"),    
+    publicKey("temp_token2_account"),
+    publicKey("taker"),
+    publicKey("token3_mint"),
+    uint64("token3_amount"),
+    publicKey("token4_mint"),
+    uint64("token4_amount"),
+]);
+const PROGRAM_STATE = BufferLayout.struct([
+    BufferLayout.u8("is_initialized"),
+    publicKey("pickle_mint"),
+    uint64("fee_chips"),
+    BufferLayout.u8("dev_percentage"),
+    publicKey("dev_treasury"),
+    publicKey("mcdegens_treasury"),
+]);
 
 let social_1 = new Image();
 let social_2 = new Image();
@@ -73,6 +98,7 @@ social_1.id = "social_discord";
 social_2.id = "social_github";
 social_3.id = "social_twitter";
 
+let selected = false;
 let initializeSwapIx = false;
 let initializedSwapIx = false;
 let createTempFeeAccountIx = false;
@@ -104,6 +130,9 @@ let swapTokenMint = false;
 let swapLamports = false;
 let extendALTIx = false;
 var provider;
+
+let idleTime = 0;
+let idleInterval = false;
 
 // returns matching combos for provided attributes
 async function get_combos(attributes) {
@@ -162,7 +191,7 @@ async function copy(save_string) {
   return "success";
 }
 
-// returns the proofs required for a mint
+// returns the number of proofs required for a cNFT mint
 async function required_proofs(id){
   if (id.length < 32) {return;}
   let connection = new solanaWeb3.Connection(conf.cluster, "confirmed");
@@ -177,7 +206,7 @@ async function required_proofs(id){
   let ck_Proof = response.data.result.proof;
   let ck_Root = response.data.result.root;
   let ck_treeIdPubKey = new solanaWeb3.PublicKey(ck_treeId);
-  let treeAccount = await splAccountComp.ConcurrentMerkleTreeAccount.fromAccountAddress(connection, ck_treeIdPubKey, );
+  let treeAccount = await splAccountCompression_.ConcurrentMerkleTreeAccount.fromAccountAddress(connection, ck_treeIdPubKey, );
   let treeAuthority = treeAccount.getAuthority();
   return (response.data.result.proof.length-treeAccount.getCanopyDepth());
 
@@ -249,6 +278,7 @@ async function master_connect() {
   } 
   else {
     if (provider.isConnected === false) {
+      $("#spl_choice_1").prop("disabled",true);
       $("#cover, #wallet_chooser").fadeOut(400);
       await provider.connect()
         .then(function() {
@@ -257,6 +287,8 @@ async function master_connect() {
             $("#wallet_connect").prop("disabled", false);
             $("#wallet_disconnect").hide().css({"display": "none"});
           } else {
+            $("#spl_choice_1").prop("disabled",false);
+            $(".swap_spl_a").addClass("active_spl");
             $("#wallet_connect").prop("disabled", false).hide();
             $("#wallet_disconnect").show().css({
               "display": "block"
@@ -269,6 +301,7 @@ async function master_connect() {
             }
             $("#nav_compose, #nav_view").prop("disabled", false);
           }
+          provider.on('accountChanged', (publicKey) => {$("#wallet_disconnect").click();});
           swap_viewer();
         })
         .catch(function(err) {
@@ -281,12 +314,16 @@ async function master_connect() {
         });
     } 
     else if (provider.isConnected === true) {
+      $("#cover, #wallet_chooser").fadeOut(400);
+      $("#spl_choice_1").prop("disabled",false);
+      $(".swap_spl_a").addClass("active_spl");
       $("#wallet_connect").prop("disabled", false).hide();
       $("#wallet_disconnect").show().css({
         "display": "block"
       });
       $("#wallet_cnfts").prop("disabled", false).click();
       $("#nav_compose, #nav_view").prop("disabled", false);
+      provider.on('accountChanged', (publicKey) => {$("#wallet_disconnect").click();});
       swap_viewer();
     }
   }
@@ -302,9 +339,13 @@ $(document).delegate(".sol_balance", "click", async function() {
 // master disconnect
 $(document).delegate("#wallet_disconnect", "click", async function() {
   provider = wallet_provider();
+  if(!provider){
+    console.log("no provider");
+    return;
+  }
   provider.disconnect();
   conf.provider = false;
-  $("#mcprofile_nav ul li").first().find("button").click();
+//   $("#mcprofile_nav ul li").first().find("button").click();
   $(".asset").remove();
   $("#wallet_connect").show();
   $("#wallet_disconnect").hide().css({
@@ -315,7 +356,6 @@ $(document).delegate("#wallet_disconnect", "click", async function() {
   $(".sol_balance").addClass("connect_me").html("Connect");
   $("#fulfil_create").prop("disabled", true);
   $(".fulfil_g").hide();
-  
   $(".swap_img_a, .swap_img_b").attr("src", "/img/img-placeholder.png");
   $("#a_type, #b_type").val("");
   $("#create_a_id, #create_b_id, #create_a_owner, #create_b_owner").val("");
@@ -326,10 +366,15 @@ $(document).delegate("#wallet_disconnect", "click", async function() {
   $("#token_sol, #token_pikl, #token_usdc").attr("src", "/img/check_default.png");
   $("#proofs_a").hide();
   $("#create_b_id, #fetch_b, #create_b_owner").prop("disabled", true);
-  
+//   $("#spl_clear").click();
+  $("#spl_choice_1").prop("disabled",true);
+  $("#spl_owner").removeAttr("style");
   $(".fulfil_d, .fulfil_e").removeClass("active_swap");
+  $("#spl_clear").click();
+  $(".swap_spl_a").removeClass("active_spl");
   setTimeout(() => {
     $(".pikl_balance, .usdc_balance").html("");
+    $("#wallet_list").getNiceScroll().resize();
     swap_viewer();
   },1000);
 });
@@ -337,9 +382,7 @@ $(document).delegate("#wallet_disconnect", "click", async function() {
 // wallet choice
 $(document).delegate("#chooser_backpack, #chooser_solflare, #chooser_phantom", "click", async function() {
   conf.provider = $(this).attr("id").replace("chooser_", "");
-  
   let link;
-  
   if (conf.tool == "mcwallet") {
     master_connect();
     setTimeout(() => {
@@ -358,7 +401,8 @@ $(document).delegate("#chooser_backpack, #chooser_solflare, #chooser_phantom", "
         link.click();
         $("a#gogo_deep").remove();
         $("#chooser_cancel").click();
-      } else if (conf.provider == "phantom") {
+      } 
+      else if (conf.provider == "phantom") {
         let app_link = "https://phantom.app/ul/browse/" + encodeURIComponent("https://" + window.location.hostname+window.location.pathname+"#connect-phantom") + "?ref=" + encodeURIComponent("https://"+window.location.hostname);
         $("#wallet_connect").prop("disabled", false);
         $("#cover").html('<a id="gogo_deep" href="' + app_link + '">test</a>');
@@ -368,11 +412,14 @@ $(document).delegate("#chooser_backpack, #chooser_solflare, #chooser_phantom", "
         $("#chooser_cancel").click();
       }
       /////////////////////////////////////////////////
-    } else {
+    } 
+    else {
       $("#cover_message").html("Requesting Connection...");
       await provider.connect()
         .then(function() {
           if (provider.isConnected === true) {
+            $(".swap_spl_a").addClass("active_spl");
+            $("#spl_choice_1").prop("disabled",false);
             $("#wallet_connect").hide();
             $("#wallet_disconnect").show().css({
               "display": "block"
@@ -390,6 +437,9 @@ $(document).delegate("#chooser_backpack, #chooser_solflare, #chooser_phantom", "
             }
             conf.tool = "mcwallet";
           }
+        else{
+          $("#spl_choice_1").prop("disabled",true);
+        }
         })
         .catch(function(err) {
           $("#cover_message").html("");
@@ -397,56 +447,7 @@ $(document).delegate("#chooser_backpack, #chooser_solflare, #chooser_phantom", "
           conf.tool = "mcwallet";
         });
     }
-  } 
-  else if (conf.tool == "pubkey") {
-    provider = await wallet_provider();
-    if (typeof provider == "undefined") {
-      /////////////////////////////////////////////////
-      if (conf.provider == "solflare") {
-        let app_link = "https://solflare.com/ul/v1/browse/" + encodeURIComponent("https://" + window.location.hostname+window.location.pathname+"#connect-solflare")+ "?ref=" + encodeURIComponent("https://"+window.location.hostname);
-        $("#wallet_connect").prop("disabled", false);
-        $("#cover").html('<a id="gogo_deep" href="' + app_link + '">test</a>');
-        link = document.getElementById('gogo_deep');
-        link.click();
-        $("a#gogo_deep").remove();
-        $("#chooser_cancel").click();
-      } else if (conf.provider == "phantom") {
-        let app_link = "https://phantom.app/ul/browse/" + encodeURIComponent("https://" + window.location.hostname+window.location.pathname+"#connect-phantom") + "?ref=" + encodeURIComponent("https://"+window.location.hostname);
-        $("#wallet_connect").prop("disabled", false);
-        $("#cover").html('<a id="gogo_deep" href="' + app_link + '">test</a>');
-        link = document.getElementById('gogo_deep');
-        link.click();
-        $("a#gogo_deep").remove();
-        $("#chooser_cancel").click();
-      }
-      /////////////////////////////////////////////////
-    } else {
-      $("#my_mcdegens").addClass("disabled").html("<li>Requesting Connection...</li>");
-      await provider.connect()
-      .then(function() {
-        if (provider.isConnected === true) {
-          $("#cover, #wallet_connect").fadeOut(400);
-          $("#wallet_disconnect").show().css({
-            "display": "block"
-          });
-          $("#wallet_nfts, #wallet_cnfts").prop("disabled", false);
-          $("#wallet_chooser").hide();
-          $("#cover_message").html("");
-          $("#my_mcdegens").removeClass("disabled").html("<li>Check Combos</li>");
-          $("#my_mcdegens").click();
-          conf.tool = "mcwallet";
-        } else {
-          $("#my_mcdegens").removeClass("disabled").html("<li>Check Combos</li>");
-          conf.tool = "mcwallet";
-        }
-})
-      .catch(function(err) {
-        $("#my_mcdegens").removeClass("disabled").html("<li>Check Combos</li>");
-        $("#cover_message").html("");
-});
-    }
   }
-  
 });
 
 // cancel wallet chooser
@@ -503,7 +504,7 @@ $(document).delegate(".mcprofile_close", "click", async function() {
 });
 
 // format a number with commas
-function numberWithCommas(x) {
+function add_commas(x) {
   return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
@@ -519,7 +520,7 @@ async function mcswap_balances() {
         let balance = data / conf.billion;
         balance = parseFloat(balance).toFixed(9);
         let ui_split = balance.split(".");
-        let formatted = numberWithCommas(ui_split[0]);
+        let formatted = add_commas(ui_split[0]);
         formatted = formatted + "." + ui_split[1];
         $(".sol_balance").removeClass("connect_me").html(formatted);
       });
@@ -559,7 +560,7 @@ async function mcswap_balances() {
       amount = amount / multiplier;
       amount = parseFloat(amount).toFixed(decimals);
       let ui_split = amount.split(".");
-      let formatted = numberWithCommas(ui_split[0]);
+      let formatted = add_commas(ui_split[0]);
       formatted = formatted + "." + ui_split[1];
       $(".pikl_balance").html(formatted);
     }
@@ -578,7 +579,7 @@ async function mcswap_balances() {
       amount = amount / 1000000;
       amount = parseFloat(amount).toFixed(6);
       let ui_split = amount.split(".");
-      let formatted = numberWithCommas(ui_split[0]);
+      let formatted = add_commas(ui_split[0]);
       formatted = formatted + "." + ui_split[1];
       $(".usdc_balance").html(formatted);
     }
@@ -587,7 +588,7 @@ async function mcswap_balances() {
 }
 
 // wallet
-async function getMintPDA(mint) {
+async function get_pda(mint) {
   let connection = new solanaWeb3.Connection(conf.cluster, "confirmed");
   let meta_program_id = new solanaWeb3.PublicKey(conf.METADATA_PROGRAM_ID);
   let meta_mint = new solanaWeb3.PublicKey(mint);
@@ -617,6 +618,12 @@ $(document).delegate("#wallet_view", "click", async function() {
       setTimeout(() => {
         $(".loader").hide();
         $("#wallet_list").getNiceScroll().resize();
+        if($("ul[data-type='nft']:visible").length > 0){
+          $("#wallet_nfts span.count").html('(' + $("ul[data-type='nft']:visible").length + ')');
+        }
+        if($("ul[data-type='cnft']:visible").length > 0){
+          $("#wallet_cnfts span.count").html('(' + $("ul[data-type='cnft']:visible").length + ')');
+        }
       }, 1200);
     });
 });
@@ -648,7 +655,7 @@ async function send_donation() {
   $("#cover").fadeIn(400);
   $("#cover_message").html("Requesting Approval...");
   $("#donation_box").hide();
-  let provider = wallet_provider();
+  provider = wallet_provider();
   if (provider == undefined) {
     alert("You need a Solflare or Phantom wallet for this.");
   } else {
@@ -722,7 +729,7 @@ $(document).delegate("#donation_continue", "click", async function(e) {
 // open donation
 $(document).delegate("#donate_sol", "click", async function(e) {
   e.preventDefault();
-  let donate_yes = confirm("Choose amount of SOL to donate to "+conf.wallet_name+"?");
+  let donate_yes = confirm("Do you want to donate SOL to "+conf.wallet_name+"?");
     if(donate_yes){
     conf.tool = "donate_sol";
     $("#cover").fadeIn(400);
@@ -793,7 +800,7 @@ $(document).delegate("#wallet_nfts", "click", async function() {
       // get the additional metadata for each nft
       let assets = [];
       for (let i = 0; i < nfts.length; i++) {
-        let pda = getMintPDA(nfts[i])
+        let pda = get_pda(nfts[i])
           .then(function(response) {
             let account = new solanaWeb3.PublicKey(response);
             let res = Metadata_.Metadata.fromAccountAddress(connection, account)
@@ -835,35 +842,48 @@ $(document).delegate("#wallet_nfts", "click", async function() {
               .catch(function(err) {});
           })
           .catch(function(err) {});
-        
         if (i == (nfts.length - 1)) {
           /////////////////////////////////////////////////////////////
             setTimeout(function() {
             for (let nm = 0; nm < assets.length; nm++) {
               let ass = assets[nm];
-              if (ass.data.name.includes("BobbleHeads")) {
-                assets[nm].data.collection = {};
-                assets[nm].data.collection.name = "BobbleHeads";
-              }
-              else if (ass.data.name.includes("BONIES")) {
-                assets[nm].data.collection = {};
-                assets[nm].data.collection.name = "BONIES";
+              if (typeof ass.data != "undefined" && typeof ass.data.name != "undefined"){
+                if (ass.data.name.includes("BobbleHeads")) {
+                  assets[nm].data.collection = {};
+                  assets[nm].data.collection.name = "BobbleHeads";
+                }
+                else if (ass.data.name.includes("BONIES")) {
+                  assets[nm].data.collection = {};
+                  assets[nm].data.collection.name = "BONIES";
+                }
               }
             }
             let collections = [];
             let collects = [];
             for (let s = 0; s < assets.length; s++) {
               let ass = assets[s];
-              if(typeof ass.data.collection == "undefined" || typeof ass.data.collection.name == "undefined"){
+              if(typeof ass == "string"){
+                ass = {};
+              }
+              if(typeof ass.data != "undefined"){
+                if(typeof ass.data.collection == "undefined" || typeof ass.data.collection.name == "undefined"){
+                  ass.data.collection = {};
+                  ass.data.collection.name = "Unknown";
+                }
+                collects.push(ass.data.collection.name);
+              }
+              else{
+                ass.data = {}
                 ass.data.collection = {};
                 ass.data.collection.name = "Unknown";
+                collects.push(ass.data.collection.name);
               }
-              collects.push(ass.data.collection.name);
+              
             }
-            function onlyUnique(value, index, array) {
+            function unique(value, index, array) {
               return array.indexOf(value) === index;
             }
-            collects = collects.filter(onlyUnique);
+            collects = collects.filter(unique);
             collects.sort();
             for (let c = 0; c < collects.length; c++) {
               let obj = {};
@@ -874,14 +894,18 @@ $(document).delegate("#wallet_nfts", "click", async function() {
             for (let a = 0; a < assets.length; a++) {
               for (let col = 0; col < collections.length; col++) {
                 if(assets[a].data.collection.name == collections[col].name){
-                  let x = assets[a].data.name.split("#");
-                  if(typeof x[1] != "undefined"){
-                    assets[a].sort = parseInt(x[1]);
+                  
+                  if(typeof assets[a].data.name != "undefined"){
+//                     console.log(assets[a].data);
+                    let x = assets[a].data.name.split("#");
+                    if(typeof x[1] != "undefined"){
+                      assets[a].sort = parseInt(x[1]);
+                    }
+                    else{
+                      assets[a].sort = false;
+                    }
+                    collections[col].data.push(assets[a]);
                   }
-                  else{
-                    assets[a].sort = false;
-                  }
-                  collections[col].data.push(assets[a]);
                 }
               }
             }
@@ -1128,6 +1152,7 @@ $(document).delegate("#view_nfts button.ass_sell", "click", async function() {
   window.open(conf.sell_nft+$(this).data("mint"));
 });
 $(document).delegate("#view_nfts button.ass_swap", "click", async function() {
+  $("#mode_spl").click();
   if($(this).attr("data-pnft") == "true"){
     alert("Sorry, you've selected a pNFT which is not currently supported by this dApp.");
     return;
@@ -1165,53 +1190,11 @@ $(document).delegate("#view_nfts button.ass_swap", "click", async function() {
   } 
   $("#create_b_id").prop("disabled", false);
   $("#fetch_b").click();
+  $("#scroll_wrapper").getNiceScroll(0).doScrollTop(0, 1000);
   validate_details();
 });
 
 // cnfts
-$(document).delegate("#view_cnfts button.ass_swap", "click", async function() {
-  $("#a_type").val("cNFT");
-  $("#proofs_a").hide();
-  $("#create_a_owner").val("");
-  $(".swap_img_a").attr("src","/img/img-placeholder.png");
-  $("#create_b_id, #sol_request, #pikl_request, #usdc_request, #swap_create").prop("disabled", true);
-  provider = wallet_provider();
-  if (provider.publicKey.toString() == $("#create_b_owner").val()) {
-    alert("Same Owner!");
-    return;
-  }
-  $("#mc_swap_create .mc_title").html("Fetching Asset...");
-  let item = $(this).parent().parent();
-  let item_id = item.attr("data-id");
-  let img_src = item.find("img.ass_img").attr("src");
-  $("#create_a_id").val(item_id);
-  $("#mc_swap_create img.swap_img_a").attr("src", img_src);
-  $("#create_a_owner").val(provider.publicKey.toString());
-  if($(".mcprofile_open").length){$(".mcprofile_open").click();}
-  const axiosInstance = axios.create({
-    baseURL: conf.cluster
-  });
-  let response = await axiosInstance.post(conf.cluster, {
-    jsonrpc: "2.0",
-    method: "getAsset",
-    id: "rpd-op-123",
-    params: {id: item_id},
-  });
-  $("#create_b_id").prop("disabled", false).removeClass("id_disabled");
-  $("#create_b_owner").prop("disabled", false);
-  $("#sol_request, #pikl_request, #usdc_request").prop("disabled", false);
-  $("#fetch_b").prop("disabled", false);
-  $("#nav_compose").click();
-  $(".swap_a ").removeClass("active_swap");
-  $(".swap_b").addClass("active_swap");
-  if($("#scroll_wrapper").width() < 1841){
-    $("#wallet_close").click();
-  }
-  $("#fetch_b").click();
-  let proofs_required = await required_proofs(item_id);
-  $("#proofs_a").html(proofs_required+"x Proofs").show();
-  max_proofs();
-swap_create});
 $(document).delegate("#wallet_cnfts", "click", async function() {
   $("#wallet_refresh").addClass("refresh_rotate").prop("disabled", true);
   $(".wallet_filter, .wallet_rarity").show();
@@ -1240,7 +1223,7 @@ $(document).delegate("#wallet_cnfts", "click", async function() {
       params: {
         ownerAddress: provider.publicKey.toString(),
         page: 1,
-        limit: 250
+        limit: conf.nft_limit
       },
     });
     assets = assets.data.result;
@@ -1359,13 +1342,15 @@ $(document).delegate("#wallet_cnfts", "click", async function() {
 
     }
     
-    // if loading proposal from remote link
-    if($("ul[data-id='"+$("#create_a_id").val()+"']").length){
-      $("ul[data-id='"+$("#create_a_id").val()+"']").find("button.ass_swap").prop("disabled",false).click();
-    }
-    else{
-      $("#create_a_id").val("");
-    }
+//     // if loading proposal from remote link
+//     if($("ul[data-id='"+$("#create_a_id").val()+"']").length){
+//       console.log("debug");
+//       $("ul[data-id='"+$("#create_a_id").val()+"']").find("button.ass_swap").prop("disabled",false).click();
+      
+//     }
+//     else{
+//       $("#create_a_id").val("");
+//     }
     
     // applying filter or not
     if (typeof has_filter !== 'undefined' && typeof has_filter !== undefined && typeof has_filter !== null) {
@@ -1447,14 +1432,60 @@ $(document).delegate("#wallet_cnfts", "click", async function() {
       $("#wallet_cnfts span.count").html('(' + $("ul[data-type='cnft']:visible").length + ')');
     },1500);
   }
-  
+});
+$(document).delegate("#view_cnfts button.ass_swap", "click", async function() {
+  $("#mode_spl").click();
+  $("#a_type").val("cNFT");
+  $("#proofs_a").hide();
+  $("#create_a_owner").val("");
+  $(".swap_img_a").attr("src","/img/img-placeholder.png");
+  $("#create_b_id, #sol_request, #pikl_request, #usdc_request, #swap_create").prop("disabled", true);
+  provider = wallet_provider();
+  if (provider.publicKey.toString() == $("#create_b_owner").val()) {
+    alert("Same Owner!");
+    return;
+  }
+  $("#mc_swap_create .mc_title").html("Fetching Asset...");
+  let item = $(this).parent().parent();
+  let item_id = item.attr("data-id");
+  let img_src = item.find("img.ass_img").attr("src");
+  $("#create_a_id").val(item_id);
+  $("#mc_swap_create img.swap_img_a").attr("src", img_src);
+  $("#create_a_owner").val(provider.publicKey.toString());
+  if($(".mcprofile_open").length){$(".mcprofile_open").click();}
+  let axiosInstance = axios.create({
+    baseURL: conf.cluster
+  });
+  let response = await axiosInstance.post(conf.cluster, {
+    jsonrpc: "2.0",
+    method: "getAsset",
+    id: "rpd-op-123",
+    params: {id: item_id},
+  });
+  $("#create_b_id").prop("disabled", false).removeClass("id_disabled");
+  $("#create_b_owner").prop("disabled", false);
+  $("#sol_request, #pikl_request, #usdc_request").prop("disabled", false);
+  $("#fetch_b").prop("disabled", false);
+  $("#nav_compose").click();
+  $(".swap_a ").removeClass("active_swap");
+  $(".swap_b").addClass("active_swap");
+  if($("#scroll_wrapper").width() < 1841){
+    $("#wallet_close").click();
+  }
+  $("#fetch_b").click();
+  let proofs_required = await required_proofs(item_id);
+  $("#proofs_a").html(proofs_required+"x Proofs").show();
+  $("#scroll_wrapper").getNiceScroll(0).doScrollTop(0, 1000);
+  max_proofs();
+  swap_create
 });
 $(document).delegate("#view_cnfts button.ass_meta", "click", async function() {
   let mint = $(this).parent().parent().attr("data-id");
   window.open(conf.cnft_explorer + mint);
 });
 $(document).delegate("#view_cnfts button.ass_sell", "click", async function() {
-  window.open(conf.sell_cnft+"?walletAddress=" + $(this).data("wallet") + "&collectibleMint=" + $(this).data("mint") + "&screenType=STASHING");
+//   window.open(conf.sell_cnft+"?walletAddress=" + $(this).data("wallet") + "&collectibleMint=" + $(this).data("mint") + "&screenType=STASHING");
+  window.open(conf.sell_cnft+"/"+$(this).data("mint"));
 });
 $(document).delegate("#view_cnfts button.ass_donate", "click", async function() {
   $(".ass_donate").prop("disabled", true);
@@ -1472,7 +1503,7 @@ $(document).delegate("#view_cnfts button.ass_donate", "click", async function() 
   $("#nft_donation_mint").val(mint);
 });
 $(document).delegate("ul.asset li.ass_tags button", "click", async function() {
-  const item = $(this);
+  let item = $(this);
   let set_tag = item.html();
   $(".wallet_filter").remove();
   $("#wallet_filters").prepend('<span class="wallet_filter">' + set_tag + '</span>');
@@ -1497,6 +1528,7 @@ $(document).delegate("ul.asset li.ass_tags button", "click", async function() {
     });
   }
   $("#wallet_cnfts span.count").html("(" + $('ul[data-type="cnft"]:visible').length + ")");
+  $("#wallet_list").getNiceScroll().resize();
 });
 $(document).delegate("ul.asset li.ass_rarity", "click", async function() {
   $(".wallet_rarity").remove();
@@ -1522,6 +1554,7 @@ $(document).delegate(".wallet_filter", "click", async function() {
   }
   let showing = $("ul[data-type='cnft']:visible").length;
   $("#wallet_cnfts span").html("(" + showing + ")");
+  $("#wallet_list").getNiceScroll().resize();
 });
 $(document).delegate(".wallet_rarity", "click", async function() {
   $(".wallet_rarity").remove();
@@ -1599,7 +1632,7 @@ $(document).delegate("#cnft_send_donation", "click", async function() {
         // console.log("assetProof ", assetProof);
         // console.log("assetRoot ", assetRoot);
         let treeIdPubKey = new solanaWeb3.PublicKey(treeId);
-        let treeAccount = await splAccountComp.ConcurrentMerkleTreeAccount.fromAccountAddress(connection, treeIdPubKey, );
+        let treeAccount = await splAccountCompression_.ConcurrentMerkleTreeAccount.fromAccountAddress(connection, treeIdPubKey, );
         // console.log("treeAccount ", treeAccount);
         let treeAuthority = treeAccount.getAuthority();
         let canopyDepth = treeAccount.getCanopyDepth();
@@ -1613,14 +1646,14 @@ $(document).delegate("#cnft_send_donation", "click", async function() {
           }));
         // console.log("proof ", proof);
         // create the NFT transfer instruction (via the Bubblegum package)
-        const transferIx = mplBubble.createTransferInstruction({
+        const transferIx = mplBubblegum_.createTransferInstruction({
             merkleTree: new solanaWeb3.PublicKey(treeId),
             treeAuthority,
             leafOwner: provider.publicKey,
             leafDelegate: provider.publicKey,
             newLeafOwner: recipientAccountPubkey,
-            logWrapper: splAccountComp.SPL_NOOP_PROGRAM_ID,
-            compressionProgram: splAccountComp.SPL_ACCOUNT_COMPRESSION_PROGRAM_ID,
+            logWrapper: splAccountCompression_.SPL_NOOP_PROGRAM_ID,
+            compressionProgram: splAccountCompression_.SPL_ACCOUNT_COMPRESSION_PROGRAM_ID,
             anchorRemainingAccounts: proof,
           }, {
             root: [...new solanaWeb3.PublicKey(assetRoot).toBytes()],
@@ -1814,6 +1847,7 @@ async function load_asset_b() {
     $("#create_b_id").val("");
     $("#b_type").val("");
     alert("Mixmatched NFT Types Not Allowed!");
+    $("#mc_swap_create .mc_title").html("New Proposal");
     validate_details();
     return;
   }
@@ -2137,7 +2171,7 @@ async function provision_proposal() {
     //console.log("proof ", getAssetProof.data.result.proof);
     //console.log("root ", getAssetProof.data.result.root);
     
-    let treeAccount = await splAccountComp.ConcurrentMerkleTreeAccount.fromAccountAddress(connection, new solanaWeb3.PublicKey(getAssetProof.data.result.tree_id),);
+    let treeAccount = await splAccountCompression_.ConcurrentMerkleTreeAccount.fromAccountAddress(connection, new solanaWeb3.PublicKey(getAssetProof.data.result.tree_id),);
     let treeAuthorityPDA = treeAccount.getAuthority();
     let canopyDepth = treeAccount.getCanopyDepth();
     //console.log("treeAuthorityPDA ", treeAuthorityPDA.toString());
@@ -2185,7 +2219,7 @@ async function provision_proposal() {
       //console.log("swap proof total ", swapProofTotal);
       //console.log("swap root ", swapRoot);
 
-      let swapTreeAccount = await splAccountComp.ConcurrentMerkleTreeAccount.fromAccountAddress(connection,
+      let swapTreeAccount = await splAccountCompression_.ConcurrentMerkleTreeAccount.fromAccountAddress(connection,
       new solanaWeb3.PublicKey(getSwapAssetProof.data.result.tree_id),);
       //console.log("swapTreeAccount ", swapTreeAccount);  
       let swapCanopyDepth = swapTreeAccount.getCanopyDepth();
@@ -2350,9 +2384,9 @@ async function provision_proposal() {
       { pubkey: new solanaWeb3.PublicKey(getAssetProof.data.result.tree_id), isSigner: false, isWritable: true }, // 4
       { pubkey: new solanaWeb3.PublicKey(swapTreeId), isSigner: false, isWritable: false }, // 5
       { pubkey: new solanaWeb3.PublicKey(swapAssetOwner), isSigner: false, isWritable: false }, // 6
-      { pubkey: mplBubble.PROGRAM_ID, isSigner: false, isWritable: false }, // 7
-      { pubkey: splAccountComp.PROGRAM_ID, isSigner: false, isWritable: false }, // 8
-      { pubkey: splAccountComp.SPL_NOOP_PROGRAM_ID, isSigner: false, isWritable: false }, // 9
+      { pubkey: mplBubblegum_.PROGRAM_ID, isSigner: false, isWritable: false }, // 7
+      { pubkey: splAccountCompression_.PROGRAM_ID, isSigner: false, isWritable: false }, // 8
+      { pubkey: splAccountCompression_.SPL_NOOP_PROGRAM_ID, isSigner: false, isWritable: false }, // 9
       { pubkey: solanaWeb3.SystemProgram.programId, isSigner: false, isWritable: false }, // 10 
       { pubkey: cNFTProgramStatePDA[0], isSigner: false, isWritable: false }, // 11
       { pubkey: tempFeeAccount.publicKey, isSigner: false, isWritable: true }, // 12 
@@ -2386,9 +2420,9 @@ async function provision_proposal() {
       addresses: [
         cNFTSwapProgramId,
         solanaWeb3.SystemProgram.programId,
-        mplBubble.PROGRAM_ID,
-        splAccountComp.PROGRAM_ID,
-        splAccountComp.SPL_NOOP_PROGRAM_ID,
+        mplBubblegum_.PROGRAM_ID,
+        splAccountCompression_.PROGRAM_ID,
+        splAccountCompression_.SPL_NOOP_PROGRAM_ID,
         swapVaultPDA[0],
         devTreasury,
         mcDegensTreasury,
@@ -2419,8 +2453,8 @@ async function provision_proposal() {
       $("#cover_message").html("Requesting Approval...");
       let signedTx = await provider.signTransaction(createALTTx);
       let signature = await connection.sendTransaction(signedTx);
-      //console.log("Signature: ", signature)
-      //console.log(`https://solscan.io/tx/${signature}`);
+      console.log("Signature: ", signature)
+      console.log(`https://solscan.io/tx/${signature}`);
       $(".fee_prov_sig span.swap_val").html(signature);
       
       $("#cover_message").html("Finalizing Transaction...");
@@ -2441,7 +2475,7 @@ async function provision_proposal() {
           console.log("ALT:");
           console.log(lookupTableAccount.key.toString());
           $(".fee_prov_alt .swap_val").html(lookupTableAccount.key.toString());
-          $("#swap_provisioning").removeClass("provisioning").html("3. Provision Proposal");
+          $("#swap_provisioning").removeClass("provisioning").html("3. Provision");
           $("#cover_message").html("");
           $("#cover").fadeOut(400);
           $(".swap_e").removeClass("active_swap");
@@ -2452,16 +2486,16 @@ async function provision_proposal() {
       
     }
     catch(error) {
-      //console.log("Error: ", error);
+      console.log("Error: ", error);
       error = JSON.stringify(error);
       error = JSON.parse(error);
-      //console.log("Error Logs: ", error);
+      console.log("Error Logs: ", error);
       $("#cover_message").html("Error!<br /><br />Canceling Transaction...");
       setTimeout(() => {
         $("#cover_message").html("");
         $("#cover").fadeOut(400);
         $(".swap_cancel, #swap_provision").prop("disabled", false);
-        $("#swap_provisioning").removeClass("provisioning").html("3. Provision Proposal");      
+        $("#swap_provisioning").removeClass("provisioning").html("3. Provision");      
       },3000);
       return;
     }
@@ -2856,7 +2890,7 @@ async function deploy_proposal() {
           clearInterval(deployID);
           $(".types_").val("");
           $(".share_id .swap_val").html(conf.host+"/swap/"+$("#create_a_id").val()+"-"+$("#create_b_id").val());
-          $("#swap_deploying").removeClass("provisioning").html("4. Deploy Proposal");
+          $("#swap_deploying").removeClass("provisioning").html("4. Deploy");
           $(".swap_f").removeClass("active_swap");
           $(".swap_g").addClass("active_swap");
           $("#nav_shop, #nav_view, .ass_donate, .ass_swap, .ass_sell, #wallet_disconnect, #wallet_refresh, #wallet_nfts, #wallet_cnfts, .mcprofile_close").prop("disabled",false);
@@ -2878,7 +2912,7 @@ async function deploy_proposal() {
         error = JSON.parse(error);
         //console.log("Error Logs: ", error);
         $(".swap_cancel_b, #swap_deploy").prop("disabled",false);
-        $("#swap_deploying").removeClass("provisioning").html("4. Deploy Proposal");
+        $("#swap_deploying").removeClass("provisioning").html("4. Deploy");
         $("#cover_message").html("Error!<br /><br />Canceling Transaction...");
         setTimeout(() => { 
           $("#cover").fadeOut(400);
@@ -2890,8 +2924,8 @@ async function deploy_proposal() {
       // ******************************************************************
 
     }
-
-    if($("#a_type").val()=="cNFT"){
+    
+        if($("#a_type").val()=="cNFT"){
 
       lookupTableAccount = await connection.getAddressLookupTable(lookupTableAddressSaved).then((res) => res.value);    
       if (!lookupTableAccount) {
@@ -2971,440 +3005,11 @@ async function deploy_proposal() {
 
     }
 
-} 
-else {return;}
+  } 
+  else {return;}
   
 }
 $(document).delegate("#swap_deploy", "click", deploy_proposal);
-
-// provisioning swap
-async function provision_swap_o() {
-  provider = wallet_provider();
-  if(provider.isConnected === true) {
-    
-    $("#fulfil_create").prop("disabled", true);
-    $("#fulfil_step_2").addClass("provisioning").html("Provisioning...");
-    $("#cover").fadeIn(400);
-    $("#cover_message").html("Preparing Transaction...");
-    $("#nav_shop, #nav_compose, .ass_donate, .ass_swap, #wallet_disconnect, #wallet_refresh, #wallet_nfts, #wallet_cnfts, .mcprofile_close").prop("disabled", true);
-    
-    let connection = new solanaWeb3.Connection(conf.cluster, "confirmed");
-    let from_wallet = provider.publicKey.toString();
-    // console.log("Executer ", from_wallet);
-    
-    let assetId = $("#fulfil_a_id").val();
-    let swapAssetId = $("#fulfil_b_id").val();    
-    // console.log("assetId ", assetId);
-    // console.log("swapAssetId ", swapAssetId);    
-    
-    let heliusUrl = conf.cluster;
-    let cNFTSwapProgramId = new solanaWeb3.PublicKey(conf.MCSWAP_CNFT_PROGRAM);
-    usdcMint = new solanaWeb3.PublicKey(conf.usdc);
-    
-    let devTreasury = new solanaWeb3.PublicKey(conf.treasury_studio_cnft);
-    let mcDegensTreasury = new solanaWeb3.PublicKey(conf.treasury);
-//     let mcDegensDevTreasury = new solanaWeb3.PublicKey(conf.treasury_dev);
-    let feeLamports = conf.fee;
-    // console.log("feeLamports ", feeLamports);
-    
-    let swapStatePDA = solanaWeb3.PublicKey.findProgramAddressSync(
-      [Buffer.from("cNFT-swap"), new solanaWeb3.PublicKey(assetId).toBytes(), new solanaWeb3.PublicKey(swapAssetId).toBytes()],
-      cNFTSwapProgramId
-    );
-    // console.log("Swap State PDA: ", swapStatePDA[0].toString());
-    
-    let swapState = null;
-    await connection.getAccountInfo(swapStatePDA[0])
-    .then(function(response) {swapState = response;})
-    .catch(function(error){
-      error = JSON.stringify(error);
-      error = JSON.parse(error);
-      // console.log("Error: ", error);
-      return;
-    });    
-    
-    swapInitializer = null;
-    swapLamports = null;
-    swapTokens = null;
-    swapUSDC = null;
-    swapTokenMint = null;    
-    changeTokenAuthorityIx = null;    
-        
-    if (swapState != null) {
-        const encodedSwapStateData = swapState.data;
-        const decodedSwapStateData = SWAP_CNFT_STATE.decode(encodedSwapStateData);
-        // console.log("swapState - is_initialized: ", decodedSwapStateData.is_initialized);
-        // console.log("swapState - initializer: ", new solanaWeb3.PublicKey(decodedSwapStateData.initializer).toString());
-        // console.log("swapState - asset_id: ", new solanaWeb3.PublicKey(decodedSwapStateData.asset_id).toString());
-        // console.log("swapState - merkle_tree: ", new solanaWeb3.PublicKey(decodedSwapStateData.merkle_tree).toString());
-        // console.log("swapState - root: ", new solanaWeb3.PublicKey(decodedSwapStateData.root).toString());
-        // console.log("swapState - data_hash: ", new solanaWeb3.PublicKey(decodedSwapStateData.data_hash).toString());
-        // console.log("swapState - creator_hash: ", new solanaWeb3.PublicKey(decodedSwapStateData.creator_hash).toString());
-        // console.log("swapState - nonce", new BN(decodedSwapStateData.nonce, 10, "le").toString());
-        // console.log("swapState - swap_asset_id: ", new solanaWeb3.PublicKey(decodedSwapStateData.swap_asset_id).toString());
-        // console.log("swapState - swap_merkle_tree: ", new solanaWeb3.PublicKey(decodedSwapStateData.swap_merkle_tree).toString());
-        // console.log("swapState - swap_root: ", new solanaWeb3.PublicKey(decodedSwapStateData.swap_root).toString());
-        // console.log("swapState - swap_data_hash: ", new solanaWeb3.PublicKey(decodedSwapStateData.swap_data_hash).toString());
-        // console.log("swapState - swap_creator_hash: ", new solanaWeb3.PublicKey(decodedSwapStateData.swap_creator_hash).toString());
-        // console.log("swapState - swap_nonce", new BN(decodedSwapStateData.swap_nonce, 10, "le").toString());
-        // console.log("swapState - swap_leaf_owner: ", new solanaWeb3.PublicKey(decodedSwapStateData.swap_leaf_owner).toString());
-        // console.log("swapState - swap_lamports", new BN(decodedSwapStateData.swap_lamports, 10, "le").toString());
-        // console.log("swapState - swap_token_mint", new solanaWeb3.PublicKey(decodedSwapStateData.swap_token_mint).toString());
-        // console.log("swapState - swap_tokens", new BN(decodedSwapStateData.swap_tokens, 10, "le").toString());
-        // console.log("swapState - swap_usdc", new BN(decodedSwapStateData.swap_usdc, 10, "le").toString());
-        swapInitializer = new solanaWeb3.PublicKey(decodedSwapStateData.initializer);
-        swapLamports = new BN(decodedSwapStateData.swap_lamports, 10, "le");
-        swapTokenMint = new solanaWeb3.PublicKey(decodedSwapStateData.swap_token_mint);
-        swapTokens = new BN(decodedSwapStateData.swap_tokens, 10, "le");
-        swapUSDC = new BN(decodedSwapStateData.swap_usdc, 10, "le");
-    } else {
-        // console.log("Swap Not Initialized");    
-        return;
-    }    
-    
-    let axiosInstance = axios.create({baseURL: heliusUrl,});    
-    
-    let getAsset = await axiosInstance.post(heliusUrl, {
-      jsonrpc: "2.0",
-      method: "getAsset",
-      id: "rpd-op-123",
-      params: {id: assetId},
-    });
-    // console.log("data_hash ", getAsset.data.result.compression.data_hash);
-    // console.log("creator_hash ", getAsset.data.result.compression.creator_hash);
-    // console.log("leaf_id ", getAsset.data.result.compression.leaf_id);
-    
-    let getAssetProof = await axiosInstance.post(heliusUrl, {
-      jsonrpc: "2.0",
-      method: "getAssetProof",
-      id: "rpd-op-123",
-      params: {id: assetId},
-    });
-    // console.log("tree_id ", getAssetProof.data.result.tree_id);
-    // console.log("proof ", getAssetProof.data.result.proof);
-    // console.log("root ", getAssetProof.data.result.root);
-    
-    let treeAccount = await splAccountComp.ConcurrentMerkleTreeAccount.fromAccountAddress(connection,
-    new solanaWeb3.PublicKey(getAssetProof.data.result.tree_id),);
-    let treeAuthorityPDA = treeAccount.getAuthority();
-    let canopyDepth = treeAccount.getCanopyDepth();
-    // console.log("treeAuthorityPDA ", treeAuthorityPDA.toString());
-    // console.log("canopyDepth ", canopyDepth);    
-    
-    // parse the list of proof addresses into a valid AccountMeta[]
-    let proof = getAssetProof.data.result.proof
-    .slice(0, getAssetProof.data.result.proof.length - (!!canopyDepth ? canopyDepth : 0))
-    .map((node) => ({
-      pubkey: new solanaWeb3.PublicKey(node),
-      isWritable: false,
-      isSigner: false,
-    }));
-    // console.log("proof ", proof);
-
-    let getSwapAsset = await axiosInstance.post(heliusUrl, {
-      jsonrpc: "2.0",
-      method: "getAsset",
-      id: "rpd-op-123",
-      params: {id: swapAssetId},
-    });
-    // console.log("swap data_hash ", getSwapAsset.data.result.compression.data_hash);
-    // console.log("swap creator_hash ", getSwapAsset.data.result.compression.creator_hash);
-    // console.log("swap leaf_id ", getSwapAsset.data.result.compression.leaf_id);
-    
-    let getSwapAssetProof = await axiosInstance.post(heliusUrl, {
-      jsonrpc: "2.0",
-      method: "getAssetProof",
-      id: "rpd-op-123",
-      params: {id: swapAssetId},
-    });
-    // console.log("swap tree_id ", getSwapAssetProof.data.result.tree_id);
-    // console.log("swap proof ", getSwapAssetProof.data.result.proof);
-    // console.log("swap root ", getSwapAssetProof.data.result.root);
-
-    let swapTreeAccount = await splAccountComp.ConcurrentMerkleTreeAccount.fromAccountAddress(connection,
-    new solanaWeb3.PublicKey(getSwapAssetProof.data.result.tree_id),);
-    // console.log("swapTreeAccount ", swapTreeAccount);  
-    swapTreeAuthorityPDA = swapTreeAccount.getAuthority();
-    let swapCanopyDepth = swapTreeAccount.getCanopyDepth();
-    // console.log("swap treeAuthorityPDA ", swapTreeAuthorityPDA.toString());
-    // console.log("swap canopyDepth ", swapCanopyDepth);    
-    
-    let swapProof = getSwapAssetProof.data.result.proof
-    .slice(0, getSwapAssetProof.data.result.proof.length - (!!swapCanopyDepth ? swapCanopyDepth : 0))
-    .map((node) => ({
-      pubkey: new solanaWeb3.PublicKey(node),
-      isWritable: false,
-      isSigner: false,
-    }));
-    // console.log("swapProof ", swapProof);
-    
-    let swapVaultPDA = solanaWeb3.PublicKey.findProgramAddressSync([Buffer.from("cNFT-vault")],cNFTSwapProgramId);
-    // console.log("Swap Vault PDA: ", swapVaultPDA[0].toString());
-    
-    if (getAsset.data.result.ownership.owner == swapVaultPDA || getSwapAsset.data.result.ownership.owner == swapVaultPDA) {
-      // console.log("One or both cNFTs are already in the Swap Vault");
-      return;
-    }    
-    
-    let cNFTProgramStatePDA = solanaWeb3.PublicKey.findProgramAddressSync([Buffer.from("cNFT-program-state")],cNFTSwapProgramId);
-    // console.log("cNFT Program State PDA: ", cNFTProgramStatePDA[0].toString());    
-    
-    let totalFee = parseInt(feeLamports) + parseInt(swapLamports);
-    // console.log("totalFee ", totalFee);
-    tempFeeAccount = new solanaWeb3.Keypair();
-    // console.log("Temp Fee Account: ", tempFeeAccount.publicKey.toString());
-    createTempFeeAccountIx = solanaWeb3.SystemProgram.createAccount({
-      programId: cNFTSwapProgramId,
-      space: 0,
-      lamports: totalFee,
-      fromPubkey: provider.publicKey,
-      newAccountPubkey: tempFeeAccount.publicKey,
-    });
-    // console.log("Create Temp Fee Account Ix: ", createTempFeeAccountIx);
-    
-    //***********************************************************
-    
-    providerTokenATA = await splToken.getAssociatedTokenAddress(
-      swapTokenMint,
-      provider.publicKey,
-      false,
-      splToken.TOKEN_PROGRAM_ID,
-      splToken.ASSOCIATED_TOKEN_PROGRAM_ID,
-    );
-    // console.log("Provider Token ATA: ", providerTokenATA.toString());    
-    
-    tempTokenAccount = new solanaWeb3.Keypair();
-    createTempTokenAccountIx = null;
-    initTempTokenAccountIx = null;
-    transferTokenIx = null;
-    if (swapTokens > 0) {
-    
-    let rent = await connection.getMinimumBalanceForRentExemption(splToken.AccountLayout.span);
-    // console.log("Temp Token Account: ", tempTokenAccount.publicKey.toString());
-    createTempTokenAccountIx = solanaWeb3.SystemProgram.createAccount({
-      programId: splToken.TOKEN_PROGRAM_ID,
-      space: splToken.AccountLayout.span,
-      lamports: rent,
-      fromPubkey: provider.publicKey,
-      newAccountPubkey: tempTokenAccount.publicKey,
-    });
-    // console.log("Create Temp Token Account Ix: ", createTempFeeAccountIx);    
-    
-    initTempTokenAccountIx = splToken.createInitializeAccountInstruction(
-      tempTokenAccount.publicKey,
-      swapTokenMint,
-      tempTokenAccount.publicKey,
-      splToken.TOKEN_PROGRAM_ID
-    );
-    // console.log("Init Temp Token Account Ix: ", initTempTokenAccountIx)
-    
-    transferTokenIx = splToken.createTransferInstruction(
-      providerTokenATA,
-      tempTokenAccount.publicKey,
-      provider.publicKey,
-      parseInt(swapTokens),
-      provider.publicKey,
-      splToken.TOKEN_PROGRAM_ID,
-    )
-    // console.log("Transfer Token Ix: ", transferTokenIx);
-    
-    changeTokenAuthorityIx = splToken.createSetAuthorityInstruction(
-      tempTokenAccount.publicKey,
-      tempTokenAccount.publicKey,
-      2,
-      swapVaultPDA[0],
-      undefined,
-      undefined,
-      splToken.TOKEN_PROGRAM_ID,
-    );
-    // console.log("Change Token Authority Ix: ", changeTokenAuthorityIx);
-    
-    }
-    
-    initializerTokenATA = await splToken.getAssociatedTokenAddress(
-      swapTokenMint,
-      swapInitializer,
-      false,
-      splToken.TOKEN_PROGRAM_ID,
-      splToken.ASSOCIATED_TOKEN_PROGRAM_ID,
-    );
-    // console.log("Initializer Token ATA: ", initializerTokenATA.toString());
-    
-    //***********************************************************
-    
-    var totalSize = 1 + 32 + 32 + 1 + 1;
-    // console.log("totalSize", totalSize);
-
-    var uarray = new Uint8Array(totalSize);
-    let counter = 0;    
-    uarray[counter++] = 1;
-    
-    let arr;
-    
-    let assetIdb58 = bs58.decode(assetId);
-    arr = Array.prototype.slice.call(Buffer.from(assetIdb58), 0);
-    for (let i = 0; i < arr.length; i++) {uarray[counter++] = arr[i];}
-    
-    let swapAssetIdb58 = bs58.decode(swapAssetId);
-    arr = Array.prototype.slice.call(Buffer.from(swapAssetIdb58), 0);
-    for (let i = 0; i < arr.length; i++) {uarray[counter++] = arr[i];}
-    
-    uarray[counter++] = proof.length;
-    uarray[counter++] = swapProof.length;
-    // console.log("Contract Data: ", uarray);    
-    
-    let keys = [
-      { pubkey: provider.publicKey, isSigner: true, isWritable: true }, // 0
-      { pubkey:new solanaWeb3.PublicKey(swapInitializer), isSigner: false, isWritable: true }, // 1
-      { pubkey: swapVaultPDA[0], isSigner: false, isWritable: true }, // 2
-      { pubkey: swapStatePDA[0], isSigner: false, isWritable: true }, // 3
-      { pubkey: treeAuthorityPDA, isSigner: false, isWritable: false }, // 4
-      { pubkey: new solanaWeb3.PublicKey(getAssetProof.data.result.tree_id), isSigner: false, isWritable: true }, // 5
-      { pubkey: swapTreeAuthorityPDA, isSigner: false, isWritable: false }, // 6
-      { pubkey: new solanaWeb3.PublicKey(getSwapAssetProof.data.result.tree_id), isSigner: false, isWritable: true }, // 7
-      { pubkey: mplBubble.PROGRAM_ID, isSigner: false, isWritable: false }, // 8
-      { pubkey: splAccountComp.PROGRAM_ID, isSigner: false, isWritable: false }, // 9
-      { pubkey: splAccountComp.SPL_NOOP_PROGRAM_ID, isSigner: false, isWritable: false }, // 10
-      { pubkey: solanaWeb3.SystemProgram.programId, isSigner: false, isWritable: false }, // 11
-      { pubkey: splToken.TOKEN_PROGRAM_ID, isSigner: false, isWritable: false }, // 12
-      { pubkey: cNFTProgramStatePDA[0], isSigner: false, isWritable: false }, // 13
-      { pubkey: tempFeeAccount.publicKey, isSigner: true, isWritable: true }, // 14
-      { pubkey: tempTokenAccount.publicKey, isSigner: true, isWritable: true }, // 15
-      { pubkey: initializerTokenATA, isSigner: false, isWritable: true }, // 16
-      { pubkey: devTreasury, isSigner: false, isWritable: true }, // 19
-      { pubkey: mcDegensTreasury, isSigner: false, isWritable: true }, // 20
-//       { pubkey: mcDegensDevTreasury, isSigner: false, isWritable: true },
-    ];
-    for (let i = 0; i < proof.length; i++) {keys.push(proof[i]);}
-    for (let i = 0; i < swapProof.length; i++) {keys.push(swapProof[i]);}
-    // console.log("keys ", keys);
-    
-    swapcNFTsIx = new solanaWeb3.TransactionInstruction({
-      programId: cNFTSwapProgramId,
-      data: Buffer.from(uarray),
-      keys: keys,
-    });
-    // console.log("Swap NFTs Ix: ", swapcNFTsIx);
-    
-    let slot = await connection.getSlot();
-    [createALTIx, lookupTableAddress] = solanaWeb3.AddressLookupTableProgram.createLookupTable({
-      authority: provider.publicKey,
-      payer: provider.publicKey,
-      recentSlot: slot,
-    });
-    // console.log("Lookup Table Address", lookupTableAddress.toBase58(), lookupTableAddress);
-    
-    let proofPubkeys = [];
-    for (let i = 0; i < proof.length; i++) {proofPubkeys.push(proof[i].pubkey);}
-    // console.log("proofPubkeys ", proofPubkeys);
-    
-    let swapProofPubkeys = [];
-    for (let i = 0; i < swapProof.length; i++) {swapProofPubkeys.push(swapProof[i].pubkey);}
-    // console.log("swapProofPubkeys ", swapProofPubkeys); 
-    
-    extendIx = solanaWeb3.AddressLookupTableProgram.extendLookupTable({
-        payer: provider.publicKey,
-        authority: provider.publicKey,
-        lookupTable: lookupTableAddress,
-        addresses: [
-          cNFTSwapProgramId,
-          solanaWeb3.SystemProgram.programId,
-          mplBubble.PROGRAM_ID,
-          splAccountComp.PROGRAM_ID,
-          splAccountComp.SPL_NOOP_PROGRAM_ID,
-          swapVaultPDA[0],
-          swapStatePDA[0],
-          devTreasury,
-//           mcDegensTreasury,
-//           mcDegensDevTreasury,
-          solanaWeb3.SystemProgram.programId,
-          splToken.TOKEN_PROGRAM_ID,
-          cNFTProgramStatePDA[0],
-          ...proofPubkeys,
-          ...swapProofPubkeys,
-        ],
-    });
-    // console.log("extendIx ", extendIx);
-    
-    let msLookupTable = new solanaWeb3.PublicKey(conf.system_alt); // mainnet    
-	  let msLookupTableAccount = await connection.getAddressLookupTable(msLookupTable).then((res) => res.value);
-    
-    if (!msLookupTable) {
-      // console.log("Could not fetch McSwap ALT!");
-      return;
-    }
-    else{
-      // console.log("msLookupTableAccount", msLookupTableAccount);
-      // console.log("msLookupTableAccount.key", msLookupTableAccount.key.toString());
-      // console.log("msLookupTableAccount.state.authority", msLookupTableAccount.state.authority.toString());
-    }
-    
-    let mcswapMessageV0 = null;
-    let block_hash = (await connection.getRecentBlockhash('confirmed')).blockhash;
-    mcswapMessageV0 = new solanaWeb3.TransactionMessage({
-        payerKey: provider.publicKey,
-        recentBlockhash: block_hash,
-        instructions: [createALTIx, extendIx],
-    }).compileToV0Message([msLookupTableAccount]);
-    // console.log("V-Message: ", mcswapMessageV0);
-    
-    // console.log("Start Tx");
-    $("#cover_message").html("Requesting Approval...");
-    
-    let createALTTx = new solanaWeb3.VersionedTransaction(mcswapMessageV0);
-    
-    try {
-      
-      let signedTx = await provider.signTransaction(createALTTx);
-      let signature = await connection.sendTransaction(signedTx);
-      
-      // console.log("Signature: ", signature);
-      // // console.log(`https://solscan.io/tx/${signature}`); 
-      $(".fee_fulfil_sig span.swap_val").html(signature);
-      
-      $("#cover_message").html("Finalizing Transaction...");
-      let createAltID = setInterval(async function() {
-        let tx_status = await connection.getSignatureStatuses([signature], {searchTransactionHistory: true,});
-        if (tx_status.value[0].confirmationStatus == undefined) {
-          // console.log("Bad Status...");
-        } 
-        else if (tx_status.value[0].confirmationStatus == "finalized") {
-          clearInterval(createAltID);
-          lookupTableAccount = await connection.getAddressLookupTable(lookupTableAddress).then((res) => res.value);
-          if (!lookupTableAccount) {
-            // console.log("Could not fetch ALT!");
-          }
-          lookupTableAccountSaved = lookupTableAccount;
-          // console.log("ALT:");
-          // console.log(lookupTableAccount);
-          $(".fee_fulfil_alt .swap_val").html(lookupTableAccount.key.toString());
-          $("#fulfil_step_2").removeClass("provisioning").html("2. Create ALT.");
-          $("#cover_message").html("");
-          $("#cover").fadeOut(400);
-          $(".fulfil_d").removeClass("active_swap");
-          $(".fulfil_e").addClass("active_swap");
-          $("#swap_execute").prop("disabled", false);
-        }
-      }, 3000);
-      
-    } 
-    catch(error) {
-      // console.log("Error: ", error);
-      error = JSON.stringify(error);
-      error = JSON.parse(error);
-      // console.log("Error Logs: ", error);
-      $("#cover_message").html("");
-      $("#cover").fadeOut(400);
-      $("#nav_shop, #nav_compose, .ass_donate, .ass_swap, #wallet_disconnect, #wallet_refresh, #wallet_nfts, #wallet_cnfts, .mcprofile_close").prop("disabled", false);
-      $("#fulfil_step_2").removeClass("provisioning").html("2. Create ALT.");
-      $("#fulfil_create").prop("disabled",false);
-    }
-    
-  }
-  else{
-    return;
-  }
-}
 
 async function provision_swap() {
   provider = wallet_provider();
@@ -3507,7 +3112,7 @@ async function provision_swap() {
     //console.log("proof ", getAssetProof.data.result.proof);
     //console.log("root ", getAssetProof.data.result.root);    
 
-    let treeAccount = await splAccountComp.ConcurrentMerkleTreeAccount.fromAccountAddress(connection,
+    let treeAccount = await splAccountCompression_.ConcurrentMerkleTreeAccount.fromAccountAddress(connection,
     new solanaWeb3.PublicKey(getAssetProof.data.result.tree_id),);  
     let treeAuthorityPDA = treeAccount.getAuthority();
     let canopyDepth = treeAccount.getCanopyDepth();
@@ -3548,7 +3153,7 @@ async function provision_swap() {
       //console.log("swap tree_id ", swapTreeId);
       //console.log("swap root ", swapRoot);
 
-      let swapTreeAccount = await splAccountComp.ConcurrentMerkleTreeAccount.fromAccountAddress(connection,
+      let swapTreeAccount = await splAccountCompression_.ConcurrentMerkleTreeAccount.fromAccountAddress(connection,
       new solanaWeb3.PublicKey(getSwapAssetProof.data.result.tree_id),);
 
       //console.log("swapTreeAccount ", swapTreeAccount);  
@@ -3645,9 +3250,9 @@ async function provision_swap() {
         { pubkey: new solanaWeb3.PublicKey(getAssetProof.data.result.tree_id), isSigner: false, isWritable: true }, // 5
         { pubkey: swapTreeAuthorityPDA, isSigner: false, isWritable: false }, // 6
         { pubkey: new solanaWeb3.PublicKey(swapTreeId), isSigner: false, isWritable: true }, // 7 // HERE
-        { pubkey: mplBubble.PROGRAM_ID, isSigner: false, isWritable: false }, // 8
-        { pubkey: splAccountComp.PROGRAM_ID, isSigner: false, isWritable: false }, // 9
-        { pubkey: splAccountComp.SPL_NOOP_PROGRAM_ID, isSigner: false, isWritable: false }, // 10
+        { pubkey: mplBubblegum_.PROGRAM_ID, isSigner: false, isWritable: false }, // 8
+        { pubkey: splAccountCompression_.PROGRAM_ID, isSigner: false, isWritable: false }, // 9
+        { pubkey: splAccountCompression_.SPL_NOOP_PROGRAM_ID, isSigner: false, isWritable: false }, // 10
         { pubkey: solanaWeb3.SystemProgram.programId, isSigner: false, isWritable: false }, // 11
         { pubkey: splToken.TOKEN_PROGRAM_ID, isSigner: false, isWritable: false }, // 12
         { pubkey: cNFTProgramStatePDA[0], isSigner: false, isWritable: false }, // 13
@@ -3693,9 +3298,9 @@ async function provision_swap() {
           addresses: [
           cNFTSwapProgramId,
           solanaWeb3.SystemProgram.programId,
-          mplBubble.PROGRAM_ID,
-          splAccountComp.PROGRAM_ID,
-          splAccountComp.SPL_NOOP_PROGRAM_ID,
+          mplBubblegum_.PROGRAM_ID,
+          splAccountCompression_.PROGRAM_ID,
+          splAccountCompression_.SPL_NOOP_PROGRAM_ID,
           swapVaultPDA[0],
           swapStatePDA[0],
           devTreasury,
@@ -3714,9 +3319,9 @@ async function provision_swap() {
           addresses: [
           cNFTSwapProgramId,
           solanaWeb3.SystemProgram.programId,
-          mplBubble.PROGRAM_ID,
-          splAccountComp.PROGRAM_ID,
-          splAccountComp.SPL_NOOP_PROGRAM_ID,
+          mplBubblegum_.PROGRAM_ID,
+          splAccountCompression_.PROGRAM_ID,
+          splAccountCompression_.SPL_NOOP_PROGRAM_ID,
           swapVaultPDA[0],
           swapStatePDA[0],
           devTreasury,
@@ -4364,7 +3969,7 @@ $(document).delegate(".share_sig .swap_copy", "click", function() {
 $(document).delegate(".share_id .swap_copy", "click", function() {
   let cp = copy($(".share_id .swap_val").html())
     .then(function() {
-      alert("McSwap ID copied, but you better make sure!");
+      alert("McSwap Link copied, but you better make sure!");
     });
 });
 
@@ -4409,6 +4014,7 @@ $(document).delegate("#fullsize_img", "click", function() {
 
 // view the share id from proposal composer
 $(document).delegate(".share_id .swap_val", "click", function() {
+  $("#mode_spl").click();
   $("#nav_view").click();
   let qlink = $(this).html();
   let pathAr = qlink.split('/swap/');
@@ -4438,6 +4044,7 @@ async function reset_viewer(error = false) {
   $(".fulfil_img_b").attr("src", "/img/img-placeholder.png");
   $("#fulfil_a_id, #fulfil_a_owner, #fulfil_b_id, #fulfil_b_owner, #fulfil_sol_request, #fulfil_pikl_request, #fulfil_usdc_request").val("");
   $("#c_type, #d_type").val("");
+  $(".swap_spl_h").hide();
 }
 
 // swap viewer
@@ -4476,7 +4083,6 @@ async function swap_viewer() {
     $("#fulfil_b_id").val(ids[1]);
     $("#nav_view").click();
     $(".mcprofile_open").show().click();
-    $("#nav_view").click();
     
     provider = wallet_provider();
     let connection = new solanaWeb3.Connection(conf.cluster, "confirmed");
@@ -4757,7 +4363,278 @@ async function swap_viewer() {
       reset_viewer("Invalid Proposal");
     }
 
-  } 
+  }
+  else if (typeof pathArray[1] != "undefined" && typeof pathArray[2] != "undefined" &&
+    pathArray[1] == "spl" &&
+    pathArray[1] != "" &&
+    pathArray[2] != ""
+  ) {
+        
+    $("#mc_swap_viewer .mc_title").html("Fetching Proposal...");
+    $(".share_spl_exec_sig .swap_val").html("");
+    $(".swap_spl_e, .swap_spl_f").addClass("active_spl");
+    $(".swap_spl_g").removeClass("active_spl");
+    
+    let ids = pathArray[2].split("-");
+    $("#spl_owner_a").val(ids[0]);
+    $("#spl_owner_b").val(ids[1]);
+    $("#nav_view").click();
+    $(".mcprofile_open").show().click();
+    $("#mode_nft").click();
+    
+    provider = wallet_provider();
+    let connection = new solanaWeb3.Connection(conf.cluster, "confirmed");
+    let axiosInstance = axios.create({baseURL:conf.cluster,});    
+    let SPL_SWAP_PROGRAM = new solanaWeb3.PublicKey(conf.MCSWAP_SPL_PROGRAM);
+    let user_a_key = new solanaWeb3.PublicKey(ids[0]);
+    let user_b_key = new solanaWeb3.PublicKey(ids[1]);
+    
+    let SPL_STATE_PDA = solanaWeb3.PublicKey.findProgramAddressSync(
+    [Buffer.from("swap-state"), user_a_key.toBytes(), user_b_key.toBytes()],SPL_SWAP_PROGRAM);
+    console.log("Swap State PDA: ", SPL_STATE_PDA[0].toString());
+    
+    let swapState = null;
+    await connection.getAccountInfo(SPL_STATE_PDA[0])
+    .then(function(response) {
+      swapState = response;
+    })
+    .catch(function(error) {
+      error = JSON.stringify(error);
+      error = JSON.parse(error);
+      console.log("Error: ", error);
+    });
+    if (swapState != null) {
+      
+      let encodedSwapStateData = swapState.data;
+      let decodedSwapStateData = SWAP_SPL_STATE.decode(encodedSwapStateData);
+      let spl_initializer = new solanaWeb3.PublicKey(decodedSwapStateData.initializer);
+      let spl_token1Mint = new solanaWeb3.PublicKey(decodedSwapStateData.token1_mint);
+      let spl_token1Amount = new BN(decodedSwapStateData.token1_amount, 10, "le");
+      let spl_tempToken1Account = new solanaWeb3.PublicKey(decodedSwapStateData.temp_token1_account);
+//       let spl_token2Mint = new solanaWeb3.PublicKey(decodedSwapStateData.token2_mint);
+//       let spl_token2Amount = new BN(decodedSwapStateData.token2_amount, 10, "le");
+//       let spl_tempToken2Account = new solanaWeb3.PublicKey(decodedSwapStateData.temp_token2_account);
+      let spl_taker = new solanaWeb3.PublicKey(decodedSwapStateData.taker);
+      
+      let spl_token3Mint = new solanaWeb3.PublicKey(decodedSwapStateData.token3_mint);
+      let spl_token3Amount = new BN(decodedSwapStateData.token3_amount, 10, "le");
+      let spl_token4Mint = new solanaWeb3.PublicKey(decodedSwapStateData.token4_mint);
+      let spl_token4Amount = new BN(decodedSwapStateData.token4_amount, 10, "le");      
+      
+      let spl_pda = null;
+      let spl_metaplex = null;
+      let spl_uri = null;
+      let spl_img = null;
+      let spl_metadata = null;
+      let spl_amount = null;
+      let spl_amount_ = null;
+      let spl_deciamls = null;
+      let spl_multiplier = null;
+      let spl_data = null;
+      let spl_symbol = null;
+      
+      // spl 1
+      if(spl_token1Mint.toString() == conf.usdc){
+        spl_symbol = "USDC";
+        spl_img = "/img/usdc.png";
+        spl_amount = spl_token1Amount.toString();
+        spl_deciamls = 6;
+        spl_amount_ = spl_amount;
+      }
+      else{
+        spl_pda = await get_pda(spl_token1Mint.toString());      
+        spl_metaplex = await Metadata.fromAccountAddress(connection, new solanaWeb3.PublicKey(spl_pda));
+        spl_uri = spl_metaplex.data.uri;
+        spl_metadata = await axios.get(spl_uri);
+        spl_img = spl_metadata.data.image;
+        spl_symbol = spl_metadata.data.symbol;
+        spl_data = await connection.getAccountInfo(spl_token1Mint);
+        spl_data = splToken.MintLayout.decode(spl_data.data);
+        spl_amount_ = spl_token1Amount.toString();
+        spl_deciamls = spl_data.decimals;
+      }
+      spl_multiplier = 1;
+      for (let i = 0; i < spl_deciamls; i++) {
+        spl_multiplier = spl_multiplier * 10; 
+      }
+      spl_amount = spl_amount_ / spl_multiplier;
+      $("#spl_img_5").attr("src",spl_img).removeClass("spl_default");
+      $("#spl_choice_5").html(spl_symbol);
+      $("#spl_field_5").val(spl_amount).attr("data-spl_mint",spl_token1Mint.toString()).attr("data-spl_decimals",spl_deciamls).attr("data-spl_units",spl_amount_);
+      
+      // spl 3
+      if(spl_token3Mint.toString() == "11111111111111111111111111111111") {
+        spl_symbol = "SOL";
+        spl_img = "/img/sol.png";
+        spl_amount = spl_token3Amount.toString();
+        spl_deciamls = 9;   
+        spl_amount_ = spl_amount;
+      }
+      else if(spl_token3Mint.toString() == conf.usdc){
+        spl_symbol = "USDC";
+        spl_img = "/img/usdc.png";
+        spl_amount = spl_token3Amount.toString();
+        spl_deciamls = 6;   
+        spl_amount_ = spl_amount;
+      }
+      else{
+        spl_pda = await get_pda(spl_token3Mint.toString());      
+        spl_metaplex = await Metadata.fromAccountAddress(connection, new solanaWeb3.PublicKey(spl_pda));
+        spl_uri = spl_metaplex.data.uri;
+        spl_metadata = await axios.get(spl_uri);
+        spl_img = spl_metadata.data.image;
+        spl_symbol = spl_metadata.data.symbol;
+        spl_data = await connection.getAccountInfo(spl_token3Mint);
+        spl_data = splToken.MintLayout.decode(spl_data.data);
+        spl_amount_ = spl_token3Amount.toString();
+        spl_deciamls = spl_data.decimals;
+      }
+      spl_multiplier = 1;
+      for (let i = 0; i < spl_deciamls; i++) {
+        spl_multiplier = spl_multiplier * 10; 
+      }
+      spl_amount = spl_amount_ / spl_multiplier;
+      $("#spl_img_7").attr("src",spl_img).removeClass("spl_default");
+      $("#spl_choice_7").html(spl_symbol);
+      $("#spl_field_7").val(spl_amount).attr("data-spl_mint",spl_token3Mint.toString()).attr("data-spl_decimals",spl_deciamls).attr("data-spl_units",spl_amount_);
+      
+      // spl 4
+      if(spl_token4Mint.toString() != "11111111111111111111111111111111"){
+        if(spl_token4Mint.toString() == conf.usdc){
+          spl_symbol = "USDC";
+          spl_img = "/img/usdc.png";
+          spl_amount = spl_token4Amount.toString();
+          spl_deciamls = 6;
+          spl_amount_ = spl_amount;
+        }
+        else{
+          spl_pda = await get_pda(spl_token4Mint.toString());      
+          spl_metaplex = await Metadata.fromAccountAddress(connection, new solanaWeb3.PublicKey(spl_pda));
+          spl_uri = spl_metaplex.data.uri;
+          spl_metadata = await axios.get(spl_uri);
+          spl_img = spl_metadata.data.image;
+          spl_symbol = spl_metadata.data.symbol;
+          spl_data = await connection.getAccountInfo(spl_token4Mint);
+          spl_data = splToken.MintLayout.decode(spl_data.data);
+          spl_amount_ = spl_token4Amount.toString();
+          spl_deciamls = spl_data.decimals;
+        }
+        spl_multiplier = 1;
+        for (let i = 0; i < spl_deciamls; i++) {
+          spl_multiplier = spl_multiplier * 10; 
+        }
+        spl_amount = spl_amount_ / spl_multiplier;
+        $("#spl_img_8").attr("src",spl_img).removeClass("spl_default");
+        $("#spl_choice_8").html(spl_symbol);
+        $("#spl_field_8").val(spl_amount).attr("data-mint",spl_token4Mint.toString()).attr("data-decimals",spl_deciamls).attr("data-spl_units",spl_amount_);      
+      }
+      
+      // check for wallet connection
+      let allow_execute = true;
+      if(typeof provider != "undefined" && provider.isConnected===true){
+      
+      if(ids[0] == spl_initializer.toString() && ids[0] == provider.publicKey.toString()){
+        allow_execute = false;
+        console.log(allow_execute);
+        $(".swap_spl_h").show();
+        $("#scroll_wrapper").getNiceScroll().resize();
+      }
+      else{
+        $(".swap_spl_h").hide();
+      }
+      
+      // check for token 1 ata for user
+      let peer_ata = null;
+      await splToken.getAssociatedTokenAddress(spl_token1Mint,provider.publicKey,
+      false,splToken.TOKEN_PROGRAM_ID,splToken.ASSOCIATED_TOKEN_PROGRAM_ID,)
+      .then(function(resp){
+       if(resp != null){peer_ata = resp;}
+       else{
+         allow_execute = false;
+         console.log(allow_execute);
+       }
+     }).catch(function(){allow_execute = false;});
+      
+      // verify the user is the intended executioner
+      if(provider.publicKey.toString()!=ids[1] || provider.publicKey.toString()!=spl_taker.toString()){
+        allow_execute = false;
+        console.log(allow_execute);
+      }
+      
+      let ok_ata = null;
+      let ok_mint = null;
+      let ok_mintAccount = null;
+      let resp = null;
+      let token_acct = null;
+      let resps = null;
+      let amount = null;
+      let min_tokens = null;
+      let ata_resp = null;
+      let min_sol = conf.txfee;
+      let rent = await connection.getMinimumBalanceForRentExemption(splToken.AccountLayout.span);
+      
+      // verify minimum pikl gas
+      ok_mint = "AVm6WLmMuzdedAMjpXLYmSGjLLPPjjVWNuR6JJhJLWn3";
+      ok_mintAccount = new solanaWeb3.PublicKey(ok_mint);
+      resp = await connection.getTokenAccountsByOwner(provider.publicKey, {mint: ok_mintAccount});
+      token_acct = new solanaWeb3.PublicKey(resp.value[0].pubkey.toString());
+      resps = await connection.getTokenAccountBalance(token_acct);
+      amount = resps.value.amount;
+      if($("[data-spl_mint='"+ok_mint+"']").length){
+        let tid = $("[data-spl_mint='"+ok_mint+"']").attr("id");
+        if(tid != "spl_field_5"){
+          min_tokens = conf.chips_fee + ($("[data-spl_mint='"+ok_mint+"']").parent().find(".spl_field").val()*conf.billion);
+        }
+        else{
+          min_tokens = conf.chips_fee;
+        }
+      }
+      else{
+        min_tokens = conf.chips_fee;
+      }
+      amount = parseInt(amount);
+      if(amount < min_tokens){
+        allow_execute = false;
+      }
+      // check token 3 balance
+      ok_mint = spl_token3Mint.toString();
+      ok_ata = await splToken.getAssociatedTokenAddress(new solanaWeb3.PublicKey(ok_mint),
+      provider.publicKey,false,splToken.TOKEN_PROGRAM_ID,splToken.ASSOCIATED_TOKEN_PROGRAM_ID,);
+      ata_resp = await connection.getAccountInfo(ok_ata);
+      if (ata_resp == null) {
+        min_sol = min_sol + rent;
+      }
+      ata_resp = null;
+      
+      // check token 4 balance
+      if(spl_token4Mint.toString() != "11111111111111111111111111111111"){
+        ok_mint = spl_token3Mint.toString();
+        ok_ata = await splToken.getAssociatedTokenAddress(new solanaWeb3.PublicKey(ok_mint),
+        provider.publicKey,false,splToken.TOKEN_PROGRAM_ID,splToken.ASSOCIATED_TOKEN_PROGRAM_ID,);
+        ata_resp = await connection.getAccountInfo(ok_ata);
+        if (ata_resp == null) {
+          min_sol = min_sol + rent;
+        }
+      }
+      
+      $(".spl_tx_total_x .swap_amt").html((min_sol/conf.billion));
+      
+      }
+      else{
+        allow_execute = false;
+        $(".swap_spl_h").hide();
+        $("#spl_execute").prop("disabled",true);
+      }
+   
+      $("#mc_swap_viewer .mc_title").html("Proposal Details");
+      
+      if(allow_execute === true){
+        $("#spl_execute").prop("disabled",false);
+      }
+      
+    }
+    
+  }
   else {
     let hash = window.location.hash;
     if(hash.includes("#connect-")){
@@ -4776,31 +4653,6 @@ async function swap_viewer() {
 // open token choice
 $(document).delegate("#top_token_choice, .swap_c_pikl", "click", async function() {
   $("#cover, #swap_token_options").fadeIn(400);
-});
-
-// select token choice
-$(document).delegate("#swap_token_list ul", "click", async function() {
-  let new_choice = $(this).attr("data-id");
-  $("#top_token_choice").attr("data-id",new_choice);
-  $("#cover, #swap_token_options").fadeOut(400);
-  for (let i = 0; i < spl_tokens.length; i++) {
-    let item = spl_tokens[i];
-    if(item.address == new_choice){
-      if($(".swap_a").hasClass("active_swap") || $(".swap_b").hasClass("active_swap")){
-        $(".swap_c_pikl .custom_symbol").html(item.symbol);
-        $(".swap_c_pikl").attr("data-id",new_choice);
-        if($(".swap_c_pikl").attr("data-id") != new_choice && $("#pikl_request").val() != ""){
-          $("#pikl_request").val(0);
-        }
-      }
-      $("#top_token_choice .custom_symbol").html(item.symbol);
-      $(".pikl_icon").attr("src",item.image);
-      if($(".pikl_balance").html() != ""){
-        $(".pikl_balance").html("Fetching...");
-      }
-      return;
-    }
-  }
 });
 
 // swap reverse
@@ -4881,7 +4733,7 @@ $(document).delegate("#swap_reverse", "click", async function() {
     // console.log("node_index ", getAssetProof.data.result.node_index);
     // console.log("proof ", getAssetProof.data.result.proof);
     // console.log("root ", getAssetProof.data.result.root);
-    const treeAccount = await splAccountComp.ConcurrentMerkleTreeAccount.fromAccountAddress(connection,
+    const treeAccount = await splAccountCompression_.ConcurrentMerkleTreeAccount.fromAccountAddress(connection,
       new solanaWeb3.PublicKey(getAssetProof.data.result.tree_id), );
     const treeAuthorityPDA = treeAccount.getAuthority();
     const canopyDepth = treeAccount.getCanopyDepth();
@@ -4941,17 +4793,17 @@ $(document).delegate("#swap_reverse", "click", async function() {
         isWritable: true
       }, // 4
       {
-        pubkey: mplBubble.PROGRAM_ID,
+        pubkey: mplBubblegum_.PROGRAM_ID,
         isSigner: false,
         isWritable: false
       }, // 5
       {
-        pubkey: splAccountComp.PROGRAM_ID,
+        pubkey: splAccountCompression_.PROGRAM_ID,
         isSigner: false,
         isWritable: false
       }, // 6
       {
-        pubkey: splAccountComp.SPL_NOOP_PROGRAM_ID,
+        pubkey: splAccountCompression_.SPL_NOOP_PROGRAM_ID,
         isSigner: false,
         isWritable: false
       }, // 7
@@ -5136,6 +4988,1845 @@ $(document).delegate("#swap_reverse", "click", async function() {
 
 });
 
+// mode switcher
+$(document).delegate(".mode_switch", "click", async function() {
+  let id = $(this).attr("id");
+  if(id == "mode_nft"){
+    $("#mode_nft").hide();
+    $("#mode_spl").show();
+    $(".mc_panel_nft").hide();
+    $(".mc_panel_spl").show();
+    $("#scroll_wrapper").getNiceScroll().resize();
+  }
+  else if(id == "mode_spl"){
+    $("#mode_spl").hide();
+    $("#mode_nft").show();
+    $(".mc_panel_spl").hide();
+    $(".mc_panel_nft").show();
+    $("#scroll_wrapper").getNiceScroll().resize();
+  }
+});
+
+// spl token choice
+$(document).delegate("#swap_token_list ul", "click", async function() {
+  let new_choice = $(this).attr("data-id");
+  let sym = $(this).find(".token_symbol").html();
+  sym = sym.replace("(","",new_choice);
+  sym = sym.replace(")","",new_choice);
+  let img = $(this).find("li img").attr("src");
+  let spl_tokens_b = spl_tokens;
+  if(new_choice == "sol"){
+    let obj = {};
+    obj.name = "SOL";
+    obj.symbol = "SOL";
+    obj.address = new_choice;
+    obj.img = img;
+    obj.decimals = 9;    
+    spl_tokens_b.push(obj);
+  }
+  if(new_choice == conf.usdc){
+    let obj = {};
+    obj.name = "USD Coin";
+    obj.symbol = "USDC";
+    obj.address = new_choice;
+    obj.img = img;
+    obj.decimals = 6;    
+    spl_tokens_b.push(obj);
+  }
+  if(selected === false){
+    $("#top_token_choice").attr("data-id",new_choice);
+    $("#cover, #swap_token_options").fadeOut(400);
+    for (let i = 0; i < spl_tokens.length; i++) {
+      let item = spl_tokens[i];
+      if(item.address == new_choice){
+        if($(".swap_a").hasClass("active_swap") || $(".swap_b").hasClass("active_swap")){
+          $(".swap_c_pikl .custom_symbol").html(item.symbol);
+          $(".swap_c_pikl").attr("data-id",new_choice);
+          if($(".swap_c_pikl").attr("data-id") != new_choice && $("#pikl_request").val() != ""){
+            $("#pikl_request").val(0);
+          }
+        }
+        $("#top_token_choice .custom_symbol").html(item.symbol);
+        $(".pikl_icon").attr("src",item.image);
+        if($(".pikl_balance").html() != ""){
+          $(".pikl_balance").html("Fetching...");
+          mcswap_balances();
+        }
+        return;
+      }
+    }
+  }
+  else{
+    $("#spl_deploy").prop("disabled",true);
+    for (let i = 0; i < spl_tokens_b.length; i++) {
+      let item = spl_tokens_b[i];
+      if(item.address == new_choice){
+        $("#"+selected).attr("data-mint",new_choice);
+        $("#"+selected).next('input').attr("data-decimals",item.decimals);
+        $("#"+selected).html(sym);
+        $("#swap_token_options").fadeOut(400);
+        if(selected == "spl_choice_1"){
+          $("#spl_img_1").attr("src",img).removeClass("spl_default");
+          $("#spl_field_1, #spl_choice_2, #spl_choice_3").prop("disabled",false);
+          $(".swap_spl_b").addClass("active_spl");
+          $("#spl_field_1").val("0").focus();
+        }
+        else if(selected == "spl_choice_2"){
+          $("#spl_img_2").attr("src",img).removeClass("spl_default");
+          $("#spl_field_2").prop("disabled",false);
+          $("#spl_field_2").val("0").focus();
+        }
+        else if(selected == "spl_choice_3"){
+          $("#spl_img_3").attr("src",img).removeClass("spl_default");
+          $("#spl_field_3, #spl_choice_4").prop("disabled",false);
+          $("#spl_owner").prop("disabled",false);
+          $(".swap_spl_c").addClass("active_spl");
+          $("#spl_field_3").val("0").focus();
+        }
+        else if(selected == "spl_choice_4"){
+          $("#spl_img_4").attr("src",img).removeClass("spl_default");
+          $("#spl_field_4").prop("disabled",false);
+          $("#spl_field_4").val("0").focus();
+        }
+        selected = false;
+        $("#cover").fadeOut(400);
+        setTimeout(() => {
+          $("#temp_sol, #temp_usdc").remove();
+          $("#swap_token_list ul").show();
+        },500);
+        allow_deploy();
+        return;
+      }
+    }
+  }
+});
+
+// open spl chooser
+function spl_tokens_used(){
+  let tokens_used = [];
+  $(".spl_choice").each(function(){
+    if($(this).html() != "•••"){
+      tokens_used.push($(this).html());
+    }
+  });
+  return tokens_used;
+}
+$(document).delegate(".spl_choice", "click", async function() {
+  selected = $(this).attr("id");
+  let temp_choices = "";
+  if(selected == "spl_choice_3" || selected == "spl_choice_4"){
+    temp_choices += '<ul id="temp_sol" data-id="sol"><li><img src="/img/sol.png"></li><li class="token_symbol">(SOL)</li><li class="token_name">SOL</li></ul>';
+  }
+  temp_choices += '<ul id="temp_usdc" data-id="EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"><li><img src="/img/usdc.png"></li><li class="token_symbol">(USDC)</li><li class="token_name">USD Coin</li></ul>';
+  $("#swap_token_list").prepend(temp_choices);
+  let spl_used = spl_tokens_used();
+  $("#swap_token_list ul").each(function(){
+    let symb = $(this).find(".token_symbol").html();
+    symb = symb.replace("(","").replace(")","");
+    if(spl_used.indexOf(symb) != -1){
+      $(this).hide();
+    }
+  });
+  $("#cover, #swap_token_options").fadeIn(400);
+});
+
+// format spl amount
+async function format_spl(id,decimals) {
+  let amt = $("#"+id).val();
+  amt = amt.replace(/[^0-9.]/g, '');
+  let amt_x = amt;
+  if (amt == 0 || amt == "") {
+    $("#"+id).val(amt_x);
+    return;
+  }
+  let int = amt.split(".");
+  if (int.length > 1) {
+    let int_a = int[0];
+    let int_b = int[1];
+    int_b = int_b.substring(0, decimals);
+    amt = int_a + "." + int_b;
+  }
+  $("#"+id).val(amt);
+  return;
+}
+$(document).on("change", ".spl_field", function() {
+  format_spl($(this).attr("id"),$(this).attr("data-decimals")).then(function(){allow_deploy();});
+});
+$(document).on("keyup", ".spl_field", function() {
+  format_spl($(this).attr("id"),$(this).attr("data-decimals")).then(function(){allow_deploy();});
+});
+
+// peer user wallet
+async function allow_deploy(){
+     
+    let fields_pass = true;
+    if($("#spl_field_1").val()<=0){
+      fields_pass = false;
+    }
+    else if($("#spl_choice_2").attr("data-mint") != undefined && $("#spl_field_2").val() <= 0){
+      fields_pass = false;
+    }    
+    else if($("#spl_field_3").val()<=0){
+      fields_pass = false;
+    }    
+    else if($("#spl_choice_4").attr("data-mint") != undefined && $("#spl_field_4").val() <= 0){
+      fields_pass = false;
+    }
+    else if($("#spl_owner").attr("data-status")!="true"){
+      fields_pass = false;
+    }
+    
+    if(fields_pass === true){
+    
+    // check for connected wallet
+    provider = wallet_provider();
+    if (typeof provider == "undefined" || provider.isConnected !== true) {
+      $("#spl_deploy").prop("disabled",true);
+      return;
+    }
+    
+    let connection = new solanaWeb3.Connection(conf.cluster, "confirmed");
+    let walletPublicKey = new solanaWeb3.PublicKey(provider.publicKey.toString());
+    let rent = await connection.getMinimumBalanceForRentExemption(splToken.AccountLayout.span);
+    
+    // verify minimum pikl gas
+    let ok_gas = true;
+    let ok_mint = "AVm6WLmMuzdedAMjpXLYmSGjLLPPjjVWNuR6JJhJLWn3";
+    let ok_mintAccount = new solanaWeb3.PublicKey(ok_mint);
+    let resp = await connection.getTokenAccountsByOwner(walletPublicKey, {mint: ok_mintAccount});
+    let token_acct = new solanaWeb3.PublicKey(resp.value[0].pubkey.toString());
+    let resps = await connection.getTokenAccountBalance(token_acct);
+    let amount = resps.value.amount;
+    let min_tokens;
+    if($("[data-mint='"+ok_mint+"']").length){
+       min_tokens = conf.chips_fee + ($("[data-mint='"+ok_mint+"']").parent().find(".spl_field").val()*conf.billion);
+    }
+    else{
+      min_tokens = conf.chips_fee;
+    }
+    if(amount < min_tokens){
+      ok_gas = false;
+    }
+    
+    // sol fees
+    let min_sol = 0;
+    min_sol = min_sol + 2902320; // state account
+    
+    // check for init token balances
+    let ok_balance_1 = true;
+      min_sol = min_sol + 2039280; // temp token acct
+      if($("[data-mint='"+$("#spl_choice_1").attr("data-mint")+"']").length){
+      let ok_mint = $("#spl_choice_1").attr("data-mint");
+      let ok_mintAccount = new solanaWeb3.PublicKey(ok_mint);
+      let resp = await connection.getTokenAccountsByOwner(walletPublicKey, {mint: ok_mintAccount});
+      let ok_info = await connection.getParsedAccountInfo(new solanaWeb3.PublicKey(ok_mintAccount));
+      if(resp.value.length == 0){
+        ok_balance_1 = false;
+      }
+      else if(resp.value.length > 0){
+        let multiplier = 1;
+        for (let i=0; i<ok_info.value.data.parsed.info.decimals;i++){multiplier=multiplier*10;}
+        let token_acct = new solanaWeb3.PublicKey(resp.value[0].pubkey.toString());
+        let resps = await connection.getTokenAccountBalance(token_acct);
+        let ok_balance = resps.value.amount;
+        if(ok_balance < ($("#spl_field_1").val() * multiplier)){
+          ok_balance_1 = false;
+        }
+      }
+    }
+    
+    // check for init token balances
+    let ok_balance_2 = true;
+    if($("[data-mint='"+$("#spl_choice_2").attr("data-mint")+"']").length){
+      let ok_mint = $("#spl_choice_2").attr("data-mint");
+      let ok_mintAccount = new solanaWeb3.PublicKey(ok_mint);
+      let resp = await connection.getTokenAccountsByOwner(walletPublicKey, {mint: ok_mintAccount});
+      let ok_info = await connection.getParsedAccountInfo(new solanaWeb3.PublicKey(ok_mintAccount));
+      if(resp.value.length == 0){
+        ok_balance_2 = false;
+      }
+      else if(resp.value.length > 0){
+        let multiplier = 1;
+        for (let i=0; i<ok_info.value.data.parsed.info.decimals;i++){multiplier=multiplier*10;}
+        let token_acct = new solanaWeb3.PublicKey(resp.value[0].pubkey.toString());
+        let resps = await connection.getTokenAccountBalance(token_acct);
+        let ok_balance = resps.value.amount;
+        if(ok_balance < ($("#spl_field_2").val() * multiplier)){
+          ok_balance_2 = false;
+        }
+      }
+      min_sol = min_sol + 2039280; // temp token acct
+    }
+    
+    // check for token ata 1
+    if($("[data-mint='"+$("#spl_choice_3").attr("data-mint")+"']").length){
+      let walletMint = $("#spl_choice_3").attr("data-mint");
+      if(walletMint != "sol"){
+        walletMint = new solanaWeb3.PublicKey(walletMint);
+        let token_1_ata = await splToken.getAssociatedTokenAddress(walletMint,walletPublicKey,false,splToken.TOKEN_PROGRAM_ID,splToken.ASSOCIATED_TOKEN_PROGRAM_ID,);
+        let response = await connection.getAccountInfo(token_1_ata);
+        if (response == null) {
+          //console.log("debug 3");
+          min_sol = min_sol + rent;
+          //console.log("rent 3",rent);
+        }
+      }
+    }
+    // check for token ata 2
+    if($("[data-mint='"+$("#spl_choice_4").attr("data-mint")+"']").length){
+      let walletMint = $("#spl_choice_4").attr("data-mint");
+      if(walletMint != "sol"){
+        walletMint = new solanaWeb3.PublicKey(walletMint);  
+        let token_2_ata = await splToken.getAssociatedTokenAddress(walletMint,walletPublicKey,false,splToken.TOKEN_PROGRAM_ID,splToken.ASSOCIATED_TOKEN_PROGRAM_ID,);
+        let response = await connection.getAccountInfo(token_2_ata);
+        if (response == null) {
+          console.log("debug 4");
+          min_sol = min_sol + rent;
+          console.log("rent 4",rent);
+        }
+      }
+    }
+    
+    // check sol balance
+    let ok_sol = true;
+    let balance_sol = await connection.getBalance(provider.publicKey)
+    .then(function(data) {
+      if(data < (min_sol+conf.txfee)){
+        let ok_sol = false;
+      }
+    });
+    
+    let display_sol = 0;
+    if(ok_sol === false){
+      display_sol = (min_sol/conf.billion) + "(balance exceded)";
+    }
+    else{
+      display_sol = (min_sol/conf.billion);
+    }
+        
+    $(".spl_tx_total .swap_amt").html(display_sol);
+      
+    if(ok_gas === false || ok_balance_1 === false || ok_balance_2 == false || ok_sol == false){
+      $("#spl_deploy").prop("disabled",true);
+      return;
+    }
+    else{
+      $("#spl_deploy").prop("disabled",false);
+    }
+    
+  }
+    else{
+     $("#spl_deploy").prop("disabled",true);
+  }
+
+}
+async function valid_peer(){
+  provider = wallet_provider();
+  if(typeof provider != "undefined" && 
+     provider.isConnected === true && provider.publicKey.toString() != $("#spl_owner").val() && $("#spl_owner").val().length >= 32
+    ){
+  let connection = new solanaWeb3.Connection(conf.cluster, "confirmed");
+  let publicKey = new solanaWeb3.PublicKey($("#spl_owner").val());
+  let is_valid_peer = await solanaWeb3.PublicKey.isOnCurve(publicKey);
+    if(is_valid_peer === true){
+      $("#spl_owner").attr("data-status","true").css({"color":"#87a02f","box-shadow":"0 0 4px 0px #87a02f"});
+    }
+    else{
+      $("#spl_owner").attr("data-status","false").css({"color":"#289ab9","box-shadow":"0 0 4px 0px #289ab9"});
+    }
+  }
+  else{
+    $("#spl_owner").attr("data-status","false").css({"color":"#289ab9","box-shadow":"0 0 4px 0px #289ab9"});
+    return;
+  }
+}
+$(document).on("change", "#spl_owner", function() {
+  valid_peer().catch(function(){$("#spl_owner").attr("data-status","false").css({"color":"#289ab9","box-shadow":"0 0 4px 0px #289ab9"});}).then(function(){allow_deploy();});
+});
+$(document).on("keyup", "#spl_owner", function() {
+  valid_peer().catch(function(){$("#spl_owner").attr("data-status","false").css({"color":"#289ab9","box-shadow":"0 0 4px 0px #289ab9"});}).then(function(){allow_deploy();});
+});
+
+// clear spl form
+$(document).delegate("#spl_clear", "click", async function() {
+  $("#spl_img_1, #spl_img_2, #spl_img_3, #spl_img_4").attr("src","/img/default_token.png").addClass("spl_default");
+  $("#spl_choice_1, #spl_choice_2, #spl_choice_3, #spl_choice_4").html("•••");
+  $("#spl_choice_2, #spl_choice_3, #spl_choice_4").prop("disabled",true);
+  $("#spl_field_1, #spl_field_2, #spl_field_3, #spl_field_4").val("").prop("disabled",true);
+  $("#spl_owner").val("").prop("disabled",true).attr("data-status","false");
+  $(".spl_tx_total .swap_amt").html("0.0");
+  $("#spl_deploy").prop("disabled",true);
+  $(".swap_spl_b, .swap_spl_c, .swap_spl_d").removeClass("active_spl");
+  $(".spl_choice").removeAttr("data-mint");
+  $("#spl_owner").prop("disabled",true);
+  $("#spl_owner").attr("style","").val("").attr("data-status","false");
+});
+
+// copy table id
+$(document).delegate(".spl_share_sig .swap_copy", "click", function() {
+  let cp = copy($(".spl_share_sig .swap_val").html())
+    .then(function() {
+      alert("Signature copied, but you better make sure!");
+    });
+});
+
+// copy mcswap id
+$(document).delegate(".spl_share_id .swap_copy", "click", function() {
+  let cp = copy($(".spl_share_id .swap_val").html())
+    .then(function() {
+      alert("McSwap Link copied, but you better make sure!");
+    });
+});
+
+// copy spl exec signature
+$(document).delegate(".share_spl_exec_sig .swap_copy", "click", function() {
+  let cp = copy($(".share_spl_exec_sig .swap_val").html())
+  .then(function() {
+    alert("Signature copied, but you better make sure!");
+  });
+});
+
+// view the share id from proposal composer
+$(document).delegate(".spl_share_id .swap_val", "click", function() {
+  $("#mode_nft").click();
+  $("#nav_view").click();
+  let qlink = $(this).html();
+  let pathAr = qlink.split('/spl/');
+  if (typeof pathAr[1] != "undefined") {
+    let ids = pathAr[1].split("-");
+    let quick_link = "/spl/" + ids[0] + "-" + ids[1];
+    history.pushState("", "", quick_link);
+    swap_viewer();
+  }
+  $("#scroll_wrapper").getNiceScroll(0).doScrollTop(0, 1000);
+});
+
+// clear a spl choice
+$(document).delegate(".active_spl #spl_img_1, .active_spl #spl_img_2, .active_spl #spl_img_3, .active_spl #spl_img_4", "click", function() {
+  let id = $(this).attr("id");
+  let btn = $("#"+id).parent().find(".spl_choice");
+  let fld = $("#"+id).parent().find(".spl_field");
+  if(btn.attr("data-mint") && btn.prop("disabled") != true){
+    $(this).attr("src","/img/default_token.png").addClass("spl_default");
+    btn.removeAttr("data-mint").html("•••");
+    fld.val("");
+  }
+  allow_deploy();
+  if(id == "spl_img_1"){
+    $("#spl_img_2").click();
+    $("#spl_img_3").click();
+    $("#spl_owner, .spl_choice, .spl_field").prop("disabled",true);
+    $(".swap_spl_b, .swap_spl_c, .swap_spl_d ").removeClass("active_spl");
+    $("#spl_owner").attr("style","").val("").attr("data-status","false");
+    $("#spl_choice_1").prop("disabled",false);
+  }
+  else if(id == "spl_img_2"){
+    $("#spl_field_2").prop("disabled",true);
+  }
+  else if(id == "spl_img_3"){
+    $("#spl_img_4").click();
+    $("#spl_owner").attr("style","").val("").attr("data-status","false");
+    $("#spl_owner, #spl_field_3, #spl_field_4, #spl_choice_4").prop("disabled",true);
+    $(".swap_spl_c, .swap_spl_d ").removeClass("active_spl");
+  }
+  else if(id == "spl_img_4"){
+    $("#spl_field_4").prop("disabled",true);
+  }
+});
+
+// version copy click
+$(document).delegate("#vrs", "click", function() {
+  let cp = copy("McSwap dApp Vrs: "+$("#vrs").html())
+  .then(function() {
+      let openifo = confirm("McSwap dApp Vrs: "+$("#vrs").html()+"\nClick Ok for more details.\nClick Cancel to stay.");
+      if(openifo === true){
+        window.open("https://mcdegen.xyz/mcswap");
+      }
+    else{
+      return;
+    }
+    });
+});
+
+// deploy spl button
+$(document).delegate("#spl_deploy", "click", async function() {
+  $(this).prop("disabled",true);
+  $("#cover").fadeIn(400);
+  $("#cover_message").html("Requesting Approval...");
+  $(".swap_spl_a, .swap_spl_b").removeClass("active_spl");
+  $("#spl_owner, .spl_choice, .spl_field").prop("disabled",true);
+  spl_deploy();
+});
+
+// deploy spl proposal
+async function spl_deploy(){
+  
+  let taker = $("#spl_owner").val();
+  let multiply = 1;
+  let token1Mint = null;
+  let token2Mint = null;
+  let token3Mint = null;
+  let token4Mint = null;
+  
+  if($("#spl_choice_1").attr("data-mint")){token1Mint = $("#spl_choice_1").attr("data-mint");}
+  else{token1Mint = "11111111111111111111111111111111";}
+  let token1Amount = $("#spl_field_1").val();
+  let token1_decimals = $("#spl_field_1").attr("data-decimals");
+  token1_decimals = parseInt(token1_decimals);
+  multiply = 1; for ( let i = 0; i < token1_decimals; i ++ ) {multiply = multiply * 10;}
+  token1Amount = token1Amount * multiply;
+  
+  if($("#spl_choice_2").attr("data-mint")){token2Mint = $("#spl_choice_2").attr("data-mint");}
+  else{token2Mint = "11111111111111111111111111111111";}
+  let token2Amount = $("#spl_field_2").val();
+  let token2_decimals = $("#spl_field_2").attr("data-decimals");
+  token2_decimals = parseInt(token2_decimals);
+  multiply = 1; for ( let i = 0; i < token2_decimals; i ++ ) {multiply = multiply * 10;}
+  token2Amount = token2Amount * multiply;
+  
+  let token3Amount = 0;
+  let token3_decimals = 0;
+  let token4Amount = 0;
+  let token4_decimals = 0;
+  
+  if($("#spl_choice_4").attr("data-mint")=="sol"){
+    token3Mint = "11111111111111111111111111111111";
+    token3Amount = $("#spl_field_4").val();
+    token3_decimals = 9;
+    multiply = 1; for ( let i = 0; i < token3_decimals; i ++ ) {multiply = multiply * 10;}
+    token3Amount = token3Amount * multiply;
+  }
+  else if($("#spl_choice_3").attr("data-mint")=="sol"){
+    token3Mint = "11111111111111111111111111111111";
+    token3Amount = $("#spl_field_3").val();
+    token3_decimals = 9;
+    multiply = 1; for ( let i = 0; i < token3_decimals; i ++ ) {multiply = multiply * 10;}
+    token3Amount = token3Amount * multiply;
+  }
+  else if($("#spl_choice_3").attr("data-mint")){
+    token3Mint = $("#spl_choice_3").attr("data-mint");
+    token3Amount = $("#spl_field_3").val();
+    token3_decimals = $("#spl_field_3").attr("data-decimals");
+    multiply = 1; for ( let i = 0; i < token3_decimals; i ++ ) {multiply = multiply * 10;}
+    token3Amount = token3Amount * multiply;
+  }
+    
+  if($("#spl_choice_4").attr("data-mint")=="sol"){
+    token4Mint = $("#spl_choice_3").attr("data-mint");
+    token4Amount = $("#spl_field_3").val();
+    token4_decimals = $("#spl_field_3").attr("data-decimals");
+    multiply = 1; for ( let i = 0; i < token4_decimals; i ++ ) {multiply = multiply * 10;}
+    token4Amount = token4Amount * multiply;
+  }
+  else if($("#spl_choice_4").attr("data-mint")){
+    token4Mint = $("#spl_choice_4").attr("data-mint");
+    token4Amount = $("#spl_field_4").val();
+    token4_decimals = $("#spl_field_4").attr("data-decimals");
+    multiply = 1; for ( let i = 0; i < token4_decimals; i ++ ) {multiply = multiply * 10;}
+    token4Amount = token4Amount * multiply;
+  }
+  else{
+    token4Mint = "11111111111111111111111111111111";
+    token4Amount = 0;
+    token4_decimals = 0;
+    token4Amount = token4Amount * token4_decimals;
+  }
+  
+  console.log("taker ", taker);
+  console.log("token1Mint ", token1Mint);
+  console.log("token1Amount", token1Amount);
+  console.log("token2Mint ", token2Mint);
+  console.log("token2Amount", token2Amount);
+  console.log("token3Mint ", token3Mint);
+  console.log("token3Amount", token3Amount);
+  console.log("token4Mint ", token4Mint);
+  console.log("token4Amount", token4Amount);
+  
+  let connection = new solanaWeb3.Connection(conf.cluster, "confirmed");
+  
+  let tokenSwapProgramId = new solanaWeb3.PublicKey(conf.MCSWAP_SPL_PROGRAM);
+  
+  let programStatePDA = solanaWeb3.PublicKey.findProgramAddressSync([Buffer.from("program-state")],tokenSwapProgramId);
+  console.log("Program State PDA: ", programStatePDA[0].toString());
+  
+  let programState = null;
+  await connection.getAccountInfo(programStatePDA[0])
+  .then(function(response) {programState = response;})
+  .catch(function(error) {
+    error = JSON.stringify(error);
+    error = JSON.parse(error);
+    console.log("Error: ", error);
+    return;
+  });
+  
+  let pickleMint = null;
+  let feeChips = null;
+  let devTreasury = null;
+  let mcDegensTreasury = null;
+  let temp_rent = null;
+  if (programState != null) {
+      const encodedProgramStateData = programState.data;
+      const decodedProgramStateData = PROGRAM_STATE.decode(encodedProgramStateData);
+      console.log("programState - is_initialized: ", decodedProgramStateData.is_initialized);
+      console.log("programState - pickle_mint: ", new solanaWeb3.PublicKey(decodedProgramStateData.pickle_mint).toString());
+      console.log("programState - fee_chips: ", new BN(decodedProgramStateData.fee_chips, 10, "le").toString());
+      console.log("programState - dev_percentage: ", new BN(decodedProgramStateData.dev_percentage, 10, "le").toString());
+      console.log("programState - dev_treasury: ", new solanaWeb3.PublicKey(decodedProgramStateData.dev_treasury).toString());
+      console.log("programState - mcdegens_treasury: ", new solanaWeb3.PublicKey(decodedProgramStateData.mcdegens_treasury).toString());
+      pickleMint = new solanaWeb3.PublicKey(decodedProgramStateData.pickle_mint);
+      feeChips = new BN(decodedProgramStateData.fee_chips, 10, "le");
+      devTreasury = new solanaWeb3.PublicKey(decodedProgramStateData.dev_treasury);
+      mcDegensTreasury = new solanaWeb3.PublicKey(decodedProgramStateData.mcdegens_treasury);
+  } 
+  else {
+      console.log("Program State Not Initialized");    
+      return;
+  }
+  
+  let swapVaultPDA = solanaWeb3.PublicKey.findProgramAddressSync([Buffer.from("swap-vault")],tokenSwapProgramId);
+  console.log("Swap Vault PDA: ", swapVaultPDA[0].toString());  
+  
+  let swapStatePDA = solanaWeb3.PublicKey.findProgramAddressSync([Buffer.from("swap-state"), 
+  provider.publicKey.toBytes(), new solanaWeb3.PublicKey(taker).toBytes()],tokenSwapProgramId);
+  console.log("Swap State PDA: ", swapStatePDA[0].toString());
+  
+  const tempFeeAccount = new solanaWeb3.Keypair();
+  console.log("Temp Fee Account: ", tempFeeAccount.publicKey.toString());
+  temp_rent = await connection.getMinimumBalanceForRentExemption(splToken.AccountLayout.span);
+  let createTempFeeAccountIx = solanaWeb3.SystemProgram.createAccount({programId: splToken.TOKEN_PROGRAM_ID,
+  space: splToken.AccountLayout.span,lamports: temp_rent,fromPubkey: provider.publicKey,newAccountPubkey: tempFeeAccount.publicKey,});    
+  console.log("Create Temp Fee Account Ix: ", createTempFeeAccountIx);    
+  
+  let initTempFeeAccountIx = splToken.createInitializeAccountInstruction(tempFeeAccount.publicKey,
+  new solanaWeb3.PublicKey(pickleMint),tempFeeAccount.publicKey,splToken.TOKEN_PROGRAM_ID);
+  console.log("Init Temp Fee Account Ix: ", initTempFeeAccountIx);
+  
+  let providerPickleATA = await splToken.getAssociatedTokenAddress(new solanaWeb3.PublicKey(pickleMint),
+  provider.publicKey,false,splToken.TOKEN_PROGRAM_ID,splToken.ASSOCIATED_TOKEN_PROGRAM_ID,);    
+  let transferPickleIx = splToken.createTransferInstruction(providerPickleATA,tempFeeAccount.publicKey,
+  provider.publicKey,feeChips,provider.publicKey,splToken.TOKEN_PROGRAM_ID,);
+  console.log("Transfer Pickle Ix: ", transferPickleIx);  
+  
+  const tempToken1Account = new solanaWeb3.Keypair();
+  console.log("Temp Token1 Account: ", tempToken1Account.publicKey.toString());
+  temp_rent = await connection.getMinimumBalanceForRentExemption(splToken.AccountLayout.span);
+  let createTempToken1AccountIx = solanaWeb3.SystemProgram.createAccount({programId: splToken.TOKEN_PROGRAM_ID,
+  space: splToken.AccountLayout.span,lamports: temp_rent,fromPubkey: provider.publicKey,newAccountPubkey: tempToken1Account.publicKey,});    
+  console.log("Create Temp Token1 Account Ix: ", createTempToken1AccountIx);  
+  
+  let initTempToken1AccountIx = splToken.createInitializeAccountInstruction(tempToken1Account.publicKey,
+  new solanaWeb3.PublicKey(token1Mint),tempToken1Account.publicKey,splToken.TOKEN_PROGRAM_ID);
+  console.log("Init Temp Token1 Account Ix: ", initTempToken1AccountIx);  
+  
+  let providerToken1ATA = await splToken.getAssociatedTokenAddress(new solanaWeb3.PublicKey(token1Mint),
+  provider.publicKey,false,splToken.TOKEN_PROGRAM_ID,splToken.ASSOCIATED_TOKEN_PROGRAM_ID,); 
+  
+  console.log("providerToken1ATA", providerToken1ATA.toString());
+  console.log("tempToken1Account.publicKey", tempToken1Account.publicKey.toString());
+  console.log("provider.publicKey", provider.publicKey.toString());
+  console.log("token1Amount", token1Amount);
+  console.log("splToken.TOKEN_PROGRAM_ID", splToken.TOKEN_PROGRAM_ID.toString());
+    
+  let transferToken1Ix = splToken.createTransferInstruction(providerToken1ATA,tempToken1Account.publicKey,
+  provider.publicKey,token1Amount,provider.publicKey,splToken.TOKEN_PROGRAM_ID,);
+  console.log("Transfer Token1 Ix: ", transferToken1Ix);  
+  
+  let tempToken2Account = new solanaWeb3.Keypair();
+  let createTempToken2AccountIx = null;
+  let initTempToken2AccountIx = null;
+  let transferToken2Ix = null;  
+  
+  if (token2Amount > 0) {
+      
+    console.log("Temp Token2 Account: ", tempToken2Account.publicKey.toString());
+    temp_rent = await connection.getMinimumBalanceForRentExemption(splToken.AccountLayout.span);
+    createTempToken2AccountIx = solanaWeb3.SystemProgram.createAccount({programId: splToken.TOKEN_PROGRAM_ID,
+    space: splToken.AccountLayout.span,lamports: temp_rent,fromPubkey: provider.publicKey,
+    newAccountPubkey: tempToken2Account.publicKey,});    
+    console.log("Create Temp Token2 Account Ix: ", createTempToken2AccountIx);    
+
+    initTempToken2AccountIx = splToken.createInitializeAccountInstruction(tempToken2Account.publicKey,
+    new solanaWeb3.PublicKey(token2Mint),tempToken2Account.publicKey,splToken.TOKEN_PROGRAM_ID);
+    console.log("Init Temp Token2 Account Ix: ", initTempToken2AccountIx);
+    
+    let providerToken2ATA = await splToken.getAssociatedTokenAddress(new solanaWeb3.PublicKey(token2Mint),
+    provider.publicKey,false,splToken.TOKEN_PROGRAM_ID,splToken.ASSOCIATED_TOKEN_PROGRAM_ID,);    
+    transferToken2Ix = splToken.createTransferInstruction(providerToken2ATA,tempToken2Account.publicKey,
+    provider.publicKey,token2Amount,provider.publicKey,splToken.TOKEN_PROGRAM_ID,);
+    console.log("Transfer Token2 Ix: ", transferToken2Ix);
+    
+  }  
+  
+  let createToken3ATA = null; 
+  let createToken3ATAIx = null;
+  let token3ATA = null;  
+  
+  if (token3Mint != "11111111111111111111111111111111"){
+    token3ATA = await splToken.getAssociatedTokenAddress(new solanaWeb3.PublicKey(token3Mint),provider.publicKey,
+    false,splToken.TOKEN_PROGRAM_ID,splToken.ASSOCIATED_TOKEN_PROGRAM_ID,);
+    console.log("Token3 ATA: ", token3ATA.toString());
+    let token3ATAresponse = await connection.getAccountInfo(token3ATA);
+    if (token3ATAresponse == null) {createToken3ATA = true;
+      createToken3ATAIx = splToken.createAssociatedTokenAccountInstruction(provider.publicKey,token3ATA,
+      provider.publicKey,new solanaWeb3.PublicKey(token3Mint),splToken.TOKEN_PROGRAM_ID,splToken.ASSOCIATED_TOKEN_PROGRAM_ID,);
+      console.log("Create Token3 ATA Ix: ", createToken3ATAIx); 
+    }
+    else {
+      createToken3ATA = false;
+      console.log("Not creating Token3 ATA Ix"); 
+    }    
+  }
+  
+  let createToken4ATA = false;
+  let token4ATA = null;
+  let createToken4ATAIx = null;
+  
+  if (token4Amount > 0) {
+    token4ATA = await splToken.getAssociatedTokenAddress(new solanaWeb3.PublicKey(token4Mint),provider.publicKey,false,
+    splToken.TOKEN_PROGRAM_ID,splToken.ASSOCIATED_TOKEN_PROGRAM_ID,);
+    console.log("Token4 ATA: ", token4ATA.toString());
+    let token4ATAresponse = await connection.getAccountInfo(token4ATA);
+    if (token4ATAresponse == null) {createToken4ATA = true;
+      createToken4ATAIx = splToken.createAssociatedTokenAccountInstruction(provider.publicKey,token4ATA,provider.publicKey,
+      new solanaWeb3.PublicKey(token4Mint),splToken.TOKEN_PROGRAM_ID,splToken.ASSOCIATED_TOKEN_PROGRAM_ID,);
+      console.log("Create Token4 ATA Ix: ", createToken4ATAIx); 
+    } 
+    else {
+      console.log("Not creating Token4 ATA Ix"); 
+      createToken4ATA = false;
+    }
+  }
+  
+  let totalSize = 1 + 32 + 8 + 32 + 8 + 32 + 8;
+  console.log("totalSize", totalSize);
+
+  let uarray = new Uint8Array(totalSize);
+  let counter = 0;    
+  uarray[counter++] = 0; // 0 = token_swap InitializeSwap instruction
+  
+  let arr;
+  let byte;
+  let byteArray;
+  let index;
+  
+  let takerb58 = bs58.decode(taker);
+  arr = Array.prototype.slice.call(Buffer.from(takerb58), 0);
+  for (let i = 0; i < arr.length; i++) {uarray[counter++] = arr[i];}
+  
+  let token2 = token2Amount;
+  byteArray = [0, 0, 0, 0, 0, 0, 0, 0];
+  for ( index = 0; index < byteArray.length; index ++ ) {byte = token2 & 0xff;byteArray [ index ] = byte;token2 = (token2 - byte) / 256 ;}
+  for (let i = 0; i < byteArray.length; i++) {uarray[counter++] = byteArray[i];}
+
+  let token3Mintb58 = bs58.decode(token3Mint);
+  arr = Array.prototype.slice.call(Buffer.from(token3Mintb58), 0);
+  for (let i = 0; i < arr.length; i++) {uarray[counter++] = arr[i];}
+
+  byteArray = [0, 0, 0, 0, 0, 0, 0, 0];
+  for ( index = 0; index < byteArray.length; index ++ ) {byte = token3Amount & 0xff;byteArray [ index ] = byte;token3Amount = (token3Amount - byte) / 256 ;}
+  for (let i = 0; i < byteArray.length; i++) {uarray[counter++] = byteArray[i];}
+
+  let token4Mintb58 = bs58.decode(token4Mint.toString());
+  arr = Array.prototype.slice.call(Buffer.from(token4Mintb58), 0);
+  for (let i = 0; i < arr.length; i++) {uarray[counter++] = arr[i];}
+
+  byteArray = [0, 0, 0, 0, 0, 0, 0, 0];
+  for ( index = 0; index < byteArray.length; index ++ ) {byte = token4Amount & 0xff;byteArray [ index ] = byte;token4Amount = (token4Amount - byte) / 256 ;}
+  for (let i = 0; i < byteArray.length; i++) {uarray[counter++] = byteArray[i];}
+  
+  console.log("Contract Data: ", uarray);
+  
+  const initializeSwapIx = new solanaWeb3.TransactionInstruction({
+    programId: tokenSwapProgramId,data: Buffer.from(uarray),
+    keys: [
+      { pubkey: provider.publicKey, isSigner: true, isWritable: true }, // 0
+      { pubkey: programStatePDA[0], isSigner: false, isWritable: false }, // 1
+      { pubkey: swapVaultPDA[0], isSigner: false, isWritable: false }, // 2
+      { pubkey: swapStatePDA[0], isSigner: false, isWritable: true }, // 3            
+      { pubkey: tempToken1Account.publicKey, isSigner: true, isWritable: true }, // 4
+      { pubkey: tempToken2Account.publicKey, isSigner: true, isWritable: true }, // 5
+      { pubkey: tempFeeAccount.publicKey, isSigner: true, isWritable: true }, // 6
+      { pubkey: solanaWeb3.SystemProgram.programId, isSigner: false, isWritable: false }, // 7
+      { pubkey: splToken.TOKEN_PROGRAM_ID, isSigner: false, isWritable: false }, // 8
+      { pubkey: devTreasury, isSigner: false, isWritable: true }, // 9
+      { pubkey: mcDegensTreasury, isSigner: false, isWritable: true }, // 10
+    ]
+  });
+  console.log("Initialize Swap Ix: ", initializeSwapIx);
+  
+  let lookupTable = new solanaWeb3.PublicKey(conf.spl_alt); // mainnet    
+	lookupTableAccount = await connection.getAddressLookupTable(lookupTable).then((res) => res.value);
+  if (!lookupTableAccount) {
+    console.log("Could not fetch ALT!");
+    return;
+  } 
+  
+  let messageV0 = null;
+  if (token2Amount > 0) {
+    
+    console.log("debug set 2");
+    
+    if (createToken3ATA == true && createToken4ATA) {
+          console.log("1");
+          messageV0 = new solanaWeb3.TransactionMessage({
+              payerKey: provider.publicKey,
+              recentBlockhash: (await connection.getRecentBlockhash('confirmed')).blockhash,
+              instructions: [
+                  createTempFeeAccountIx,
+                  initTempFeeAccountIx,
+                  transferPickleIx,
+                  createTempToken1AccountIx,
+                  initTempToken1AccountIx,
+                  transferToken1Ix,
+                  createTempToken2AccountIx,
+                  initTempToken2AccountIx,
+                  transferToken2Ix,            
+                  createToken3ATAIx,
+                  createToken4ATAIx,
+                  initializeSwapIx             
+              ],
+          }).compileToV0Message([lookupTableAccount]);
+      } 
+    else if (createToken3ATA) {
+          console.log("2");
+          messageV0 = new solanaWeb3.TransactionMessage({
+              payerKey: provider.publicKey,
+              recentBlockhash: (await connection.getRecentBlockhash('confirmed')).blockhash,
+              instructions: [
+                  createTempFeeAccountIx,
+                  initTempFeeAccountIx,
+                  transferPickleIx,
+                  createTempToken1AccountIx,
+                  initTempToken1AccountIx,
+                  transferToken1Ix,
+                  createTempToken2AccountIx,
+                  initTempToken2AccountIx,
+                  transferToken2Ix,            
+                  createToken3ATAIx,
+                  initializeSwapIx
+              ],
+          }).compileToV0Message([lookupTableAccount]);
+      } 
+    else if (createToken4ATA) {
+          console.log("3");
+          messageV0 = new solanaWeb3.TransactionMessage({
+              payerKey: provider.publicKey,
+              recentBlockhash: (await connection.getRecentBlockhash('confirmed')).blockhash,
+              instructions: [
+                  createTempFeeAccountIx,
+                  initTempFeeAccountIx,
+                  transferPickleIx,
+                  createTempToken1AccountIx,
+                  initTempToken1AccountIx,
+                  transferToken1Ix,
+                  createTempToken2AccountIx,
+                  initTempToken2AccountIx,
+                  transferToken2Ix,            
+                  createToken4ATAIx,
+                  initializeSwapIx                
+              ],
+          }).compileToV0Message([lookupTableAccount]);
+      } 
+    else {
+          console.log("4");
+          messageV0 = new solanaWeb3.TransactionMessage({
+              payerKey: provider.publicKey,
+              recentBlockhash: (await connection.getRecentBlockhash('confirmed')).blockhash,
+              instructions: [
+                  createTempFeeAccountIx,
+                  initTempFeeAccountIx,
+                  transferPickleIx,
+                  createTempToken1AccountIx,
+                  initTempToken1AccountIx,
+                  transferToken1Ix,
+                  createTempToken2AccountIx,
+                  initTempToken2AccountIx,
+                  transferToken2Ix,
+                  initializeSwapIx,         
+              ],
+          }).compileToV0Message([lookupTableAccount]);
+      }
+  } 
+  else {        
+    if (createToken3ATA == true && createToken4ATA == true) {
+          console.log("5");
+          messageV0 = new solanaWeb3.TransactionMessage({
+              payerKey: provider.publicKey,
+              recentBlockhash: (await connection.getRecentBlockhash('confirmed')).blockhash,
+              instructions: [
+                  createTempFeeAccountIx,
+                  initTempFeeAccountIx,
+                  transferPickleIx,
+                  createTempToken1AccountIx,
+                  initTempToken1AccountIx,
+                  transferToken1Ix,
+                  createToken3ATAIx,
+                  createToken4ATAIx,
+                  initializeSwapIx                   
+              ],
+          }).compileToV0Message([lookupTableAccount]);
+      } 
+    else if (createToken3ATA) {
+          console.log("6");
+          messageV0 = new solanaWeb3.TransactionMessage({
+              payerKey: provider.publicKey,
+              recentBlockhash: (await connection.getRecentBlockhash('confirmed')).blockhash,
+              instructions: [
+                  createTempFeeAccountIx,
+                  initTempFeeAccountIx,
+                  transferPickleIx,
+                  createTempToken1AccountIx,
+                  initTempToken1AccountIx,
+                  transferToken1Ix,
+                  createToken3ATAIx,
+                  initializeSwapIx
+              ],
+          }).compileToV0Message([lookupTableAccount]);
+      } 
+    else if (createToken4ATA) {
+          console.log("7");
+          messageV0 = new solanaWeb3.TransactionMessage({
+              payerKey: provider.publicKey,
+              recentBlockhash: (await connection.getRecentBlockhash('confirmed')).blockhash,
+              instructions: [
+                  createTempFeeAccountIx,
+                  initTempFeeAccountIx,
+                  transferPickleIx,
+                  createTempToken1AccountIx,
+                  initTempToken1AccountIx,
+                  transferToken1Ix,
+                  createToken4ATAIx,
+                  initializeSwapIx
+              ],
+          }).compileToV0Message([lookupTableAccount]);
+      } 
+    else {
+          console.log("8");
+          messageV0 = new solanaWeb3.TransactionMessage({
+              payerKey: provider.publicKey,
+              recentBlockhash: (await connection.getRecentBlockhash('confirmed')).blockhash,
+              instructions: [
+                  createTempFeeAccountIx,
+                  initTempFeeAccountIx,
+                  transferPickleIx,
+                  createTempToken1AccountIx,
+                  initTempToken1AccountIx,
+                  transferToken1Ix,
+                  initializeSwapIx
+              ],
+          }).compileToV0Message([lookupTableAccount]);
+      }
+  }  
+  
+  const initializeSwapTx = new solanaWeb3.VersionedTransaction(messageV0);
+  
+  try {
+    let signedTx = await provider.signTransaction(initializeSwapTx);
+    signedTx.sign([tempFeeAccount, tempToken1Account, tempToken2Account]);
+    let signature = await connection.sendTransaction(signedTx);
+    console.log("Signature: ", signature);
+    $(".spl_share_sig .swap_val").html(signature);
+    console.log(`https://solscan.io/tx/${signature}`);
+    $(".spl_share_sig .swap_val").html(signature);
+    $("#cover_message").html("Finalizing Transaction...");
+    let splDeployID = setInterval(async function() {
+      let tx_status = await connection.getSignatureStatuses([signature], {searchTransactionHistory:true,});
+      if (tx_status.value[0].confirmationStatus == undefined) {} 
+      else if (tx_status.value[0].confirmationStatus == "finalized") {
+        clearInterval(splDeployID);
+        $("#cover_message").html("Transaction Complete.");
+        let peer = $("#spl_owner").val();
+        $("#spl_clear").click();
+        $(".swap_spl_d").addClass("active_spl");
+        $(".spl_share_id .swap_val").html(conf.host+"/spl/"+provider.publicKey.toString()+"-"+peer);
+        setTimeout(() => {
+          $("#cover").fadeOut(400);
+          $("#cover_message").html("");
+        }, 3000);
+      }
+    }, 3000);
+  } 
+  catch(error) {
+    console.log("Error: ", error);
+    error = JSON.stringify(error);
+    error = JSON.parse(error);
+    console.log("Error Logs: ", error);
+    $("#cover_message").html("Error, Canceling Transaction...");
+    setTimeout(() => {
+      $("#cover").fadeOut(400);
+      $("#cover_message").html("");
+      $("#spl_deploy, .spl_choice, .spl_field, #spl_owner").prop("disabled", false);
+      $(".swap_spl_a, .swap_spl_b").addClass("active_spl");
+    }, 3000);
+    return;
+  }
+  
+}
+
+// spl reverse
+$(document).delegate("#swap_spl_reverse", "click", async function() {
+  
+  $("#cover").fadeIn(400);
+  $("#cover_message").html("Requesting Approval...");
+  
+  let connection = new solanaWeb3.Connection(conf.cluster, "confirmed");
+  provider = await wallet_provider();
+  
+  // These are passed
+  let taker = $("#spl_owner_b").val();
+  console.log("taker ", taker);
+  
+  let tokenSwapProgramId = new solanaWeb3.PublicKey(conf.MCSWAP_SPL_PROGRAM);
+  
+  let swapVaultPDA = solanaWeb3.PublicKey.findProgramAddressSync([Buffer.from("swap-vault")],tokenSwapProgramId);
+  console.log("Swap Vault PDA: ", swapVaultPDA[0].toString());
+  
+  let swapStatePDA = solanaWeb3.PublicKey.findProgramAddressSync([Buffer.from("swap-state"),
+  provider.publicKey.toBytes(), new solanaWeb3.PublicKey(taker).toBytes()],tokenSwapProgramId);
+  console.log("Swap State PDA: ", swapStatePDA[0].toString());
+  
+  let swapState = null;
+  await connection.getAccountInfo(swapStatePDA[0])
+  .then(function(response){swapState = response;})
+  .catch(function(error){
+    error = JSON.stringify(error);
+    error = JSON.parse(error);
+    console.log("Error: ", error);
+    return;
+  });
+  
+  let token1Mint = null;
+  let tempToken1Account = null;
+  let token2Mint = null;
+  let tempToken2Account = null;
+  if (swapState != null) {
+      let encodedSwapStateData = swapState.data;
+      let decodedSwapStateData = SWAP_SPL_STATE.decode(encodedSwapStateData);
+      console.log("swapState - is_initialized: ", decodedSwapStateData.is_initialized);
+      console.log("swapState - initializer: ", new solanaWeb3.PublicKey(decodedSwapStateData.initializer).toString());
+      console.log("swapState - token1_mint: ", new solanaWeb3.PublicKey(decodedSwapStateData.token1_mint).toString());
+      console.log("swapState - token1_amount", new BN(decodedSwapStateData.token1Amount, 10, "le").toString());
+      console.log("swapState - temp_token1_account", new solanaWeb3.PublicKey(decodedSwapStateData.temp_token1_account).toString());
+      console.log("swapState - token2_mint: ", new solanaWeb3.PublicKey(decodedSwapStateData.token2_mint).toString());
+      console.log("swapState - token2_amount", new BN(decodedSwapStateData.token2Amount, 10, "le").toString());
+      console.log("swapState - temp_token2_account", new solanaWeb3.PublicKey(decodedSwapStateData.temp_token2_account).toString());
+      token1Mint = new solanaWeb3.PublicKey(decodedSwapStateData.token1_mint);
+      tempToken1Account = new solanaWeb3.PublicKey(decodedSwapStateData.temp_token1_account);
+      token2Mint = new solanaWeb3.PublicKey(decodedSwapStateData.token2_mint);
+      tempToken2Account = new solanaWeb3.PublicKey(decodedSwapStateData.temp_token2_account);
+  } 
+  else {
+      console.log("Swap Not Initialized");    
+      return;
+  }  
+  
+  let token1ATA = await splToken.getAssociatedTokenAddress(token1Mint,provider.publicKey,
+  false,splToken.TOKEN_PROGRAM_ID,splToken.ASSOCIATED_TOKEN_PROGRAM_ID,);
+
+  let token2ATA = await splToken.getAssociatedTokenAddress(token2Mint,provider.publicKey,
+  false,splToken.TOKEN_PROGRAM_ID,splToken.ASSOCIATED_TOKEN_PROGRAM_ID,);
+
+  var totalSize = 1 + 32;
+  console.log("totalSize", totalSize);
+
+  var uarray = new Uint8Array(totalSize);    
+  let counter = 0;    
+  uarray[counter++] = 2; // 2 = token_swap ReverseSwap instruction
+
+  let takerb58 = bs58.decode(taker);
+  var arr = Array.prototype.slice.call(Buffer.from(takerb58), 0);
+  for (let i = 0; i < arr.length; i++) {uarray[counter++] = arr[i];}
+  
+  console.log("Data: ", uarray);
+  
+  let reverseSwapIx = new solanaWeb3.TransactionInstruction({
+  programId: tokenSwapProgramId,
+  data: Buffer.from(uarray),
+  keys: [
+    { pubkey: provider.publicKey, isSigner: true, isWritable: true }, // 0
+    { pubkey: swapVaultPDA[0], isSigner: false, isWritable: false }, // 1
+    { pubkey: swapStatePDA[0], isSigner: false, isWritable: true }, // 2
+    { pubkey: tempToken1Account, isSigner: false, isWritable: true }, // 3
+    { pubkey: tempToken2Account, isSigner: false, isWritable: true }, // 4
+    { pubkey: token1ATA, isSigner: false, isWritable: true }, // 5
+    { pubkey: token2ATA, isSigner: false, isWritable: true }, // 6
+    { pubkey: splToken.TOKEN_PROGRAM_ID, isSigner: false, isWritable: false }, // 7
+  ]});
+  console.log("Reverse Swap Ix: ", reverseSwapIx);
+  
+  let messageV0 = new solanaWeb3.TransactionMessage({payerKey: provider.publicKey,
+  recentBlockhash: (await connection.getRecentBlockhash('confirmed')).blockhash,
+  instructions: [reverseSwapIx],}).compileToV0Message([]);
+  let reverseSwapTx = new solanaWeb3.VersionedTransaction(messageV0);
+  try {
+    let signedTx = await provider.signTransaction(reverseSwapTx);
+    let txId = await connection.sendTransaction(signedTx);
+    console.log("Signature: ", txId)
+    console.log(`https://solscan.io/tx/${txId}`);
+    $("#cover_message").html("Finalizing Transaction...");
+    let splCancelID = setInterval(async function() {
+      let tx_status = await connection.getSignatureStatuses([txId], {searchTransactionHistory:true,});
+      if (tx_status.value[0].confirmationStatus == undefined) {} 
+      else if (tx_status.value[0].confirmationStatus == "finalized") {
+        clearInterval(splCancelID);
+        $("#cover_message").html("Proposal Closed.");
+        history.pushState("", "", '/');
+        $("#spl_img_5, #spl_img_6, #spl_img_7, #spl_img_8").attr("src","/img/default_token.png").addClass("spl_default");
+        $("#spl_choice_5, #spl_choice_6, #spl_choice_7, #spl_choice_8").html("•••");
+        $("#spl_field_5, #spl_field_6, #spl_field_7, #spl_field_8").val("");
+        $("#spl_owner_a, #spl_owner_b").val("");
+        $(".spl_tx_total_x .swap_amt").val(0);
+        $(".swap_spl_h").hide();
+        $("#scroll_wrapper").getNiceScroll().resize();
+        $("#scroll_wrapper").getNiceScroll(0).doScrollTop(0, 1000);
+        setTimeout(() => {
+          $("#cover").fadeOut(400);
+          $("#cover_message").html("");
+          $("#spl_choice_1").prop("disabled",false);
+        }, 3000);
+      }
+    }, 3000); 
+  } 
+  catch(error) {
+    console.log("Error: ", error);
+    error = JSON.stringify(error);
+    error = JSON.parse(error);
+    console.log("Error Logs: ", error);
+    $("#cover").fadeOut(400);
+    $("#cover_message").html("");
+    return;
+  }
+  
+});
+
+// spl execute
+$(document).delegate("#spl_execute", "click", async function() {
+    
+    $("#cover").fadeIn(400);
+    $("#cover_message").html("Requesting Approval...");
+  
+    let connection = new solanaWeb3.Connection(conf.cluster, "confirmed");
+    let tokenSwapProgramId = new solanaWeb3.PublicKey(conf.MCSWAP_SPL_PROGRAM);  
+    
+    let swapInitializer = $("#spl_owner_a").val(); // phantom hot account
+    console.log("swapInitializer ", swapInitializer);
+    
+    let programStatePDA = solanaWeb3.PublicKey.findProgramAddressSync([Buffer.from("program-state")],tokenSwapProgramId);
+    console.log("Program State PDA: ", programStatePDA[0].toString());
+    
+    let programState = null;
+    await connection.getAccountInfo(programStatePDA[0])
+    .then(function(response){programState = response;})
+    .catch(function(error){
+        error = JSON.stringify(error);
+        error = JSON.parse(error);
+        console.log("Error: ", error);
+        return;
+      });
+  
+    let pickleMint = null;
+    let feeChips = null;
+    let devTreasury = null;
+    let mcDegensTreasury = null;
+    if (programState != null) {
+        let encodedProgramStateData = programState.data;
+        let decodedProgramStateData = PROGRAM_STATE.decode(encodedProgramStateData);
+        console.log("programState - is_initialized: ", decodedProgramStateData.is_initialized);
+        console.log("programState - pickle_mint: ", new solanaWeb3.PublicKey(decodedProgramStateData.pickle_mint).toString());
+        console.log("programState - fee_chips: ", new BN(decodedProgramStateData.fee_chips, 10, "le").toString());
+        console.log("programState - dev_percentage: ", new BN(decodedProgramStateData.dev_percentage, 10, "le").toString());
+        console.log("programState - dev_treasury: ", new solanaWeb3.PublicKey(decodedProgramStateData.dev_treasury).toString());
+        console.log("programState - mcdegens_treasury: ", new solanaWeb3.PublicKey(decodedProgramStateData.mcdegens_treasury).toString());
+        pickleMint = new solanaWeb3.PublicKey(decodedProgramStateData.pickle_mint);
+        feeChips = new BN(decodedProgramStateData.fee_chips, 10, "le");
+        devTreasury = new solanaWeb3.PublicKey(decodedProgramStateData.dev_treasury);
+        mcDegensTreasury = new solanaWeb3.PublicKey(decodedProgramStateData.mcdegens_treasury);
+    } 
+    else {
+        console.log("Program State Not Initialized");    
+        return;
+    }  
+    
+    let swapVaultPDA = solanaWeb3.PublicKey.findProgramAddressSync( [Buffer.from("swap-vault")],tokenSwapProgramId);
+    console.log("Swap Vault PDA: ", swapVaultPDA[0].toString());
+
+    let swapStatePDA = solanaWeb3.PublicKey.findProgramAddressSync([Buffer.from("swap-state"), 
+    new solanaWeb3.PublicKey(swapInitializer).toBytes(), provider.publicKey.toBytes()],tokenSwapProgramId);
+    console.log("Swap State PDA: ", swapStatePDA[0].toString());
+
+    let swapState = null;
+    await connection.getAccountInfo(swapStatePDA[0])
+    .then(function(response){swapState = response;})
+    .catch(function(error) {
+      error = JSON.stringify(error);
+      error = JSON.parse(error);
+      console.log("Error: ", error);
+      return;
+    });  
+    
+    let initializer = null;
+    let token1Mint = null;
+    let token1Amount = null;
+    let tempToken1Account = null;
+    let token2Mint = null;
+    let token2Amount = null;
+    let tempToken2Account = null;
+    let taker = null
+    let token3Mint = null;
+    let token3Amount = null;
+    let token4Mint = null;
+    let token4Amount = null;  
+    if (swapState != null) {
+      let encodedSwapStateData = swapState.data;
+      let decodedSwapStateData = SWAP_SPL_STATE.decode(encodedSwapStateData);
+      console.log("swapState - is_initialized: ", decodedSwapStateData.is_initialized);
+      console.log("swapState - initializer: ", new solanaWeb3.PublicKey(decodedSwapStateData.initializer).toString());
+      console.log("swapState - token1_mint: ", new solanaWeb3.PublicKey(decodedSwapStateData.token1_mint).toString());
+      console.log("swapState - token1_amount", new BN(decodedSwapStateData.token1_amount, 10, "le").toString());
+      console.log("swapState - temp_token1_account", new solanaWeb3.PublicKey(decodedSwapStateData.temp_token1_account).toString());
+      console.log("swapState - token2_mint: ", new solanaWeb3.PublicKey(decodedSwapStateData.token2_mint).toString());
+      console.log("swapState - token2_amount", new BN(decodedSwapStateData.token2_amount, 10, "le").toString());
+      console.log("swapState - temp_token2_account", new solanaWeb3.PublicKey(decodedSwapStateData.temp_token2_account).toString());
+      console.log("swapState - taker: ", new solanaWeb3.PublicKey(decodedSwapStateData.taker).toString());
+      console.log("swapState - token3_mint: ", new solanaWeb3.PublicKey(decodedSwapStateData.token3_mint).toString());
+      console.log("swapState - token3_amount", new BN(decodedSwapStateData.token3_amount, 10, "le").toString());
+      console.log("swapState - token4_mint: ", new solanaWeb3.PublicKey(decodedSwapStateData.token4_mint).toString());
+      console.log("swapState - token4_amount", new BN(decodedSwapStateData.token4_amount, 10, "le").toString());
+      initializer = new solanaWeb3.PublicKey(decodedSwapStateData.initializer);
+      token1Mint = new solanaWeb3.PublicKey(decodedSwapStateData.token1_mint);
+      token1Amount = new BN(decodedSwapStateData.token1_amount, 10, "le");
+      tempToken1Account = new solanaWeb3.PublicKey(decodedSwapStateData.temp_token1_account);
+      token2Mint = new solanaWeb3.PublicKey(decodedSwapStateData.token2_mint);
+      token2Amount = new BN(decodedSwapStateData.token2_amount, 10, "le");
+      tempToken2Account = new solanaWeb3.PublicKey(decodedSwapStateData.temp_token2_account);
+      taker = new solanaWeb3.PublicKey(decodedSwapStateData.taker);
+      token3Mint = new solanaWeb3.PublicKey(decodedSwapStateData.token3_mint);
+      token3Amount = new BN(decodedSwapStateData.token3_amount, 10, "le");
+      token4Mint = new solanaWeb3.PublicKey(decodedSwapStateData.token4_mint);
+      token4Amount = new BN(decodedSwapStateData.token4_amount, 10, "le");
+    } 
+    else {
+      console.log("Swap Not Initialized");    
+      return;
+    }
+    
+    let rent = await connection.getMinimumBalanceForRentExemption(splToken.AccountLayout.span);
+      
+    let tempFeeAccount = new solanaWeb3.Keypair();
+    console.log("Temp Fee Account: ", tempFeeAccount.publicKey.toString());
+    let createTempFeeAccountIx = solanaWeb3.SystemProgram.createAccount({
+        programId: splToken.TOKEN_PROGRAM_ID,
+        space: splToken.AccountLayout.span,
+        lamports: rent,
+        fromPubkey: provider.publicKey,
+        newAccountPubkey: tempFeeAccount.publicKey,
+    });    
+    console.log("Create Temp Fee Account Ix: ", createTempFeeAccountIx);    
+
+    let initTempFeeAccountIx = splToken.createInitializeAccountInstruction(
+        tempFeeAccount.publicKey,
+        new solanaWeb3.PublicKey(pickleMint),
+        tempFeeAccount.publicKey,
+        splToken.TOKEN_PROGRAM_ID
+    );
+    console.log("Init Temp Fee Account Ix: ", initTempFeeAccountIx);
+
+    let providerPickleATA = await splToken.getAssociatedTokenAddress(
+        new solanaWeb3.PublicKey(pickleMint),
+        provider.publicKey,
+        false,
+        splToken.TOKEN_PROGRAM_ID,
+        splToken.ASSOCIATED_TOKEN_PROGRAM_ID,
+    );    
+    let transferPickleIx = splToken.createTransferInstruction(
+        providerPickleATA,
+        tempFeeAccount.publicKey,
+        provider.publicKey,
+        feeChips,
+        provider.publicKey,
+        splToken.TOKEN_PROGRAM_ID,
+    )
+    console.log("Transfer Pickle Ix: ", transferPickleIx);
+    
+    let createTempToken3AccountIx = null;
+    let initTempToken3AccountIx = null;
+    let transferToken3Ix = null;
+    
+    let tempToken3Account = new solanaWeb3.Keypair();
+    console.log("Temp Token3 Account: ", tempToken3Account.publicKey.toString());
+    if (token3Mint.toString() != "11111111111111111111111111111111") {
+        createTempToken3AccountIx = solanaWeb3.SystemProgram.createAccount({
+            programId: splToken.TOKEN_PROGRAM_ID,
+            space: splToken.AccountLayout.span,
+            lamports: rent,
+            fromPubkey: provider.publicKey,
+            newAccountPubkey: tempToken3Account.publicKey,
+        });    
+        console.log("Create Temp Token3 Account Ix: ", createTempToken3AccountIx);    
+
+        initTempToken3AccountIx = splToken.createInitializeAccountInstruction(
+            tempToken3Account.publicKey,
+            token3Mint,
+            tempToken3Account.publicKey,
+            splToken.TOKEN_PROGRAM_ID
+        );
+        console.log("Init Temp Token3 Account Ix: ", initTempToken3AccountIx);
+
+        let providerToken3ATA = await splToken.getAssociatedTokenAddress(
+            token3Mint,
+            provider.publicKey,
+            false,
+            splToken.TOKEN_PROGRAM_ID,
+            splToken.ASSOCIATED_TOKEN_PROGRAM_ID,
+        );
+        transferToken3Ix = splToken.createTransferInstruction(
+          providerToken3ATA,
+          tempToken3Account.publicKey,
+          provider.publicKey,
+          token3Amount,
+          provider.publicKey,
+          splToken.TOKEN_PROGRAM_ID,
+        )
+        console.log("Transfer Token3 Ix: ", transferToken3Ix);
+    } 
+    else {
+        createTempToken3AccountIx = solanaWeb3.SystemProgram.createAccount({
+            programId: tokenSwapProgramId,
+            space: 0,
+            lamports: token3Amount,
+            fromPubkey: provider.publicKey,
+            newAccountPubkey: tempToken3Account.publicKey,
+        });    
+        console.log("Create Token3 Account Tx: ", createTempToken3AccountIx);    
+    }    
+    
+    let tempToken4Account = new solanaWeb3.Keypair();
+    let createTempToken4AccountIx = null;
+    let initTempToken4AccountIx = null;
+    let transferToken4Ix = null;
+    
+    if (token4Amount > 0) {
+        console.log("Temp Token4 Account: ", tempToken4Account.publicKey.toString());
+        createTempToken4AccountIx = solanaWeb3.SystemProgram.createAccount({
+            programId: splToken.TOKEN_PROGRAM_ID,
+            space: splToken.AccountLayout.span,
+            lamports: rent,
+            fromPubkey: provider.publicKey,
+            newAccountPubkey: tempToken4Account.publicKey,
+        });    
+        console.log("Create Temp Token4 Account Ix: ", createTempToken4AccountIx);    
+
+        initTempToken4AccountIx = splToken.createInitializeAccountInstruction(
+            tempToken4Account.publicKey,
+            token4Mint,
+            tempToken4Account.publicKey,
+            splToken.TOKEN_PROGRAM_ID
+        );
+        console.log("Init Temp Token4 Account Ix: ", initTempToken4AccountIx);
+
+        let providerToken4ATA = await splToken.getAssociatedTokenAddress(
+            token4Mint,
+            provider.publicKey,
+            false,
+            splToken.TOKEN_PROGRAM_ID,
+            splToken.ASSOCIATED_TOKEN_PROGRAM_ID,
+        );    
+        transferToken4Ix = splToken.createTransferInstruction(
+            providerToken4ATA,
+            tempToken4Account.publicKey,
+            provider.publicKey,
+            token4Amount,
+            provider.publicKey,
+            splToken.TOKEN_PROGRAM_ID,
+        )
+        console.log("Transfer Token4 Ix: ", transferToken4Ix);
+    }  
+  
+    let createToken1ATA = null;
+    let createToken1ATAIx = null;
+    let token1ATA = await splToken.getAssociatedTokenAddress(
+        token1Mint,
+        provider.publicKey,
+        false,
+        splToken.TOKEN_PROGRAM_ID,
+        splToken.ASSOCIATED_TOKEN_PROGRAM_ID,
+    );
+    console.log("Token1 ATA: ", token1ATA.toString());
+
+    await connection.getAccountInfo(token1ATA)
+    .then(function(response) {
+            console.log("token1ATA response ", response);
+            if (response == null) {
+                createToken1ATA = true;
+                createToken1ATAIx = splToken.createAssociatedTokenAccountInstruction(
+                    provider.publicKey,
+                    token1ATA,
+                    provider.publicKey,
+                    token1Mint,
+                    splToken.TOKEN_PROGRAM_ID,
+                    splToken.ASSOCIATED_TOKEN_PROGRAM_ID,
+                )
+                console.log("Create Token1 ATA Ix: ", createToken1ATAIx);
+            } else {
+                createToken1ATA = false;
+            }
+        })
+    .catch(function(error) {
+            error = JSON.stringify(error);
+            error = JSON.parse(error);
+            console.log("Error: ", error);
+            return;
+        });
+    console.log("createToken1ATA ", createToken1ATA);  
+    
+    let token2ATA = token1ATA;
+    let createToken2ATA = null;
+    let createToken2ATAIx = null;
+    if (token2Amount > 0) {
+        token2ATA = await splToken.getAssociatedTokenAddress(
+          token2Mint,
+          provider.publicKey,
+          false,
+          splToken.TOKEN_PROGRAM_ID,
+          splToken.ASSOCIATED_TOKEN_PROGRAM_ID,
+        );
+        console.log("Token2 ATA: ", token2ATA.toString());
+        
+        await connection.getAccountInfo(token2ATA)
+        .then(function(response) {
+                console.log("token2ATA response ", response);
+                if (response == null) {
+                    createToken2ATA = true;
+                    createToken2ATAIx = splToken.createAssociatedTokenAccountInstruction(
+                        provider.publicKey,
+                        token2ATA,
+                        provider.publicKey,
+                        token2Mint,
+                        splToken.TOKEN_PROGRAM_ID,
+                        splToken.ASSOCIATED_TOKEN_PROGRAM_ID,
+                    )
+                    console.log("Create Token2 ATA Ix: ", createToken2ATAIx);
+                } else {
+                    createToken2ATA = false;
+                }
+            })
+        .catch(function(error) {
+          error = JSON.stringify(error);
+          error = JSON.parse(error);
+          console.log("Error: ", error);
+          return;
+        });
+        console.log("createToken2ATA ", createToken2ATA);
+    }  
+    
+    let token3ATA = initializer;
+    if (token3Mint.toString() != "11111111111111111111111111111111") {
+      token3ATA = await splToken.getAssociatedTokenAddress(
+        token3Mint,
+        initializer,
+        false,
+        splToken.TOKEN_PROGRAM_ID,
+        splToken.ASSOCIATED_TOKEN_PROGRAM_ID,
+      );
+      console.log("Token3 ATA: ", token3ATA.toString());
+    }  
+  
+    let token4ATA = token3ATA;
+    if (token4Amount > 0) {
+      token4ATA = await splToken.getAssociatedTokenAddress(
+        token4Mint,
+        initializer,
+        false,
+        splToken.TOKEN_PROGRAM_ID,
+        splToken.ASSOCIATED_TOKEN_PROGRAM_ID,);
+      console.log("Token4 ATA: ", token4ATA.toString());
+    }
+  
+    let totalSize = 1;
+    console.log("totalSize", totalSize);
+
+    let uarray = new Uint8Array(totalSize);    
+    let counter = 0;    
+    uarray[counter++] = 1; // 1 = token_swap SwapNFTs instruction
+    console.log("Data: ", uarray);
+    
+    let swapTokensIx = new solanaWeb3.TransactionInstruction({
+        programId: tokenSwapProgramId,
+        data: Buffer.from(
+            uarray
+        ),
+        keys: [
+            { pubkey: provider.publicKey, isSigner: true, isWritable: true }, // 0
+            { pubkey: initializer, isSigner: false, isWritable: true }, // 1
+            { pubkey: programStatePDA[0], isSigner: false, isWritable: false }, // 2
+            { pubkey: swapVaultPDA[0], isSigner: false, isWritable: false }, // 3
+            { pubkey: swapStatePDA[0], isSigner: false, isWritable: true }, // 4
+            { pubkey: tempToken1Account, isSigner: false, isWritable: true }, // 5
+            { pubkey: tempToken2Account, isSigner: false, isWritable: true }, // 6
+            { pubkey: tempToken3Account.publicKey, isSigner: false, isWritable: true }, // 7
+            { pubkey: tempToken4Account.publicKey, isSigner: true, isWritable: true }, // 8
+            { pubkey: token1ATA, isSigner: false, isWritable: true }, // 9
+            { pubkey: token2ATA, isSigner: false, isWritable: true }, // 10
+            { pubkey: token3ATA, isSigner: false, isWritable: true }, // 11
+            { pubkey: token4ATA, isSigner: false, isWritable: true }, // 12
+            { pubkey: tempFeeAccount.publicKey, isSigner: true, isWritable: true }, // 13
+            { pubkey: splToken.TOKEN_PROGRAM_ID, isSigner: false, isWritable: false }, // 14
+            { pubkey: devTreasury, isSigner: false, isWritable: true }, // 15
+            { pubkey: mcDegensTreasury, isSigner: false, isWritable: true }, // 16
+        ]
+    });
+    console.log("Swap Tokens Ix: ", swapTokensIx);  
+    
+    let lookupTable = new solanaWeb3.PublicKey(conf.spl_alt);
+	  let lookupTableAccount = await connection
+		.getAddressLookupTable(lookupTable)
+		.then((res) => res.value);
+    if (!lookupTableAccount) {
+        console.log("Could not fetch ALT!");
+        return;
+    }
+  
+    let messageV0 = null;
+    if (token4Amount > 0) {
+        if (token3Mint.toString() != "11111111111111111111111111111111") {
+            if (createToken1ATA == true && createToken2ATA) {
+                console.log("1");
+                messageV0 = new solanaWeb3.TransactionMessage({
+                    payerKey: provider.publicKey,
+                    recentBlockhash: (await connection.getRecentBlockhash('confirmed')).blockhash,
+                    instructions: [
+                        createTempFeeAccountIx,
+                        initTempFeeAccountIx,
+                        transferPickleIx,
+                        createTempToken3AccountIx,
+                        initTempToken3AccountIx,
+                        transferToken3Ix,
+                        createTempToken4AccountIx,
+                        initTempToken4AccountIx,
+                        transferToken4Ix,            
+                        createToken1ATAIx,
+                        createToken2ATAIx,
+                        swapTokensIx             
+                    ],
+                }).compileToV0Message([lookupTableAccount]);
+            } 
+            else if (createToken1ATA) {
+                console.log("2");
+                messageV0 = new solanaWeb3.TransactionMessage({
+                    payerKey: provider.publicKey,
+                    recentBlockhash: (await connection.getRecentBlockhash('confirmed')).blockhash,
+                    instructions: [
+                        createTempFeeAccountIx,
+                        initTempFeeAccountIx,
+                        transferPickleIx,
+                        createTempToken3AccountIx,
+                        initTempToken3AccountIx,
+                        transferToken3Ix,
+                        createTempToken4AccountIx,
+                        initTempToken4AccountIx,
+                        transferToken4Ix,            
+                        createToken1ATAIx,
+                        swapTokensIx             
+                    ],
+                }).compileToV0Message([lookupTableAccount]);
+            } 
+            else if (createToken2ATA) {
+                console.log("3");
+                messageV0 = new solanaWeb3.TransactionMessage({
+                    payerKey: provider.publicKey,
+                    recentBlockhash: (await connection.getRecentBlockhash('confirmed')).blockhash,
+                    instructions: [
+                        createTempFeeAccountIx,
+                        initTempFeeAccountIx,
+                        transferPickleIx,
+                        createTempToken3AccountIx,
+                        initTempToken3AccountIx,
+                        transferToken3Ix,
+                        createTempToken4AccountIx,
+                        initTempToken4AccountIx,
+                        transferToken4Ix,            
+                        createToken2ATAIx,
+                        swapTokensIx             
+                    ],
+                }).compileToV0Message([lookupTableAccount]);
+            } 
+            else {
+                console.log("4");
+                messageV0 = new solanaWeb3.TransactionMessage({
+                    payerKey: provider.publicKey,
+                    recentBlockhash: (await connection.getRecentBlockhash('confirmed')).blockhash,
+                    instructions: [
+                        createTempFeeAccountIx,
+                        initTempFeeAccountIx,
+                        transferPickleIx,
+                        createTempToken3AccountIx,
+                        initTempToken3AccountIx,
+                        transferToken3Ix,
+                        createTempToken4AccountIx,
+                        initTempToken4AccountIx,
+                        transferToken4Ix,            
+                        swapTokensIx
+                    ],
+                }).compileToV0Message([lookupTableAccount]);
+            }
+        } 
+      else {
+            if (createToken1ATA == true && createToken2ATA) {
+                console.log("5");
+                messageV0 = new solanaWeb3.TransactionMessage({
+                    payerKey: provider.publicKey,
+                    recentBlockhash: (await connection.getRecentBlockhash('confirmed')).blockhash,
+                    instructions: [
+                        createTempFeeAccountIx,
+                        initTempFeeAccountIx,
+                        transferPickleIx,
+                        createTempToken3AccountIx,
+                        createTempToken4AccountIx,
+                        initTempToken4AccountIx,
+                        transferToken4Ix,            
+                        createToken1ATAIx,
+                        createToken2ATAIx,
+                        swapTokensIx             
+                    ],
+                }).compileToV0Message([lookupTableAccount]);
+            } else if (createToken1ATA) {
+                console.log("6");
+                messageV0 = new solanaWeb3.TransactionMessage({
+                    payerKey: provider.publicKey,
+                    recentBlockhash: (await connection.getRecentBlockhash('confirmed')).blockhash,
+                    instructions: [
+                        createTempFeeAccountIx,
+                        initTempFeeAccountIx,
+                        transferPickleIx,
+                        createTempToken3AccountIx,
+                        createTempToken4AccountIx,
+                        initTempToken4AccountIx,
+                        transferToken4Ix,            
+                        createToken1ATAIx,
+                        swapTokensIx             
+                    ],
+                }).compileToV0Message([lookupTableAccount]);
+            } else if (createToken2ATA) {
+                console.log("7");
+                messageV0 = new solanaWeb3.TransactionMessage({
+                    payerKey: provider.publicKey,
+                    recentBlockhash: (await connection.getRecentBlockhash('confirmed')).blockhash,
+                    instructions: [
+                        createTempFeeAccountIx,
+                        initTempFeeAccountIx,
+                        transferPickleIx,
+                        createTempToken3AccountIx,
+                        createTempToken4AccountIx,
+                        initTempToken4AccountIx,
+                        transferToken4Ix,            
+                        createToken2ATAIx,
+                        swapTokensIx             
+                    ],
+                }).compileToV0Message([lookupTableAccount]);
+            } else {
+                console.log("8");
+                messageV0 = new solanaWeb3.TransactionMessage({
+                    payerKey: provider.publicKey,
+                    recentBlockhash: (await connection.getRecentBlockhash('confirmed')).blockhash,
+                    instructions: [
+                        createTempFeeAccountIx,
+                        initTempFeeAccountIx,
+                        transferPickleIx,
+                        createTempToken3AccountIx,
+                        createTempToken4AccountIx,
+                        initTempToken4AccountIx,
+                        transferToken4Ix,            
+                        swapTokensIx             
+                    ],
+                }).compileToV0Message([lookupTableAccount]);
+            }            
+        }
+    } 
+    else {        
+        if (token3Mint.toString() != "11111111111111111111111111111111") {
+            if (createToken1ATA == true && createToken2ATA) {
+                console.log("9");
+                messageV0 = new solanaWeb3.TransactionMessage({
+                    payerKey: provider.publicKey,
+                    recentBlockhash: (await connection.getRecentBlockhash('confirmed')).blockhash,
+                    instructions: [
+                        createTempFeeAccountIx,
+                        initTempFeeAccountIx,
+                        transferPickleIx,
+                        createTempToken3AccountIx,
+                        initTempToken3AccountIx,
+                        transferToken3Ix,
+                        createToken1ATAIx,
+                        createToken2ATAIx,
+                        swapTokensIx             
+                    ],
+                }).compileToV0Message([lookupTableAccount]);
+            } else if (createToken1ATA) {
+                console.log("10");
+                messageV0 = new solanaWeb3.TransactionMessage({
+                    payerKey: provider.publicKey,
+                    recentBlockhash: (await connection.getRecentBlockhash('confirmed')).blockhash,
+                    instructions: [
+                        createTempFeeAccountIx,
+                        initTempFeeAccountIx,
+                        transferPickleIx,
+                        createTempToken3AccountIx,
+                        initTempToken3AccountIx,
+                        transferToken3Ix,
+                        createToken1ATAIx,
+                        swapTokensIx             
+                    ],
+                }).compileToV0Message([lookupTableAccount]);
+            } else if (createToken2ATA) {
+                console.log("11");
+                messageV0 = new solanaWeb3.TransactionMessage({
+                    payerKey: provider.publicKey,
+                    recentBlockhash: (await connection.getRecentBlockhash('confirmed')).blockhash,
+                    instructions: [
+                        createTempFeeAccountIx,
+                        initTempFeeAccountIx,
+                        transferPickleIx,
+                        createTempToken3AccountIx,
+                        initTempToken3AccountIx,
+                        transferToken3Ix,
+                        createToken2ATAIx,
+                        swapTokensIx             
+                    ],
+                }).compileToV0Message([lookupTableAccount]);
+            } else {
+                console.log("12");
+                messageV0 = new solanaWeb3.TransactionMessage({
+                    payerKey: provider.publicKey,
+                    recentBlockhash: (await connection.getRecentBlockhash('confirmed')).blockhash,
+                    instructions: [
+                        createTempFeeAccountIx,
+                        initTempFeeAccountIx,
+                        transferPickleIx,
+                        createTempToken3AccountIx,
+                        initTempToken3AccountIx,
+                        transferToken3Ix,
+                        swapTokensIx             
+                    ],
+                }).compileToV0Message([lookupTableAccount]);
+            }
+        } else {
+            if (createToken1ATA == true && createToken2ATA) {
+                console.log("13");
+                messageV0 = new solanaWeb3.TransactionMessage({
+                    payerKey: provider.publicKey,
+                    recentBlockhash: (await connection.getRecentBlockhash('confirmed')).blockhash,
+                    instructions: [
+                        createTempFeeAccountIx,
+                        initTempFeeAccountIx,
+                        transferPickleIx,
+                        createTempToken3AccountIx,
+                        createToken1ATAIx,
+                        createToken2ATAIx,
+                        swapTokensIx             
+                    ],
+                }).compileToV0Message([lookupTableAccount]);
+            } else if (createToken1ATA) {
+                console.log("14");
+                messageV0 = new solanaWeb3.TransactionMessage({
+                    payerKey: provider.publicKey,
+                    recentBlockhash: (await connection.getRecentBlockhash('confirmed')).blockhash,
+                    instructions: [
+                        createTempFeeAccountIx,
+                        initTempFeeAccountIx,
+                        transferPickleIx,
+                        createTempToken3AccountIx,
+                        createToken1ATAIx,
+                        swapTokensIx             
+                    ],
+                }).compileToV0Message([lookupTableAccount]);
+            } else if (createToken2ATA) {
+                console.log("15");
+                messageV0 = new solanaWeb3.TransactionMessage({
+                    payerKey: provider.publicKey,
+                    recentBlockhash: (await connection.getRecentBlockhash('confirmed')).blockhash,
+                    instructions: [
+                        createTempFeeAccountIx,
+                        initTempFeeAccountIx,
+                        transferPickleIx,
+                        createTempToken3AccountIx,
+                        createToken2ATAIx,
+                        swapTokensIx             
+                    ],
+                }).compileToV0Message([lookupTableAccount]);
+            } else {
+                console.log("16");
+                messageV0 = new solanaWeb3.TransactionMessage({
+                    payerKey: provider.publicKey,
+                    recentBlockhash: (await connection.getRecentBlockhash('confirmed')).blockhash,
+                    instructions: [
+                        createTempFeeAccountIx,
+                        initTempFeeAccountIx,
+                        transferPickleIx,
+                        createTempToken3AccountIx,
+                        swapTokensIx             
+                    ],
+                }).compileToV0Message([lookupTableAccount]);
+            }            
+        }
+    }
+    console.log("messageV0 ", messageV0);  
+    
+    let swapTokensTx = new solanaWeb3.VersionedTransaction(messageV0);
+    
+    try {
+      let signedTx = await provider.signTransaction(swapTokensTx);
+      signedTx.sign([tempFeeAccount, tempToken3Account, tempToken4Account]);
+      let txId = await connection.sendTransaction(signedTx);
+      console.log("Signature: ", txId);
+      console.log(`https://solscan.io/tx/${txId}`);
+      $("#cover_message").html("Finalizing Transaction...");
+      let splExecID = setInterval(async function() {
+        let tx_status = await connection.getSignatureStatuses([txId], {searchTransactionHistory:true,});
+        if (tx_status.value[0].confirmationStatus == undefined) {} 
+        else if (tx_status.value[0].confirmationStatus == "finalized") {
+          clearInterval(splExecID);
+          $(".share_spl_exec_sig .swap_val").html(txId);
+          $("#cover_message").html("Swap Complete.");
+          history.pushState("", "", '/');
+          $("#spl_img_5, #spl_img_6, #spl_img_7, #spl_img_8").attr("src","/img/default_token.png").addClass("spl_default");
+          $("#spl_choice_5, #spl_choice_6, #spl_choice_7, #spl_choice_8").html("•••");
+          $("#spl_field_5, #spl_field_6, #spl_field_7, #spl_field_8").val("");
+          $("#spl_owner_a, #spl_owner_b").val("");
+          $(".spl_tx_total_x .swap_amt").val(0);
+          $(".swap_spl_h").hide();
+          $("#scroll_wrapper").getNiceScroll().resize();
+          setTimeout(() => {
+            $("#cover").fadeOut(400);
+            $("#cover_message").html("");
+            $("#spl_choice_1").prop("disabled",false);
+          }, 3000);
+        }
+      }, 3000); 
+    } 
+    catch(error) {
+      console.log("Error: ", error);
+      error = JSON.stringify(error);
+      error = JSON.parse(error);
+      console.log("Error Logs: ", error);
+      $("#cover").fadeOut(400);
+      $("#cover_message").html("");
+      return;
+    }  
+  
+});
+
+// idle disconnect
+$(this).mousemove(function (e) {idleTime = 1;});
+$(this).keypress(function (e) {idleTime = 1;});
+async function idleIncrement(limit) {
+  idleTime = idleTime + 1;
+  if(idleTime > limit && $("#wallet_disconnect").is(":visible")){
+    $("#wallet_disconnect").click();
+    console.log("user idle");
+  }
+}
+idleInterval = setInterval(function(){idleIncrement(conf.idler)}, 60000);
+
 // after the dom is ready
 $(window).on('load', function() {
   $("#social_discord").parent().html(social_1);
@@ -5181,7 +6872,7 @@ $(window).on('load', function() {
       railalign: "right"
   });
   $("#swap_token_options").niceScroll({
-      cursorcolor: "#fff",
+      cursorcolor: conf.scrollbar,
       cursoropacitymin: 1,
       cursoropacitymax: 1,
       cursorwidth: "7px",
@@ -5192,10 +6883,10 @@ $(window).on('load', function() {
       bouncescroll: false,
       horizrailenabled: false,
       railpadding: {
-        top: 1,
-        right: 2,
+        top: 7,
+        right: 7,
         left: 0,
-        bottom: 1
+        bottom: 7
       },
       railalign: "right"
     });
@@ -5218,10 +6909,7 @@ $(window).on('load', function() {
   setTimeout(() => {swap_viewer();},400);  
   //////////////////////////////////////////////////////////////////////////
   $("#wallet_tool").html(conf.wallet_name);
-//   $(".custom_symbol").html(conf.pikl_symbol);
-  $("#mc_swap_shop .mc_title").html(conf.shop_name);
   $("#mcprofile_nav ul li").first().find("button").click();
-//   $(".pikl_icon").attr("src",conf.pikl_image);
   $("#wallet_box").css({"background-image":"url("+conf.logo_wallet+")"});
   $("#center_logo").attr("src",conf.logo);
   $("#set_discord").attr("href",conf.discord);
@@ -5234,5 +6922,16 @@ $(window).on('load', function() {
   $("title").html(conf.title);
   $("#donat_to").html(conf.wallet_name);
   $("#donat_address").html(conf.sol);
+  $("#vrs").html(conf.version);
+  setTimeout(() => {
+    $("#init_cover").fadeOut(400);
+    $("#init_loader").fadeOut(400);
+    setTimeout(() => {
+      $("#center_logo").addClass("animate__animated animate__zoomIn").show();
+      setTimeout(() => {
+        $("#socials").addClass("animate__animated animate__fadeInUp").show();
+      },1000);
+    },700);
+  },2000);
   ////////////////////////////////////////////////////////////////////////// 
 });
