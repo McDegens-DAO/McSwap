@@ -1,7 +1,7 @@
 # McSwap
 The Trustless P2P NFT/cNFT/SPL Trade dApp.
 
-Version: 1.5 (beta)
+Version: 1.6 (beta)
 
 Published by: [McDegens DAO](https://discord.com/invite/hXXDvYTQhj)
 
@@ -43,10 +43,6 @@ The following skins are included as examples.
 * mycelium
 
 ![Mycelium](https://mcswap.xyz/img/screen-mycelium.png)
-
-* ducktrader
-
-![McSwap](https://mcswap.xyz/img/screen-ducktrader.png)
 
 1. Copy your preferred skin folder in [css/skins](https://github.com/McDegens-DAO/McSwap/tree/main/css/skins) and give it a new name.
 2. Replace images in your new folder as needed.
