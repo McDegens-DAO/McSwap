@@ -162,3 +162,13 @@ button#wallet_view img, button.mcprofile_open, button.mcprofile_close, img#donat
   -webkit-filter: invert(90%);
   filter: invert(90%);
 }
+
+button#mode_spl, button#mode_nft{
+  background: #1254a5;
+  background: linear-gradient(180deg, #00aeef 0%, #1254a5 100%);
+}
+
+button#mode_spl:hover, button#mode_nft:hover{
+  background: #1254a5;
+  background: linear-gradient(180deg, #00aeef 0%, #1254a5 100%);
+}
