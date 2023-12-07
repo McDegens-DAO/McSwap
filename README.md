@@ -34,16 +34,6 @@ Create a ticket at our [Discord](https://discord.com/invite/hXXDvYTQhj)
 3. Extract the contents of the package.
 
 ## Skins
-The following skins are included as examples. 
-
-* default
-
-![McSwap](https://mcswap.xyz/img/screen-mcswap.png)
-
-* mycelium
-
-![Mycelium](https://mcswap.xyz/img/screen-mycelium.png)
-
 1. Copy your preferred skin folder in [css/skins](https://github.com/McDegens-DAO/McSwap/tree/main/css/skins) and give it a new name.
 2. Replace images in your new folder as needed.
 3. Add css rules to the default.css file in your new folder to override the default css rules.
