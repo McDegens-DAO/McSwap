@@ -205,7 +205,7 @@ const spl_tokens = [
 
 ## Deeplinks
 
-### Share Proposal
+### Share/Read Proposal
 These links are automatically generated for you after deploying a new proposal. They are meant to be shared with the party you are trading with via your preferred messaging app.
 
 P2P cNFT & NFT Trades
