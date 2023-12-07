@@ -334,5 +334,18 @@ const combos_ = [
         "Masks": "Clown"
       }
     ]
+  },
+  {
+    "name": "Tokers",
+    "traits": [{
+        "Headwear": "McDegens"
+      },
+      {
+        "Outfits": "McDegens"
+      },
+      {
+        "Hoods": "Blue"
+      }
+    ]
   }
 ];
