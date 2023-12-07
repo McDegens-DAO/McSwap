@@ -208,13 +208,17 @@ const spl_tokens = [
 ### Share Proposal
 These links are automatically generated for you after deploying a new proposal. They are meant to be shared with the party you are trading with via your preferred messaging app.
 
-P2P Trades
+P2P cNFT & NFT Trades
 ```javascript
 https://your-domain.com/swap/ASSET_ID_1-ASSET_ID_2
 ```
-P2P Sales
+P2P cNFT & NFT Sales
 ```javascript
 https://your-domain.com/swap/ASSET_ID_1-
+```
+P2P SPL Trades
+```javascript
+https://your-domain.com/spl/PEER_1_WALLET-PEER_2_WALLET
 ```
 
 ### Start Proposal
