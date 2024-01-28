@@ -1240,7 +1240,8 @@ $(document).delegate("#wallet_cnfts", "click", async function() {
           ass.hasOwnProperty('content') &&
           ass.content.hasOwnProperty('files') &&
           typeof ass.content.files[0] == "object" &&
-          ass.content.files[0].hasOwnProperty('uri')
+          ass.content.files[0].hasOwnProperty('uri') &&
+	  typeof ass.grouping[0] != "undefined"
         ) {
           let rebuild = {};
           rebuild.mint = ass.id;
