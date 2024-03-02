@@ -3,6 +3,8 @@ The Trustless P2P NFT/cNFT/SPL Trade dApp.
 
 Version: 1.6 (beta)
 
+This repo is not production ready and is currently for experimental use only.
+
 Published by: [McDegens DAO](https://discord.com/invite/hXXDvYTQhj)
 
 Developed by: [Dapper](https://twitter.com/SolDapper)
