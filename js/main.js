@@ -165,7 +165,7 @@ $(window).on('load', async function() {
   let idleInterval = false;
   
   // verifies finalized status of signature
-  async function finalized(sig,max=30,int=4000){
+  async function finalized(sig,max=40,int=4000){
     return await new Promise(resolve => {
       let start = 1;
       let connection = new solanaWeb3.Connection(conf.cluster, "confirmed");
@@ -176,7 +176,7 @@ $(window).on('load', async function() {
         console.log(sig);
         console.log(tx_status.value);
         
-        if(start > 9 && tx_status.value[0] == null){
+        if(start > 20 && tx_status.value[0] == null){
           resolve('Oh No! Transaction Dropped!');
           clearInterval(intervalID);
         }
@@ -887,7 +887,7 @@ $(window).on('load', async function() {
           let serializedTransaction = signedTransaction.serialize();
           let signature = await connection.sendRawTransaction(serializedTransaction,{skipPreflight:false,preflightCommitment:'confirmed'},);
           $("#cover_message").html("Finalizing Donation...");
-          let final = await finalized(signature,30,4000);
+          let final = await finalized(signature,40,4000);
           if(final != "finalized"){
             $("#cover_message").html("Sorry, Transaction Error!");
             setTimeout(function(){$("#cover").fadeOut(400);$("#cover_message").html("");$("#donation_box").show();},3000);
@@ -2893,7 +2893,7 @@ $(window).on('load', async function() {
           //console.log(`https://solscan.io/tx/${signature}?cluster=devnet`);
           $(".share_sig span.swap_val").html(signature);
           $("#cover_message").html("Finalizing Transaction...");
-          let final = await finalized(signature,30,4000);
+          let final = await finalized(signature,40,4000);
           if(final != "finalized"){          
             $(".swap_cancel_b, #swap_deploy").prop("disabled", false);
             $("#swap_deploying").removeClass("provisioning").html("3. Deploy");
@@ -3374,7 +3374,7 @@ $(window).on('load', async function() {
             let signedTx = await provider.signTransaction(createALTTx);
             let txId = await connection.sendTransaction(signedTx);
 //             console.log("Signature: ", txId);
-            let final = await finalized(txId,30,4000);
+            let final = await finalized(txId,40,4000);
             if(final != "finalized"){
               $(".swap_cancel_b, #swap_deploy").prop("disabled", false);
               $("#swap_deploying").removeClass("provisioning").html("3. Deploy");
@@ -3828,7 +3828,7 @@ $(window).on('load', async function() {
             let txId = await connection.sendTransaction(signedTx);
 //             console.log("Signature: ", txId);
             $("#cover_message").html("Creating ALT...");
-            let final = await finalized(txId,30,4000);
+            let final = await finalized(txId,40,4000);
             if(final != "finalized"){
 //               console.log("ALT Error: ", final);
               return;
@@ -3875,7 +3875,7 @@ $(window).on('load', async function() {
 //           console.log("Signature: ", txId);
           $(".share_fulfil_sig .swap_val").html(txId);
           $("#cover_message").html("Executing Contract...");
-          let final = await finalized(txId,30,4000);
+          let final = await finalized(txId,40,4000);
           if(final != "finalized"){
             $("#cover_message").html(final);
             setTimeout(function(){
@@ -5546,7 +5546,7 @@ $(window).on('load', async function() {
         let serializedTransaction = signedTransaction.serialize();
         let signature = await connection.sendRawTransaction(serializedTransaction,{skipPreflight:false,preflightCommitment:'confirmed'},);
         $("#cover_message").html("Please Wait...");
-        let final = await finalized(signature,30,4000);
+        let final = await finalized(signature,40,4000);
         if(final != "finalized"){
           $("#cover_message").html(final);
           setTimeout(function(){
@@ -5688,7 +5688,7 @@ $(window).on('load', async function() {
         let signature = await connection.sendTransaction(signedTx);
         //console.log("Signature: ", signature)
         //console.log(`https://solscan.io/tx/${signature}`);
-        let final = await finalized(signature,30,4000);
+        let final = await finalized(signature,40,4000);
         if(final != "finalized"){
           $("#cover_message").html(final);
           setTimeout(function(){$("#cover").fadeOut(400);$("#cover_message").html("");$("#swap_reverse").prop("disabled",false);},3000);
@@ -6918,7 +6918,7 @@ $(window).on('load', async function() {
       console.log(`https://solscan.io/tx/${signature}`);
       $(".spl_share_sig .swap_val").html(signature);
       $("#cover_message").html("Finalizing Transaction...");
-      let final = await finalized(signature,30,4000);
+      let final = await finalized(signature,40,4000);
       if(final != "finalized"){
         $("#spl_deploy, .spl_choice, .spl_field, #spl_owner").prop("disabled", false);
         $(".swap_spl_a, .swap_spl_b").addClass("active_spl");
@@ -7094,7 +7094,7 @@ $(window).on('load', async function() {
       let txId = await connection.sendTransaction(signedTx);
       console.log("Signature: ", txId);
       $("#cover_message").html("Finalizing Transaction...");
-      let final = await finalized(txId,30,4000);
+      let final = await finalized(txId,40,4000);
       if(final != "finalized"){
         $("#cover_message").html(final);
         setTimeout(() => {
@@ -7566,7 +7566,7 @@ $(window).on('load', async function() {
       console.log("Signature: ", txId);
       console.log(`https://solscan.io/tx/${txId}`);
       $("#cover_message").html("Executing Contract...");
-      let final = await finalized(txId,30,4000);
+      let final = await finalized(txId,40,4000);
       if(final != "finalized"){
         $("#cover_message").html(final);
         setTimeout(() => {
