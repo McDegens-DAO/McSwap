@@ -1,9 +1,9 @@
 # McSwap
-The Trustless P2P NFT/cNFT/SPL Trade dApp.
+rustless P2P Contract Creator.
 
-Version: 1.6 (beta)
+Version: 1.7 (beta)
 
-This repo is not production ready and is currently for experimental use only.
+This repo is currently for experimental use only.
 
 Published by: [McDegens DAO](https://discord.com/invite/hXXDvYTQhj)
 
@@ -14,13 +14,6 @@ Developed by: [Dapper](https://twitter.com/SolDapper)
 ## Live dApp
 [McSwap.xyz](https://mcswap.xyz)
 
-## White Label
-You are welcome to use our dApp at mcswap.xyz, or follow the instructions below to spin one up with your community or project branding.
-
-## ATTN
-McSwap supports trades for NFTs and cNFTs. 
-pNFTs are not yet supported.
-
 ## Support
 Create a ticket at our [Discord](https://discord.com/invite/hXXDvYTQhj)
 
@@ -28,7 +21,7 @@ Create a ticket at our [Discord](https://discord.com/invite/hXXDvYTQhj)
 * A registered domain name.
 * Basic Linux web hosting with PHP8+ & SSL.
 * Apache mod_rewrite enabled (usually default).
-* A [Helius](https://www.helius.dev) or other cNFT compatible RPC endpoint.
+* A [Helius](https://www.helius.dev) RPC endpoint.
 
 ## Install
 1. [Download](https://github.com/McDegens-DAO/McSwap/archive/refs/heads/main.zip) McSwap.
