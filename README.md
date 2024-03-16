@@ -9,8 +9,6 @@ Published by: [McDegens DAO](https://discord.com/invite/hXXDvYTQhj)
 
 Developed by: [Dapper](https://twitter.com/SolDapper)
 
-![McSwap](https://mcswap.xyz/img/banner-github.png)
-
 ## Live dApp
 [McSwap.xyz](https://mcswap.xyz)
 
