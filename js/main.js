@@ -5146,7 +5146,7 @@ $(window).on('load', async function() {
                 peer_ata = resp;
               } else {
                 allow_execute = false;
-                console.log(allow_execute);
+//                 console.log(allow_execute);
               }
             }).catch(function() {
               allow_execute = false;
@@ -5155,7 +5155,7 @@ $(window).on('load', async function() {
           // verify the user is the intended executioner
           if (provider.publicKey.toString() != ids[1] || provider.publicKey.toString() != spl_taker.toString()) {
             allow_execute = false;
-            console.log(allow_execute);
+//             console.log(allow_execute);
           }
 
           let ok_ata = null;
@@ -5854,7 +5854,6 @@ $(window).on('load', async function() {
     selected = $(this).attr("id");
     let temp_choices = "";
     if (selected == "spl_choice_3" || selected == "spl_choice_4") {
-      console.log("is here");
       temp_choices += '<ul data-cmc="5426" id="temp_sol" data-id="sol"><li><img src="/img/sol.png"></li><li class="token_symbol">(SOL)</li><li class="token_name">SOL</li></ul>';
     }
     temp_choices += '<ul data-cmc="3408" id="temp_usdc" data-id="EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"><li><img src="/img/usdc.png"></li><li class="token_symbol">(USDC)</li><li class="token_name">USD Coin</li></ul>';
@@ -7081,7 +7080,7 @@ $(window).on('load', async function() {
     });
     console.log("Reverse Swap Ix: ", reverseSwapIx);
     
-    let computePriceIx = solanaWeb3.ComputeBudgetProgram.setComputeUnitPrice({microLamports: parseInt($("#priority_spl").val()),});
+    let computePriceIx = solanaWeb3.ComputeBudgetProgram.setComputeUnitPrice({microLamports: parseInt($("#priority_spl_exec").val()),});
 
     let messageV0 = new solanaWeb3.TransactionMessage({
       payerKey: provider.publicKey,
