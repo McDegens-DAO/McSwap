@@ -144,21 +144,6 @@ Accurate estimated values can not always be fetched for a tiken. It's important 
   ```cli
     [user@domain rpc]$ php cmc_sync.php sync
   ```
-  
-
-6. Open the robots file (optional): [robots.txt](https://github.com/McDegens-DAO/McSwap/blob/main/robots.txt)
-* Only make this change if you want search engines to index your app.
-
-Change:
-```txt
-User-agent: *
-Disallow: /
-```
-To:
-```txt
-User-agent: *
-Allow: /
-```
 
 ## Deeplinks
 
@@ -201,4 +186,19 @@ RewriteRule ^css/custom.css$ "/css/skins/default/default.css" [L]
 # change the lines above to:
 RewriteRule ^img/(.*)$ /css/skins/YOUR_SKIN_FOLDER/img/$1 [L]
 RewriteRule ^css/custom.css$ "/css/skins/YOUR_SKIN_FOLDER/default.css" [L]
+```
+
+## SEO
+Open the robots file (optional): [robots.txt](https://github.com/McDegens-DAO/McSwap/blob/main/robots.txt)
+* Only make this change if you want search engines to index your app.
+
+Change:
+```txt
+User-agent: *
+Disallow: /
+```
+To:
+```txt
+User-agent: *
+Allow: /
 ```
