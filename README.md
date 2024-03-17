@@ -145,23 +145,23 @@ Accurate estimated values can not always be fetched for a tiken. It's important 
     [user@domain rpc]$ php cmc_sync.php sync
   ```
 
-## Deeplinks
+## Deeplink Patterns
 
-P2P cNFT & NFT Trades
+cNFT & NFT trade contracts invloving two non fungible assets
 ```javascript
 https://your-domain.com/swap/ASSET_ID_1-ASSET_ID_2
 ```
-P2P cNFT & NFT Sales
+cNFT & NFT trade contracts involving one non fungible asset
 ```javascript
 https://your-domain.com/swap/ASSET_ID_1-
 ```
-P2P SPL Trades
+SPL token trade contracts between two peers
 ```javascript
 https://your-domain.com/spl/PEER_1_WALLET-PEER_2_WALLET
 ```
 
 ### Start Proposal
-External apps can use deeplinks as shortcuts to start new proposals using your new swap tool.
+Apps can also use deeplinks as shortcuts to start new cnFT/NFT trade contracts using your sweet new swap tool.
 ```javascript
 https://your-domain.com/propose/ASSET_ID_1
 ```
@@ -174,7 +174,7 @@ https://your-domain.com/propose/ASSET_ID_1/phantom
 1. Copy the "default" skin folder in [css/skins](https://github.com/McDegens-DAO/McSwap/tree/main/css/skins) and give it a unique name.
 2. Replace images in your new folder as needed.
 3. Add/edit css rules in your default.css file in the new folder.
-4. Update .htaccess with your folder name.
+4. Update .htaccess with your skin folder name.
 ```javascript
 # default
 RewriteRule ^img/(.*)$ /css/skins/default/img/$1 [L]
