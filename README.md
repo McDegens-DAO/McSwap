@@ -149,7 +149,8 @@ conf.whitelist = ["ACy3ZVXcch8mZXUtRVqsJfa2DhFHxnUJpBb4oeN9tZsX"];
   ```
 
 5. Sync Sent/Received Contracts
-* Coming soon.
+* Coming Soon
+* Instead of users sharing links, their sent and received contracts will be availalbe upon connecting their wallet.
 
 ## Deeplink Patterns
 
