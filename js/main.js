@@ -177,7 +177,7 @@ $(window).on('load', async function() {
         console.log(tx_status.value);
         
         if(start > 20 && tx_status.value[0] == null){
-          resolve('Oh No! Transaction Dropped!');
+          resolve('Oh No! Something Happened!');
           clearInterval(intervalID);
         }
         
@@ -3448,7 +3448,7 @@ $(window).on('load', async function() {
           if(final != "finalized"){
             $(".swap_cancel_b, #swap_deploy").prop("disabled", false);
             $("#swap_deploying").removeClass("provisioning").html("3. Deploy");
-            $("#cover_message").html("Oh No! Transaction Dropped!");
+            $("#cover_message").html("Oh No! Something Happened!");
             $(".share_id .swap_val").html(conf.host + "/swap/" + $("#create_a_id").val() + "-" + $("#create_b_id").val());
             setTimeout(function(){$("#cover").fadeOut(400);$("#cover_message").html("");},3000);
             return;
