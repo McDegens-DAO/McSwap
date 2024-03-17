@@ -104,22 +104,8 @@ conf.whitelist = ["ACy3ZVXcch8mZXUtRVqsJfa2DhFHxnUJpBb4oeN9tZsX"];
 <!-- set and then remove the robots metatag -->
 ```
 
-4. Open the robots file (optional): [robots.txt](https://github.com/McDegens-DAO/McSwap/blob/main/robots.txt)
-* Only make this change if you want search engines to index your app.
-
-Change:
-```txt
-User-agent: *
-Disallow: /
-```
-To:
-```txt
-User-agent: *
-Allow: /
-```
-
-5. Define Supported SPL Tokens: [config/tokens.json](https://github.com/McDegens-DAO/McSwap/blob/main/config/tokens.json)
-* You can add any additional SPL Tokens details to the list.
+4. Define Supported SPL Tokens: [config/tokens.json](https://github.com/McDegens-DAO/McSwap/blob/main/config/tokens.json)
+* Add a new tokens details, i.e. Bonk, and leave the "cmc" value 0.
 ```javascript
 [
   {
@@ -139,6 +125,39 @@ Allow: /
     "cmc": 0
   }
 ]
+```
+
+5. Sync CMC Ids
+CMC ids are used to estimate a tokens value which are displayed to users when they create a p2p contract and for peer review prior to execution.
+Accurate estimated values can not always be fetched for a tiken. It's important that your users continue verify asset values elsewhere.
+
+* Any time you add one or more tokens to your list you'll need to sync it with Coin Market Cap.
+* This will attempt to retrieve the CMC ID associated with any token in the list with a "cmc" value of 0.
+* If an Id is found, the Id is added and tokens.json file is updated.
+* To sync:
+
+  a. open your terminal and navigate to the rpc folder.
+  ```cli
+    [user@domain rpc]$ cd rpc
+  ```
+  b. run the sync and wait
+  ```cli
+    [user@domain rpc]$ php cmc_sync.php sync
+  ```
+  
+
+6. Open the robots file (optional): [robots.txt](https://github.com/McDegens-DAO/McSwap/blob/main/robots.txt)
+* Only make this change if you want search engines to index your app.
+
+Change:
+```txt
+User-agent: *
+Disallow: /
+```
+To:
+```txt
+User-agent: *
+Allow: /
 ```
 
 ## Deeplinks
@@ -170,12 +189,16 @@ https://your-domain.com/propose/ASSET_ID_1/phantom
 ```
 
 ## Custom Skin
-1. Copy your preferred skin folder in [css/skins](https://github.com/McDegens-DAO/McSwap/tree/main/css/skins) and give it a new name.
+1. Copy the "default" skin folder in [css/skins](https://github.com/McDegens-DAO/McSwap/tree/main/css/skins) and give it a unique name.
 2. Replace images in your new folder as needed.
-3. Add css rules to the default.css file in your new folder to override the default css rules.
-4. Update htaccess.txt with your folder name.
+3. Add/edit css rules in your default.css file in the new folder.
+4. Update .htaccess with your folder name.
 ```javascript
-# skinning css and images
+# default
+RewriteRule ^img/(.*)$ /css/skins/default/img/$1 [L]
+RewriteRule ^css/custom.css$ "/css/skins/default/default.css" [L]
+
+# change the lines above to:
 RewriteRule ^img/(.*)$ /css/skins/YOUR_SKIN_FOLDER/img/$1 [L]
 RewriteRule ^css/custom.css$ "/css/skins/YOUR_SKIN_FOLDER/default.css" [L]
 ```
