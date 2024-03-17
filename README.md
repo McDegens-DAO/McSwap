@@ -1,5 +1,5 @@
 # McSwap
-rustless P2P Contract Creator.
+Trustless P2P Contract Creator.
 
 Version: 1.7 (beta)
 
