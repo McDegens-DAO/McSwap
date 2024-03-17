@@ -132,8 +132,8 @@ conf.whitelist = ["ACy3ZVXcch8mZXUtRVqsJfa2DhFHxnUJpBb4oeN9tZsX"];
 * Accurate estimated values can not always be fetched for a token and should not be relied upon. It's important that your users continue verify asset values elsewhere.
 * Any time you add one or more tokens to your list you'll need to sync it with Coin Market Cap.
 * This will attempt to retrieve the CMC ID associated with any token in the list with a "cmc" value of 0.
-* If an Id is found, the Id is added and tokens.json file is updated.
-* To sync:
+* If an ID is found for a token, the tokens.json file is updated.
+* To Sync:
 
   a. open your terminal and navigate to the rpc folder.
   ```cli
