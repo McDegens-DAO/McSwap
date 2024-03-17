@@ -144,6 +144,10 @@ Accurate estimated values can not always be fetched for a tiken. It's important 
   ```cli
     [user@domain rpc]$ php cmc_sync.php sync
   ```
+  c. expected response
+  ```cli
+    CMC Sync Complete!
+  ```
 
 ## Deeplink Patterns
 
