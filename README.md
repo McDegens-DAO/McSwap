@@ -128,10 +128,8 @@ conf.whitelist = ["ACy3ZVXcch8mZXUtRVqsJfa2DhFHxnUJpBb4oeN9tZsX"];
 ```
 
 5. Sync CMC Ids
-
-CMC ids are used to estimate a tokens value which are displayed to users when they create a p2p contract and for peer review prior to execution.
-Accurate estimated values can not always be fetched for a tiken. It's important that your users continue verify asset values elsewhere.
-
+* CMC ids are used to estimate a tokens value which are displayed to users when they create a p2p contract and for peer review prior to execution.
+* Accurate estimated values can not always be fetched for a tiken. It's important that your users continue verify asset values elsewhere.
 * Any time you add one or more tokens to your list you'll need to sync it with Coin Market Cap.
 * This will attempt to retrieve the CMC ID associated with any token in the list with a "cmc" value of 0.
 * If an Id is found, the Id is added and tokens.json file is updated.
@@ -149,6 +147,9 @@ Accurate estimated values can not always be fetched for a tiken. It's important 
   ```cli
     CMC Sync Complete!
   ```
+
+5. Sync Sent/Received Contracts
+* Coming soon.
 
 ## Deeplink Patterns
 
