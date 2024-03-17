@@ -128,6 +128,7 @@ conf.whitelist = ["ACy3ZVXcch8mZXUtRVqsJfa2DhFHxnUJpBb4oeN9tZsX"];
 ```
 
 5. Sync CMC Ids
+
 CMC ids are used to estimate a tokens value which are displayed to users when they create a p2p contract and for peer review prior to execution.
 Accurate estimated values can not always be fetched for a tiken. It's important that your users continue verify asset values elsewhere.
 
