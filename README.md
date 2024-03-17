@@ -1,9 +1,9 @@
 # McSwap
 Trustless P2P Contract Creator.
 
-Version: 1.7 (beta)
+dApp Version: 1.7 (beta)
 
-This repo is currently for experimental use only.
+This repo is still experimental.
 
 ## Live dApp
 [McSwap.xyz](https://mcswap.xyz)
