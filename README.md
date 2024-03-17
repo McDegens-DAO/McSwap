@@ -160,12 +160,12 @@ SPL token trade contracts between two peers
 https://your-domain.com/spl/PEER_1_WALLET-PEER_2_WALLET
 ```
 
-### Start Proposal
-Apps can also use deeplinks as shortcuts to start new cnFT/NFT trade contracts using your sweet new swap tool.
+Start Proposal
+* Apps can also use deeplinks as shortcuts to start new cnFT/NFT trade contracts using your sweet new swap tool.
 ```javascript
 https://your-domain.com/propose/ASSET_ID_1
 ```
-Reduce friction by appending a provider name that will connect the user automatically using the given provider.
+* Reduce friction by appending a provider name that will connect the user automatically using the given provider.
 ```javascript
 https://your-domain.com/propose/ASSET_ID_1/phantom
 ```
