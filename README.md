@@ -1,7 +1,7 @@
 # McSwap
 Trustless P2P Contract Creator.
 
-dApp Version: 1.7 (beta)
+dApp Version: 1.8 (beta)
 
 This repo is still experimental.
 
@@ -13,43 +13,44 @@ Create a ticket at our [Discord](https://discord.com/invite/hXXDvYTQhj)
 
 ## Requirements
 * A registered domain name.
-* Basic Linux web hosting with PHP8+ & SSL.
+* Basic LAMP web hosting with PHP8+ & SSL.
 * Apache mod_rewrite enabled (usually default).
-* A [Helius](https://www.helius.dev) RPC endpoint.
+* [Helius](https://www.helius.dev) RPC credentials.
+* Coin Market Cap credentials.
 
 ## Install
-1. [Download](https://github.com/McDegens-DAO/McSwap/archive/refs/heads/main.zip) McSwap.
-2. Upload the package to your web server.
-3. Extract the contents of the package.
-4. Rename [htaccess.txt](https://github.com/McDegens-DAO/McSwap/blob/main/htaccess.txt) to .htaccess
+1. Navigate to the public_html folder of your server via terminal.
+2. Run the following command:
+```txt
+git clone https://github.com/McDegens-DAO/McSwap.git && mv McSwap/* . && mv htaccess.txt .htaccess
+```
 
 ## Configure
 1. Open the RPC proxy config: [config/proxy.php](https://github.com/McDegens-DAO/McSwap/blob/main/config/proxy.php)
-* Add your Helius key on line 2.
+* Add your Helius key.
+* Add your CMC key.
 * Add your domain to the whitelist.
 ```php
 <?php
+// helius
 $key = "YOUR_HELIUS_KEY";
 $path = "https://mainnet.helius-rpc.com/?api-key=".$key;
-$whitelist = array("https://your-domain.com");
+// cmc
 $cmc_key = "YOUR_CMC_KEY";
 $cmc_path = "https://pro-api.coinmarketcap.com";
+// wl
+$whitelist = array("https://your-domain.com");
 ```
 
 2. Open the javascript settings: [config/settings.js](https://github.com/McDegens-DAO/McSwap/blob/main/config/settings.js)
 * Default values are included, adjust as neccessary.
 ```javascript
-// ************************************************************************************
-// config
+//************************************************************************************
+// mcswap otc config
 let conf = {};
-conf.fee = 5000000;
-conf.chips_fee = 100000000;
-// only edit above if the program fees changes
-// ************************************************************************************
-
-// ************************************************************************************
-conf.wallet_name = "McSwap (beta)"; // set display name in wallet
-conf.title = "McSwap"; // set app title
+//************************************************************************************
+conf.wallet_name = "McSwap OTC (beta)"; // set display name in wallet
+conf.title = "McSwap OTC"; // set app title
 conf.desc = "Trustless P2P Contract Creator.";
 conf.host = window.location.protocol+"//"+window.location.host; // host domain
 conf.cluster = conf.host + "/rpc/"; // proxy folder
@@ -58,113 +59,66 @@ conf.cnft_explorer = "https://solana.fm/address/"; // set path to your preferred
 conf.sol = "GUFxwDrsLzSQ27xxTVe4y9BARZ6cENWmjzwe8XPy7AKu"; // set wallet you wish to receive sol donations
 conf.discord = "https://discord.com/invite/hXXDvYTQhj"; // set discord invite
 conf.twitter = "https://twitter.com/McDegensDAO"; // set twitter invite
-conf.default = "cnft"; // which list initially loads after connecting
+conf.default = "nft"; // which asset standard initially loads after connecting
 conf.nft_limit = 1000; // limit how many cNFTs can load in the wallet viewer
 conf.idler = 10; // number of minutes before disconnecting wallet for inactivity
-conf.wallet_cnft_enabled = true;
-conf.wallet_nft_enabled = false;
-conf.priority = 1000;
-// ************************************************************************************
+conf.default_priority = "Medium"; // sets the default priority fee level when the app loads
+conf.wallet_cnft_enabled = true; // enable/disable cnft asset standard display in mcwallet
+conf.wallet_nft_enabled = true; // enable/disable nft asset standard display in mcwallet
+//************************************************************************************
 
-// ************************************************************************************
+//************************************************************************************
 // conf.scrollbar = "#e99200"; // set the scroll bar color for the menu
 conf.scrollbar = "#333333"; // set the color for scroll bars
 conf.vanta = "WAVES"; // vanta animated background plugin, false boolean will exclude vanta
 conf.vanta_color = 0x111111; // mcswap
 // conf.vanta_color = 0x1254a5; // mycelium
-// conf.vanta_color = 0xc08a28; // dashingducks
+// conf.vanta_color = 0xc08a28; // duck trader
 conf.vanta_mouseControls = true;
 conf.vanta_touchControls = true;
 conf.vanta_waveSpeed = 0.10;
 conf.vanta_waveHeight = 20.00;
 conf.vanta_shininess = 0.00;
-// ************************************************************************************
-
-//************************************************************************************
-// blacklist collections
-conf.blacklist = ["ABxhEU99yGb6YDU9sCozpri57ei4czaovm4ccvCug8pA","57HzmaoGCVFpwPg78E2gqC23ZpXS2jKpSv2TmWHoGGpA"];
 //************************************************************************************
 
-// ************************************************************************************
+//************************************************************************************
+// cnft blacklist
+conf.cnft_blacklist = [];
+// nft blacklist
+conf.nft_blacklist = [];
+//************************************************************************************
+
+//************************************************************************************
 // set to empty array to use blacklist instead, or add more whitelist collections
-conf.whitelist = ["ACy3ZVXcch8mZXUtRVqsJfa2DhFHxnUJpBb4oeN9tZsX"];
-// ************************************************************************************
+conf.cnft_whitelist = [];
+conf.nft_whitelist = [];
 ```
 
 3. Open the html template: [index.html](https://github.com/McDegens-DAO/McSwap/blob/main/index.html)
 * Set the metatag titles, descriptions, and url to match your javascript settings.
 ```html
-<!-- set and then remove the robots metatag -->
-<meta name="robots" content="noindex,nofollow,noarchive">
-<title>McSwap</title>
-<meta id="og_title" property="og:title" content="McSwap">
-<meta id="meta_desc" name="description" content="P2P Blockchain Contract Creator." />
-<meta id="og_desc" property="og:description" content="P2P Blockchain Contract Creator.">
-<meta id="og_url" property="og:url" content="https://mcswap.xyz">
-<!-- set and then remove the robots metatag -->
-```
+  <!-- remove to allow indexing -->
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <!-- remove to allow indexing -->
 
-4. Define Supported SPL Tokens: [config/tokens.json](https://github.com/McDegens-DAO/McSwap/blob/main/config/tokens.json)
-* Add a new tokens details, i.e. Bonk, and leave the "cmc" value 0.
-```javascript
-[
-  {
-    "name": "Pickle",
-    "symbol": "PIKL",
-    "address": "AVm6WLmMuzdedAMjpXLYmSGjLLPPjjVWNuR6JJhJLWn3",
-    "image": "https:\/\/piklme.com\/pictures\/PIKL.png",
-    "decimals": 9,
-    "cmc": 0
-  },
-  {
-    "name": "Bonk",
-    "symbol": "BONK",
-    "address": "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263",
-    "image": "https:\/\/arweave.net\/hQiPZOsRZXGXBJd_82PhVdlM_hACsT_q6wqwf5cSY7I",
-    "decimals": 5,
-    "cmc": 0
-  }
-]
-```
+  <!-- metatags -->
+  <title>McSwap OTC</title>
+  <meta id="meta_desc" name="description" content="McSwap OTC Trustless Contract Creator." />
+  <meta id="og_title" property="og:title" content="McSwap OTC">
+  <meta id="og_desc" property="og:description" content="McSwap OTC Trustless Contract Creator.">
+  <meta id="og_url" property="og:url" content="https://mcswap.xyz">
+  <meta id="img_a" property="og:image" content="https://mcswap.xyz/img/mcswap-card.png" />
+  <meta property="og:type" content="website" />
+  <!-- metatags -->
 
-5. Sync CMC IDs
-* CMC IDs are used to estimate token values which are displayed to users when they create a p2p contract, and for peer review prior to execution.
-* Accurate estimated values can not always be fetched for a token and should not be relied upon. It's important that your users continue verify asset values elsewhere.
-* Any time you add one or more tokens to your list you'll need to sync it with Coin Market Cap.
-* This will attempt to retrieve the CMC ID associated with any token in the list with a "cmc" value of 0.
-* If an ID is found for a token, the tokens.json file is updated.
-* To Sync:
-
-  a. open your terminal and navigate to the rpc folder.
-  ```cli
-    [user@domain rpc]$ cd rpc
-  ```
-  b. run the sync and wait
-  ```cli
-    [user@domain rpc]$ php cmc_sync.php sync
-  ```
-  c. expected response
-  ```cli
-    CMC Sync Complete!
-  ```
-
-5. Sync Sent/Received Contracts
-* Coming Soon
-* Instead of users sharing links, their sent and received contracts will be availalbe upon connecting their wallet.
-
-## Deeplink Patterns
-
-cNFT & NFT trade contracts invloving two non fungible assets
-```javascript
-https://your-domain.com/swap/ASSET_ID_1-ASSET_ID_2
-```
-cNFT & NFT trade contracts involving one non fungible asset
-```javascript
-https://your-domain.com/swap/ASSET_ID_1-
-```
-SPL token trade contracts between two peers
-```javascript
-https://your-domain.com/spl/PEER_1_WALLET-PEER_2_WALLET
+  <!-- social card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:site" content="@SolDapper" />
+  <meta name="twitter:creator" content="@SolDapper" />
+  <meta name="twitter:title" content="McSwap OTC" />
+  <meta name="twitter:description" content="McSwap OTC Trustless Contract Creator." />
+  <meta name="twitter:image" content="https://mcswap.xyz/img/mcswap-card.png" />
+  <!-- social card -->
 ```
 
 Create Contract Shortcuts
