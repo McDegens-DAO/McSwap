@@ -36,14 +36,12 @@ conf.vanta_shininess = 0.00;
 
 //************************************************************************************
 // cnft blacklist
-conf.cnft_blacklist = ["ABxhEU99yGb6YDU9sCozpri57ei4czaovm4ccvCug8pA","57HzmaoGCVFpwPg78E2gqC23ZpXS2jKpSv2TmWHoGGpA","GzVyhiqKCjYQQoCJokjGMdgxyXMYLnrTVavbCkFCyszo","39RkP6mrAT6xYQzV7KRML3uJkcVw4NWvzh6KR7rGgPsc","GWfi77czDcQxwL31fnz3SUoRrWeSvXHKAkqTAQYwhEPm"];
+conf.cnft_blacklist = [];
 // nft blacklist
-conf.nft_blacklist = ["F7V1uB1yJ6QhnQoAe1wHiaeuGkCSdxSB1Y246EpyGxmG"];
+conf.nft_blacklist = [];
 //************************************************************************************
 
 //************************************************************************************
 // set to empty array to use blacklist instead, or add more whitelist collections
 conf.cnft_whitelist = [];
-// conf.cnft_whitelist = ["GokAiStXz2Kqbxwz2oqzfEXuUhE7aXySmBGEP7uejKXF","ACy3ZVXcch8mZXUtRVqsJfa2DhFHxnUJpBb4oeN9tZsX","6S4bjRhpByPRh43J6qsBuZKjhHqYy5azcFcq5kHR5vjM","3RtjqLoF6RMDWg2yUupgHZYqBFVVB8RjzNzXCHRQfF5R","WoMbiTtXKwUtf4wosoffv45khVF8yA2mPkinGosCFQ4"];
-// conf.nft_whitelist = ["Da7ryJm1WRaZagzWVSYvS8dtwQnV1iN3cz76wGH7D6UX"];
 conf.nft_whitelist = [];
