@@ -350,7 +350,7 @@ ul.nav_seventh li:hover {
   width: 400px;
   position: fixed;
   left: calc(50% - 200px);
-  top: calc(50% - 147px);
+  top: calc(50% - 210px);
   background: #000;
   z-index: 10;
   border-radius: 10px;
@@ -358,9 +358,8 @@ ul.nav_seventh li:hover {
 
 #donation_banner {
   width: 100%;
-  height: 84;
   border-radius: 7px 7px 0 0;
-  font-family: 'Ubuntu Mono', monospace;
+  font-family: 'Oxygen', sans-serif;
   color: #6f6f6f;
   font-size: 20px;
   padding: 25px;
@@ -371,8 +370,10 @@ ul.nav_seventh li:hover {
 }
 
 #donat_address {
-  color: #289ab9;
-  font-size: 14px;
+  color: #0987fadb;
+  font-family: 'Oxygen', sans-serif;
+  font-weight: bold;
+  font-size: 10px;
 }
 
 #donation_box input#donation_amount {
@@ -399,24 +400,24 @@ ul.nav_seventh li:hover {
   width: calc(100% - 40px);
   display: block;
   margin: 23px auto;
-  font-weight: bold;
   outline: none;
   border: 0;
-  font-family: 'Ubuntu Mono', monospace;
-  color: #fff;
-  text-shadow: 1px 1px #000;
+  color: #000;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
   -webkit-tap-highlight-color: transparent;
   font-size: 16px;
   padding: 15px;
   border-radius: 12px;
   text-align: center;
-  background: rgb(155, 25, 25);
-  background: linear-gradient(180deg, rgba(155, 25, 25, 1) 0%, #7f0000 100%);
+  font-family: 'Oxygen', sans-serif;
+  font-weight: bold;
+  font-size: 13px;
+  background: rgb(255,255,255);
+  background: radial-gradient(circle, rgba(255,255,255,0.6264880952380952) 0%, rgba(255,255,255,0.8169642857142857) 100%);
 }
 
 #donation_box button:hover {
-  background: #7f0000;
+  background: #fff;
 }
 
 #donation_close {
@@ -484,22 +485,22 @@ ul.nav_seventh li:hover {
   font-weight: bold;
   outline: none;
   border: 0;
-  font-family: 'Ubuntu Mono', monospace;
-  color: #fff;
-  text-shadow: 1px 1px #000;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
   -webkit-tap-highlight-color: transparent;
-  font-size: 16px;
   padding: 15px;
   border-radius: 12px;
   text-align: center;
-  background: rgb(155, 25, 25);
-  background: linear-gradient(180deg, rgba(155, 25, 25, 1) 0%, #7f0000 100%);
+  background: rgb(255,255,255);
+  background: radial-gradient(circle, rgba(255,255,255,0.6264880952380952) 0%, rgba(255,255,255,0.8169642857142857) 100%);
+  color: #000;
+  font-family: 'Oxygen', sans-serif;
+  font-weight: bold;
+  text-shadow: none;
+  font-size: 15px;
 }
 
 #donation_continue:hover {
-  background: rgb(155, 25, 25);
-  background: linear-gradient(180deg, #7f0000 0%, rgba(155, 25, 25, 1) 100%);
+  background: #fff;
 }
 
 #socials {
@@ -714,7 +715,7 @@ button#wallet_view img {
   font-family: 'Oxygen', sans-serif;
   background-repeat: no-repeat;
   background-position: center;
-  background-size: 226px 226px;
+  background-size: 200px 200px;
 }
 
 #wallet_title {
@@ -852,10 +853,31 @@ button#wallet_close img {
   color: #000;
 }
 
+.collections select{
+  display: block;
+  border: 0;
+  outline: none;
+  border-radius: 6px;
+  width: calc(100% - 17px);
+  margin: 0 9px 11px 8px;
+  cursor: pointer;
+  text-align: center;
+  height: 45px;
+  font-family: 'Oxygen', sans-serif;
+  font-weight: bold;
+  background: #111;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  -webkit-tap-highlight-color: transparent;
+}
+
+#nft_collections{
+  display: none;
+}
+
 #wallet_list {
   display: block;
   width: 100%;
-  height: calc(100% - 108px);
+  height: calc(100% - 164px);
   overflow: scroll;
   overflow-x: hidden;
   float: left;
@@ -868,9 +890,10 @@ ul.asset {
   display: block;
   display: none;
   list-style-type: none;
-  margin: 10px 10px 0 10px;
-  padding: 0 0 10px 0;
+  margin: 10px 10px 10px 10px;
+  padding: 5px 0 10px 0;
   border-bottom: 1px solid #1a1a1a;
+  border-bottom-style: dotted;
 }
 
 ul.asset li img.ass_img {
@@ -930,7 +953,7 @@ ul.asset li.ass_rarity {
   color: #000;
   text-align: center;
   padding: 4px 0 2px 0;
-  margin: 6px 0 0 0;
+  margin: 1px 0 0 0;
   font-size: 11px;
   font-weight: bold;
   background: rgb(255, 255, 255);
@@ -956,6 +979,84 @@ ul.asset li.legendary {
   background: linear-gradient(180deg, rgba(254, 232, 38, 1) 0%, rgba(190, 155, 3, 1) 100%);
 }
 
+ul.asset li.ass_standard {
+  width: 30px;
+  display: block;
+  position: absolute;
+  float: right;
+  right: 21px;
+  border: 1px solid #1a1a1a;
+  border-radius: 6px;
+  color: #f1f1f1;
+  text-align: center;
+  padding: 7px 10px;
+  margin: 1px 0 0 0;
+  font-size: 10px;
+  font-weight: bold;
+  font-family: 'Oxygen', sans-serif;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  -webkit-tap-highlight-color: transparent;
+  z-index: 9;
+  opacity: 1.0;
+  background: #111;
+}
+
+ul.asset li.ass_t22 {
+  width: 20px;
+  display: block;
+  position: absolute;
+  float: left;
+  border: 1px solid #1a1a1a;
+  border-radius: 6px;
+  color: #f1f1f1;
+  text-align: center;
+  padding: 7px 10px;
+  margin: 92px 0 0 0;
+  font-size: 10px;
+  font-weight: bold;
+  font-family: 'Oxygen', sans-serif;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  -webkit-tap-highlight-color: transparent;
+  z-index: 9;
+  opacity: 1.0;
+  background: #111;
+}
+
+ul.asset li.ass_locked {
+  width: 18px;
+  display: block;
+  position: absolute;
+  float: left;
+  border: 1px solid #1a1a1a;
+  border-radius: 6px;
+  color: #f1f1f1;
+  text-align: center;
+  padding: 2px 5px 2px 4px;
+  margin: 92px 0 0 51px;
+  font-size: 10px;
+  font-weight: bold;
+  font-family: 'Oxygen', sans-serif;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  -webkit-tap-highlight-color: transparent;
+  z-index: 9;
+  opacity: 1.0;
+  background: #111;
+}
+
+ul.asset li.ass_locked img {
+  width: 16px;
+  height: 19px;
+  -webkit-filter: invert(13%);
+  filter: invert(13%);
+}
+ul.asset li.ass_locked img.islocked {
+  width: 16px;
+  height: 19px;
+  -webkit-filter: invert(100%);
+  filter: invert(100%);
+}
+
+
 ul.asset li.ass_name {
   display: block;
   width: calc(100% - 106px);
@@ -972,7 +1073,7 @@ ul.asset li.ass_collection {
   font-size: 14px;
   font-weight: bold;
   float: right;
-  color: #c4bc72;
+  color: #464646;
 }
 
 ul.asset li.ass_options {
@@ -980,14 +1081,15 @@ ul.asset li.ass_options {
   width: calc(100% - 94px);
   padding: 6px 0 0 10px;
   float: right;
+  margin-top: 4px;
 }
 
 ul.asset li.ass_options button {
   outline: none;
   background: #111;
   border-radius: 6px;
-  margin: 4px 5px 0 0;
-  padding: 9px 10px 9px 10px;
+  margin: 0 0 0 0;
+  padding: 10px 10px 10px 10px;
   border: 1px solid #1a1a1a;
   color: #0987fadb;
   font-weight: bold;
@@ -1000,6 +1102,27 @@ ul.asset li.ass_options button {
 ul.asset li.ass_options button:hover {
   color: #fff;
 }
+
+ul.asset li.ass_options button:nth-of-type(1){
+  border-radius: 6px 0 0 0;
+  border-right: 1px solid #070707;
+  border-bottom: 1px solid #070707;
+}
+
+ul.asset li.ass_options button:nth-of-type(2){
+  border-radius: 0 6px 0 0;
+  border-bottom: 1px solid #070707;
+}
+
+ul.asset li.ass_options button:nth-of-type(3){
+  border-radius: 0 0 0 6px;
+  border-right: 1px solid #070707;
+}
+
+ul.asset li.ass_options button:nth-of-type(4){
+  border-radius: 0 0 6px 0;
+}
+
 
 /* ul[data-type="cnft"] li.ass_options button.ass_swap{
   color: #111;
@@ -1052,10 +1175,9 @@ ul[data-type="cnft"] li.ass_options button.ass_swap:disabled {
   display: none;
   width: calc(100% - 20px);
   width: 400px;
-  height: 333px;
   position: fixed;
   left: calc(50% - 200px);
-  top: calc(50% - 185px);
+  top: calc(50% - 240px);
   background: #000;
   z-index: 10;
   border-radius: 10px;
@@ -1094,6 +1216,27 @@ ul[data-type="cnft"] li.ass_options button.ass_swap:disabled {
   color: #6f6f6f;
   font-family: 'Oxygen', sans-serif;
   margin: 36px 0 0 130px;
+}
+
+#nft_donation_box #nft_donation_standard {
+  width: 30px;
+  display: block;
+  position: absolute;
+  float: left;
+  border: 1px solid #1a1a1a;
+  border-radius: 6px;
+  color: #f1f1f1;
+  text-align: center;
+  padding: 7px 10px;
+  margin: 72px 0 0 140px;
+  font-size: 10px;
+  font-weight: bold;
+  font-family: 'Oxygen', sans-serif;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  -webkit-tap-highlight-color: transparent;
+  z-index: 9;
+  opacity: 1.0;
+  background: #111;
 }
 
 #nft_donation_box input#nft_donation_addy,
@@ -1143,24 +1286,24 @@ ul[data-type="cnft"] li.ass_options button.ass_swap:disabled {
   width: calc(100% - 40px);
   display: block;
   margin: 23px auto;
-  font-weight: bold;
   outline: none;
   border: 0;
-  font-family: 'Ubuntu Mono', monospace;
-  color: #fff;
-  text-shadow: 1px 1px #000;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
   -webkit-tap-highlight-color: transparent;
   font-size: 16px;
   padding: 15px;
   border-radius: 12px;
   text-align: center;
-  background: rgb(155, 25, 25);
-  background: linear-gradient(180deg, rgba(155, 25, 25, 1) 0%, #7f0000 100%);
+  background: rgb(255,255,255);
+  background: radial-gradient(circle, rgba(255,255,255,0.6264880952380952) 0%, rgba(255,255,255,0.8169642857142857) 100%);
+  font-family: 'Oxygen', sans-serif;
+  font-weight: bold;
+  font-size: 16px;
+  color: #000;
 }
 
 #nft_donation_box button:hover {
-  background: #7f0000;
+  background: #fff;
 }
 
 #nft_donation_close {
@@ -1326,18 +1469,18 @@ button.refresh_rotate {
 
 #center_logo {
   display: none;
-  width: 226px;
-  height: 226px;
+  width: 200px;
+  height: 200px;
   margin: 0 auto;
   position: fixed;
-  top: calc(50% - 115px);
-  left: calc(50% - 113px);
+  top: calc(50% - 100px);
+  left: calc(50% - 100px);
   cursor: pointer;
 }
 
 #center_logo img {
-  width: 226px;
-  height: 226px;
+  width: 200px;
+  height: 200px;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
   -webkit-tap-highlight-color: transparent;
 }
@@ -1354,12 +1497,12 @@ button.refresh_rotate {
   background: linear-gradient(180deg, rgba(17, 17, 17, 0.5) 0%, rgba(17, 17, 17, 0.5) 100%);
 }
 
-.body_default {
+/* .body_default { */
   /*   background: rgb(155, 25, 25);
   background: linear-gradient(180deg, #212121 0%, #111111 100%); */
 /*   background: rgb(29, 29, 29);
   background: radial-gradient(circle, rgb(35, 35, 35, 1) 0%, rgba(11, 11, 11) 90%); */
-}
+/* } */
 
 .body_mcprofile {
   background: none;
@@ -1409,9 +1552,9 @@ button.mcprofile_close {
 
 #mcprofile_nav ul li {
   list-style-type: none;
-  margin: 0 0 0 17.5px;
+  margin: 0 0 0 18px;
   padding: 0;
-  width: calc(50% - 9.5px);
+  width: calc(50% - 10px);
   display: inline-block;
 }
 
@@ -1419,45 +1562,66 @@ button.mcprofile_close {
   margin: 0 0 0 0;
 }
 
-#mcprofile_nav ul li:last-of-type {
+/* #mcprofile_nav ul li:last-of-type {
 
+} */
+
+#top_swap{
+  width: 20px;
+  height: 20px;
+  display: inline-block;
+  margin: 0px -2px -5px 0;
+}
+#top_review{
+  width: 20px;
+  height: 20px;
+  display: inline-block;
+  margin: 0 3px -5px 0;
 }
 
 #mcprofile_nav ul li button {
   display: block;
   width: 100%;
-  background: none;
   outline: 0;
-  background: none;
   border-radius: 8px;
-  padding: 15px 18px 16px 18px;
-  border: 1px solid #5c13138f;
-  background: #4914146e;
-  background: linear-gradient(180deg, #9b1919db 0%, #7f00009c 100%);
+  padding: 12px 14px 13px 14px;
   cursor: pointer;
-  text-shadow: 1px 1px 1px #000;
+  border: 0;
+  background: rgb(255,255,255);
+  background: radial-gradient(circle, rgba(255,255,255,0.6264880952380952) 0%, rgba(255,255,255,0.8169642857142857) 100%);
+  color: #000;
   font-family: 'Oxygen', sans-serif;
   font-weight: bold;
-  font-size: 14px;
+  text-shadow: none;
+  font-size: 15px;
 }
 
-
-
 #mcprofile_nav ul li button:hover {
-  background: #7f0000a3;
+  background: #fff;
 }
 
 #mcprofile_nav ul li button:disabled {
-  background: rgb(155, 25, 25);
-  background: linear-gradient(180deg, rgba(155, 25, 25, 1) 0%, #7f0000 100%);
-  color: #c42a2a;
-  text-shadow: none;
+  background: #fff;
+  opacity: 0.15;
 }
 
 #mcprofile_nav ul li button.active_mcpanel {
-  background: #1d1d1d;
-  border: 1px solid #1d1d1d;
+  background: #fff;
 }
+
+#mcprofile_nav ul li button img#top_swap{
+  -webkit-filter: invert(0%);
+  filter: invert(0%);
+}
+
+#mcprofile_nav ul li button img#top_review{
+  -webkit-filter: invert(100%);
+  filter: invert(100%);
+}
+
+
+
+
 
 img#donate_sol {
   position: fixed;
@@ -1477,21 +1641,6 @@ img#donate_sol {
   display: none;
   z-index: 1;
   cursor: pointer;
-}
-
-#top_swap{
-  width: 20px;
-  height: 20px;
-  display: inline-block;
-  margin: 0px -3px -5px 0;
-  -webkit-filter: invert(100%);
-  filter: invert(100%);
-}
-#top_review{
-  width: 20px;
-  height: 20px;
-  display: inline-block;
-  margin: 0 3px -5px 0;
 }
 
 .mcmodule {
@@ -1583,17 +1732,20 @@ img#donate_sol {
 
 .connect_me {
   border: 0;
-  background: #4914146e;
-  background: linear-gradient(180deg, #9b1919db 0%, #7f00009c 100%);
   padding: 10px 25px 10px 25px;
   border-radius: 7px;
   margin: -6px -6px 0 0;
-  font-size: 14px;
+  background: rgb(255,255,255);
+  background: radial-gradient(circle, rgba(255,255,255,0.6264880952380952) 0%, rgba(255,255,255,0.8169642857142857) 100%);
+  color: #000;
+  font-family: 'Oxygen', sans-serif;
   font-weight: bold;
+  font-size: 13px;
+  text-shadow: none;
 }
 
 .connect_me:hover{
-  background: #7f0000a3;
+  background: #fff;
 }
 
 .usdc_icon {
@@ -1756,7 +1908,7 @@ img#donate_sol {
   font-size: 13px;
   padding: 19px 15px;
   text-align: center;
-  color: #289ab9;
+  color: #0987fadb;
   text-shadow: 1px 1px 1px #000;
   box-shadow: 0 0 4px 0px #0987fadb;
 }
@@ -1775,7 +1927,7 @@ img#donate_sol {
 /* #fulfil_a_id:disabled,
 #fulfil_a_owner:disabled{
   cursor: not-allowed;
-  color: #289ab9;
+  color: #0987fadb;
   box-shadow: 0 0 0 0 #841212;
 } */
 
@@ -1841,11 +1993,13 @@ img#donate_sol {
 .fulfil_c_usdc {
   display: inline-block;
   border-right: 1px solid #111;
-  width: 166px;
+  width: 146px;
   height: 56px;
   line-height: 56px;
   vertical-align: middle;
-  color: #333;
+  color: #fff;
+  text-align: center;
+  padding-right: 20px;
 }
 
 .swap_c_pikl,
@@ -1901,6 +2055,15 @@ img#donate_sol {
   margin: 25px auto 0 auto;
 }
 
+.select_token{
+  border-radius: 5px;
+  background: #292929;
+}
+.select_token:hover{
+  background: #1c1c1c;
+}
+
+
 .request_left {
   width: auto;
   display: inline-block;
@@ -1955,7 +2118,7 @@ img#donate_sol {
   font-size: 13px;
   padding: 0;
   text-align: center;
-  color: #289ab9;
+  color: #0987fadb;
   text-shadow: 1px 1px 1px #000;
   box-shadow: 0 0 4px 0px #0987fadb;
   cursor: pointer;
@@ -2052,8 +2215,8 @@ img#donate_sol {
 }
 
 #pikl_request {
-  color: #73dd00;
-  box-shadow: 0 0 4px 0px #73dd00;
+  color: #0987fadb;
+  box-shadow: 0 0 4px 0px #0987fadb;
 }
 
 #usdc_request {
@@ -2074,11 +2237,11 @@ img#donate_sol {
 }
 
 #pikl_request:disabled {
-  color: #73dd00;
+  color: #0987fadb;
 }
 
 #usdc_request:disabled {
-  color: #289ab9;
+  color: #0987fadb;
 }
 
 #fulfil_sol_request:disabled {
@@ -2088,13 +2251,13 @@ img#donate_sol {
 }
 
 #fulfil_pikl_request:disabled {
-  color: #73dd00;
-  box-shadow: 0 0 4px 0px #73dd00;
+  color: #0987fadb;
+  box-shadow: 0 0 4px 0px #0987fadb;
   cursor: not-allowed;
 }
 
 #fulfil_usdc_request:disabled {
-  color: #fff;
+  color: #0987fadb;
   box-shadow: 0 0 4px 0px #0987fadb;
   cursor: not-allowed;
 }
@@ -2108,7 +2271,6 @@ img#donate_sol {
   cursor: pointer;
   display: block;
   margin: 0 auto;
-  background: #1c1c1c;
   border: 0;
   outline: none;
   width: auto;
@@ -2118,15 +2280,20 @@ img#donate_sol {
   font-size: 16px;
   padding: 19px 40px 19px 40px;
   text-align: center;
-  color: #fff;
-  text-shadow: 1px 1px 1px #000;
-  box-shadow: 0 0 4px 0px #0987fadb;
+  color: #000;
+  background: rgb(255,255,255);
+  background: radial-gradient(circle, rgba(255,255,255,0.6264880952380952) 0%, rgba(255,255,255,0.8169642857142857) 100%);
+}
+
+#swap_create:hover,
+#fulfil_create:hover{
+  background: #fff;
 }
 
 #swap_create:disabled,
 #fulfil_create:disabled {
   color: #2c2c2c;
-  box-shadow: 0 0 0 0 #2c2c2c;
+  background: #1c1c1c;
   cursor: not-allowed;
 }
 
@@ -2165,6 +2332,10 @@ img#donate_sol {
   border-top: 1px solid #212121;
   border-bottom: 1px solid #111;
   position: relative;
+}
+
+.fulfil_a, .swap_spl_e{
+  color: #fff;
 }
 
 .fulfil_g,
@@ -2258,15 +2429,23 @@ span#sender_total, span#receiver_total, span#review_receive_total, span#review_s
   outline: none;
   width: auto;
   border-radius: 5px;
-  font-family: 'Oxygen', sans-serif;
-  font-weight: bold;
-  font-size: 16px;
   padding: 19px 40px 19px 40px;
   text-align: center;
-  color: #fff;
-  text-shadow: 1px 1px 1px #000;
-  box-shadow: 0 0 4px 0px #0987fadb;
   margin: 25px auto 0 auto;
+  background: rgb(255, 255, 255);
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.6264880952380952) 0%, rgba(255, 255, 255, 0.8169642857142857) 100%);
+  color: #000;
+  font-family: 'Oxygen', sans-serif;
+  font-weight: bold;
+  text-shadow: none;
+  font-size: 16px;
+}
+
+#swap_deploy:hover,
+#swap_execute:hover,
+#swap_reverse:hover,
+#swap_spl_reverse:hover{
+  background: #fff;
 }
 
 #swap_deploy{
@@ -2287,16 +2466,8 @@ span#sender_total, span#receiver_total, span#review_receive_total, span#review_s
   font-size: 16px;
   padding: 19px 40px 19px 40px;
   text-align: center;
-  color: #a72113;
-  text-shadow: 1px 1px 1px #000;
-  box-shadow: 0 0 4px 0px #a72113;
+  color: #fff;
   margin: 25px 15px 0 auto;
-}
-
-#swap_reverse {
-  color: #a72113;
-  text-shadow: 1px 1px 1px #000;
-  box-shadow: 0 0 4px 0px #a72113;
 }
 
 .swap_cancel_b:disabled,
@@ -2307,8 +2478,9 @@ span#sender_total, span#receiver_total, span#review_receive_total, span#review_s
 #swap_spl_reverse:disabled,
 #swap_execute:disabled {
   color: #2c2c2c;
-  box-shadow: 0 0 0 0 #2c2c2c;
   cursor: not-allowed;
+  background: #1c1c1c;
+  text-shadow: none;
 }
 
 .centerit {
@@ -2490,7 +2662,7 @@ span#sender_total, span#receiver_total, span#review_receive_total, span#review_s
 .swap_e .fee_prov_sig span.swap_val,
 .swap_e .fee_prov_sig_b span.swap_val,
 .fulfil_d .fee_fulfil_sig span.swap_val {
-  color: #289ab9;
+  color: #0987fadb;
 }
 
 .swap_e .fee_prov_alt span.swap_val,
@@ -2501,7 +2673,7 @@ span#sender_total, span#receiver_total, span#review_receive_total, span#review_s
 .swap_g .share_sig span.swap_val,
 .swap_g .share_fulfil_sig span.swap_val,
 .swap_spl_d .spl_share_sig span.swap_val{
-  color: #289ab9;
+  color: #0987fadb;
 }
 
 .swap_g .share_id span.swap_val,
@@ -2519,7 +2691,7 @@ span#sender_total, span#receiver_total, span#review_receive_total, span#review_s
   display: none;
 }
 
-.fulfil_e .fee_tx span {}
+/* .fulfil_e .fee_tx span {} */
 
 .double_combo_tag {
   position: absolute;
@@ -2601,7 +2773,7 @@ span#sender_total, span#receiver_total, span#review_receive_total, span#review_s
 
 #swap_token_options {
   width: 300px;
-  max-height: calc(80% - 50px);
+  height: calc(80% - 50px);
   border-radius: 12px;
   background: #111;
   padding: 25px;
@@ -2617,16 +2789,23 @@ span#sender_total, span#receiver_total, span#review_receive_total, span#review_s
 }
 
 #swap_token_list {
+  display: block;
   border-top: 1px solid #000;
-  border-bottom: 1px solid #212121;
-  margin-bottom: 15px;
+  border-bottom: 1px solid #111;
+  position: absolute;
+  height: calc(100% - 140px);
+  width: 300px;
+  overflow: hidden;
+  z-index: 12;
+  float: left;
+  padding-bottom: 14px;
 }
 
 #swap_token_options ul {
   width: 300px;
   list-style-type: none;
   margin: 0;
-  padding: 10px 0;
+  padding: 10px 0 10px 0;
   border-top: 1px solid #212121;
   border-bottom: 1px solid #000;
   cursor: pointer;
@@ -2648,19 +2827,20 @@ span#sender_total, span#receiver_total, span#review_receive_total, span#review_s
 #swap_token_options ul li.token_symbol {
   margin: 0;
   padding: 0;
-  width: 57px;
   line-height: 30px;
   height: 30px;
   padding-left: 10px;
+  padding-right: 8px;
 }
 
 #swap_token_options ul li.token_name {
   margin: 0;
   padding: 0;
-  width: 203px;
   line-height: 30px;
   height: 30px;
   text-align: left;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 #swap_token_options ul li img{
@@ -2668,6 +2848,20 @@ span#sender_total, span#receiver_total, span#review_receive_total, span#review_s
   height: 30px;
   display: block;
   border-radius: 6px;
+}
+
+#swap_token_filter{
+  display: block;
+  margin: 0 auto 25px auto;
+  background: #222;
+  border-radius: 6px;
+  outline: none;
+  border: 0;
+  padding: 16px;
+  font-weight: bold;
+  color: #f1f1f1;
+  text-align: center;
+  width: calc(100% - 37px);
 }
 
 #token_options_close{
@@ -2766,7 +2960,7 @@ span#sender_total, span#receiver_total, span#review_receive_total, span#review_s
     left: calc(50% - 15px);
   }
   
-  .swap_c_value,
+/*   .swap_c_value,
   .fulfil_c_value {
     border-right: 0;
   }
@@ -2776,8 +2970,8 @@ span#sender_total, span#receiver_total, span#review_receive_total, span#review_s
     padding: 0;
     width: 100%;
     border: 0;
-  }
-  .swap_c_title,
+  } */
+/*   .swap_c_title,
   .swap_c_pikl,
   .swap_c_usdc,
   .fulfil_c_title,
@@ -2785,15 +2979,15 @@ span#sender_total, span#receiver_total, span#review_receive_total, span#review_s
   .fulfil_c_usdc {
     font-size: 14px;
     width: 112px;
-  }
-  .swap_c_value,
+  } */
+/*   .swap_c_value,
   .swap_c_token,
   .fulfil_c_value,
   .fulfil_c_token {
     width: calc(100% - 139px);
     padding: 0 0 0 25px;
-  }
-  #sol_request,
+  } */
+/*   #sol_request,
   #pikl_request,
   #usdc_request,
   #fulfil_sol_request,
@@ -2801,14 +2995,14 @@ span#sender_total, span#receiver_total, span#review_receive_total, span#review_s
   #fulfil_usdc_request {
     display: block;
     width: calc(100% - 31px);
-  }
-  #token_pikl,
+  } */
+/*   #token_pikl,
   #token_usdc,
   #token_sol {
     width: 18px;
     height: 18px;
     margin: -6px 0 0 -51px;
-  }
+  } */
 }
 
 @media only screen and (max-width: 550px) {
@@ -2869,6 +3063,9 @@ span#sender_total, span#receiver_total, span#review_receive_total, span#review_s
     width: 80px;
     padding: 19px 5px 19px 5px;
   }
+  #swap_deploy{
+    width: calc(100% - 100px);
+  }
   #swap_provision {
     width: calc(100% - 106px);
     margin: 25px auto 0 24px;
@@ -2876,8 +3073,20 @@ span#sender_total, span#receiver_total, span#review_receive_total, span#review_s
   .types_{
     margin: -12px auto 0 14px;
   }  
-  .proofs_{
+  .proofs_, .proofs_view{
     margin: -12px auto 0 80px;
+  }
+  .swap_c_title, .swap_c_pikl, .fulfil_c_pikl, .fulfil_c_title{
+    width: 73px;
+  }
+  .fulfil_c_value, .fulfil_c_token{
+    width: calc(100% - 145px);
+  }
+  .swap_c_value, .swap_c_token{
+    width: calc(100% - 147px);
+  }
+  .select_token{
+    font-size: 13px;
   }
 }
 
@@ -3024,13 +3233,13 @@ span#sender_total, span#receiver_total, span#review_receive_total, span#review_s
   border-top: 0;
   border-radius: 0 0 12px 12px;
   font-size: 13px;
-  color: #289ab9;
+  color: #0987fadb;
   font-weight: bold;
   background: #0f0f0f;
 }
 
 .itm_buy a {
-  color: #289ab9;
+  color: #0987fadb;
   text-decoration: none;
   outline: none;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
@@ -3334,7 +3543,7 @@ span#sender_total, span#receiver_total, span#review_receive_total, span#review_s
 #mode_label{
   height: 38px;
   line-height: 38px;
-  font-family: Ubuntu;
+  font-family: 'Oxygen', sans-serif;
   font-size: 16px;
   font-weight: bold;
   color: #666;
@@ -3359,23 +3568,26 @@ span#sender_total, span#receiver_total, span#review_receive_total, span#review_s
 
 button#mode_nft, button#mode_spl{
   border: 0;
-  background: #4914146e;
-  background: linear-gradient(180deg, #9b1919db 0%, #7f00009c 100%);
+/*   background: #4914146e;
+  background: linear-gradient(180deg, #9b1919db 0%, #7f00009c 100%); */
+  background: rgb(255,255,255);
+  background: radial-gradient(circle, rgba(255,255,255,0.6264880952380952) 0%, rgba(255,255,255,0.8169642857142857) 100%);
+  color: #000;
+  font-family: 'Oxygen', sans-serif;
+  font-weight: bold;
+  font-size: 13px;
   padding: 10px 25px 10px 25px;
   border-radius: 7px;
-  margin: 0 0 0 0;
-  font-size: 14px;
-  font-weight: bold;
   width: 100%;
   display: inline-block;
-  margin: 1px 0 0 14px;
+  margin: 0 0 0 14px;
   cursor: pointer;
   padding-left: 30px;
   padding-right: 30px;
 }
 
 button#mode_nft:hover, button#mode_spl:hover{
-  background: #7f0000a3;
+  background: #fff;
 }
 
 button#mode_nft{
@@ -3422,20 +3634,23 @@ button#mode_nft{
  .spl_deploy{
   cursor: pointer;
   display: block;
-  background: #1c1c1c;
   border: 0;
   outline: none;
   width: auto;
   border-radius: 5px;
+  padding: 19px 40px 19px 40px;
+  text-align: center;
+  margin: 25px auto 0 auto;
+  background: rgb(255,255,255);
+  background: radial-gradient(circle, rgba(255,255,255,0.6264880952380952) 0%, rgba(255,255,255,0.8169642857142857) 100%);
+  color: #000;
   font-family: 'Oxygen', sans-serif;
   font-weight: bold;
   font-size: 16px;
-  padding: 19px 40px 19px 40px;
-  text-align: center;
-  color: #fff;
-  text-shadow: 1px 1px 1px #000;
-  box-shadow: 0 0 4px 0px #0987fadb;
-  margin: 25px auto 0 auto;
+}
+
+.spl_deploy:hover{
+  background: #fff;
 }
 
 .spl_clear:disabled {
@@ -3446,7 +3661,7 @@ button#mode_nft{
 
 .spl_deploy:disabled {
   color: #2c2c2c;
-  box-shadow: 0 0 0 0 #2c2c2c;
+  background: #1c1c1c;
   cursor: not-allowed;
 }
 
@@ -3463,7 +3678,7 @@ button#mode_nft{
   font-size: 13px;
   padding: 19px 15px;
   text-align: center;
-  color: #289ab9;
+  color: #0987fadb;
   text-shadow: 1px 1px 1px #000;
   box-shadow: 0 0 4px 0px #0987fadb;
 }
@@ -3539,15 +3754,15 @@ input#spl_owner::placeholder {
   font-size: 13px;
   padding: 19px 15px;
   text-align: center;
-  color: #289ab9;
+  color: #0987fadb;
 }
 
 input#spl_owner_a:disabled, #spl_owner_b:disabled{
   box-shadow: none;
   cursor: not-allowed;
-  color: #87a02f;
+  color: #fffa9c;
   text-shadow: 1px 1px 1px #000;
-  box-shadow: 0 0 4px 0px #87a02f;
+/*   box-shadow: 0 0 4px 0px #87a02f; */
 }
 
 input#spl_owner_a::placeholder{
@@ -3566,15 +3781,19 @@ input#spl_owner_b::placeholder {
   outline: none;
   width: auto;
   border-radius: 5px;
+  padding: 19px 40px 19px 40px;
+  text-align: center;
+  margin: 25px auto 0 auto;
+  background: rgb(255,255,255);
+  background: radial-gradient(circle, rgba(255,255,255,0.6264880952380952) 0%, rgba(255,255,255,0.8169642857142857) 100%);
+  color: #000;
   font-family: 'Oxygen', sans-serif;
   font-weight: bold;
   font-size: 16px;
-  padding: 19px 40px 19px 40px;
-  text-align: center;
-  color: #fff;
-  text-shadow: 1px 1px 1px #000;
-  box-shadow: 0 0 4px 0px #0987fadb;
-  margin: 25px auto 0 auto;
+}
+
+.spl_execute:hover{
+  background: #fff;
 }
 
 .spl_execute:disabled {
@@ -3585,7 +3804,7 @@ input#spl_owner_b::placeholder {
 
 .spl_execute:disabled {
   color: #2c2c2c;
-  box-shadow: 0 0 0 0 #2c2c2c;
+  background: #1c1c1c;
   cursor: not-allowed;
 }
 
@@ -3633,7 +3852,7 @@ button#spl_choice_7,button#spl_choice_8{
   font-family: 'Ubuntu Mono', monospace;
   font-weight: bold;
   font-size: 16px;
-  color: #289ab9;
+  color: #0987fadb;
   width: calc(50% - 77px);
   margin-right: 15px;
   cursor: pointer;
@@ -3697,7 +3916,7 @@ button#spl_choice_7:disabled,button#spl_choice_8:disabled{
   display: none;
 }
 #requests_box{
-  font-family: 'Ubuntu';
+  font-family: 'Oxygen', sans-serif;
   font-weight: bold;
   font-size: 16px;
   color: #fff;
@@ -3711,24 +3930,53 @@ button#spl_choice_7:disabled,button#spl_choice_8:disabled{
   background: none;
   vertical-align: top;
   display: none;
-  padding: 13px 0 14px 0;
+  padding: 0;
   font-size: 15px;
   font-weight: bold;
   color: #333;
   text-align: center;
   border-top: 1px solid #000;
   border-bottom: 1px solid #1a1a1a;
-  width: calc(50% - 10px);
+  width: 115px;
   max-height: 52px;
+  font-family: 'Oxygen', sans-serif;
 }
-#smart_tool_received{
+button#smart_tool_received{
+  vertical-align: middle;
+  line-height: 46px;
   border-right: 1px solid #1a1a1a;
   left: 10px;
+  font-family: 'Oxygen', sans-serif;
 }
-#smart_tool_sent{
+button#smart_tool_sent{
+  vertical-align: middle;
+  line-height: 46px;
   border-left: 1px solid #000;
-  left: 50%;
+  border-right: 1px solid #1a1a1a;
+  left: 125px;
+  font-family: 'Oxygen', sans-serif;
 }
+button#smart_tool_reload{
+  vertical-align: middle;
+  line-height: 48px;
+  border-left: 1px solid #000;
+  left: 240px;
+  width: 49px;
+  font-family: 'Oxygen', sans-serif;
+  padding: 0;
+  height: 48px;
+}
+button#smart_tool_reload img {
+  width: 18px;
+  height: 18px;
+  margin: 14px 0 0 2px;
+  cursor: pointer;
+}
+button#smart_tool_reload img.smart_rotate {
+  -webkit-animation: rotation 1s linear infinite;
+  animation: rotation 1s linear infinite;
+}
+
 #smart_scroll{
   display: none;
   position: absolute;
@@ -3759,16 +4007,32 @@ ul.smart_ul{
   border-top: 1px solid #1a1a1a;
   border-bottom: 1px solid #000;
 }
-#spl_sent ul.smart_ul:first-of-type{
+#spl_sent ul.smart_ul:first-of-type,
+#cnft_sent ul.smart_ul:first-of-type,
+#nft_sent ul.smart_ul:first-of-type,
+#pnft_sent ul.smart_ul:first-of-type,
+#core_sent ul.smart_ul:first-of-type{
   border-top: 0;
 }
-#spl_received ul.smart_ul:first-of-type{
+#spl_received ul.smart_ul:first-of-type,
+#cnft_received ul.smart_ul:first-of-type,
+#nft_received ul.smart_ul:first-of-type,
+#pnft_received ul.smart_ul:first-of-type,
+#core_received ul.smart_ul:first-of-type{
   border-top: 0;
 }
-#spl_sent ul.smart_ul:last-of-type{
+#spl_sent ul.smart_ul:last-of-type,
+#cnft_sent ul.smart_ul:last-of-type,
+#nft_sent ul.smart_ul:last-of-type,
+#pnft_sent ul.smart_ul:last-of-type,
+#core_sent ul.smart_ul:last-of-type{
   border-bottom: 0;
 }
-#spl_received ul.smart_ul:last-of-type{
+#spl_received ul.smart_ul:last-of-type,
+#cnft_received ul.smart_ul:last-of-type,
+#nft_received ul.smart_ul:last-of-type,
+#pnft_received ul.smart_ul:last-of-type,
+#core_received ul.smart_ul:last-of-type{
   border-bottom: 0;
 }
 ul.smart_ul li{
@@ -3797,6 +4061,14 @@ ul.smart_ul li.smart_row_box{
   width: 40%;
   display: inline-block;
 }
+.smart_left_asset{
+  width: 20%;
+  display: inline-block;
+}
+.smart_right_asset{
+  width: 60%;
+  display: inline-block;
+}
 .smart_direction{
   padding-right: 5px;
 }
@@ -3808,6 +4080,18 @@ ul.smart_ul li.smart_row_box{
 .smart_default{
   display: inline-block;
   width: calc(50% - 10px);
+  margin: 0 5px 0 5px;
+  border-radius: 6px;
+}
+.smart_default_1{
+  display: inline-block;
+  width: calc(100% - 10px);
+  margin: 0 5px 0 5px;
+  border-radius: 6px;
+}
+.smart_default_nft{
+  display: inline-block;
+  width: calc(33.3% - 10px);
   margin: 0 5px 0 5px;
   border-radius: 6px;
 }
@@ -3921,20 +4205,68 @@ ul.smart_ul li.smart_peer{
   color: #f1f1f1;
   text-align: center;
   width: 140px;
+  cursor: pointer;
 }
 
+option{
+  padding: 2px;
+}
 
 #bob_chooser{
   display: none;
   position: fixed;
-  width: calc(100% - 40px);
-  height: calc(100% - 40px);
+  width: 80%;
+  height: calc(100% - 80px);
   background: #010101;
   border-radius: 10px;
   padding: 10px;
-  top: 10px;
-  left: 10px;
+  top: 30px;
+  left: 10%;
   z-index: 10;
+}
+
+#bob_chooser_list{
+  position: absolute;
+  width: calc(100% - 40px);
+  height: calc(100% - 117px);
+  background: #111;
+  top: 66px;
+  border-radius: 6px;
+  padding: 10px;
+}
+
+select#bob_chooser_collections{
+  display: inline-block;
+  border: 0;
+  outline: none;
+  border-radius: 6px;
+  width: calc(100% - 56px);
+  margin: 0;
+  cursor: pointer;
+  text-align: center;
+  height: 45px;
+  font-weight: bold;
+  font-family: 'Oxygen', sans-serif;
+  background: #111;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  -webkit-tap-highlight-color: transparent;
+}
+
+button#bob_cancel{
+  display: inline-block;
+  border-radius: 6px;
+  background: #111;
+  background-image: url(/img/cross.svg);
+  background-size: 30px 30px;
+  background-position: center;
+  background-repeat: no-repeat;
+  width: 45px;
+  height: 45px;
+  border: 0;
+  outline: 0;
+  vertical-align: top;
+  margin-left: 10px;
+  cursor: pointer;
 }
 
 .bob_asset{
@@ -3948,21 +4280,27 @@ ul.smart_ul li.smart_peer{
 
 .bob_img{
   width: 180px;
+  height: 180px;
   border-radius: 6px 6px 0 0;
   vertical-align: top;
   margin: 10px 10px 0 10px;
   transition: 0.25s;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  -webkit-tap-highlight-color: transparent;
+  font-family: 'Oxygen', sans-serif;
 }
 
 .bob_name{
-  font-family: 'Ubuntu Mono', monospace;
+  font-family: 'Oxygen', sans-serif;
   text-align: center;
-  background: #111;
+  background: #010101;
   border-radius: 0 0 6px 6px;
   width: 160px;
   margin: 0 10px 10px 10px;
   padding: 13px 10px 13px 10px;
   font-weight: bold;
+  overflow: hidden;
+  font-size: 11px;
 }
 
 .bob_asset:hover .bob_img{
@@ -3970,6 +4308,36 @@ ul.smart_ul li.smart_peer{
   filter: gray; /* IE6-9 */
   -webkit-filter: grayscale(100%); /* Chrome 19+ & Safari 6+ */
 }
+
+#donation_label, #nft_donation_label, .fromto_label{
+  color: #f1f1f1;
+  font-size: 12px;
+  font-family: 'Ubuntu Mono', monospace;
+  margin: 9px 0 0px 9px;
+}
+
+.fromto_label{
+  margin: 9px 0 9px 9px;
+}
+
+
+#donation_priority, #nft_donation_priority{
+  display: block;
+  width: 100%;
+  padding: 15px;
+  color: #f1f1f1;
+  font-weight: bold;
+  text-align: center;
+  font-size: 14px;
+  border: 0;
+  background: #111;
+  margin: 10px 0 0 0;
+  outline: none;
+  cursor: pointer;
+}
+
+
+
 
 @media only screen and (max-width: 1000px) {
   
@@ -3995,15 +4363,15 @@ ul.smart_ul li.smart_peer{
   .connect_me{
     width: calc(100% - 49px);
     min-height: 0;
-    padding-top: 10px;
     padding-bottom: 12px;
-    font-size: 14px;
+    background: rgb(255,255,255);
+    background: radial-gradient(circle, rgba(255,255,255,0.6264880952380952) 0%, rgba(255,255,255,0.8169642857142857) 100%);
+    color: #000;
+    font-family: 'Oxygen', sans-serif;
     font-weight: bold;
-    background: #4914146e;
-    background: linear-gradient(180deg, #9b1919db 0%, #7f00009c 100%);
+    font-size: 13px;
+    padding: 10px 25px 10px 25px;
   }
-  
-  
   
 }
 
@@ -4017,9 +4385,8 @@ ul.smart_ul li.smart_peer{
     display: block;
     border-right: 0;
     width: auto;
-    height: 35px;
-    line-height: 35px;
-    font-family: 'Ubuntu Mono', monospace;
+    height: 31px;
+    line-height: 31px;
   }
   
   #mode_buttons{
@@ -4078,6 +4445,9 @@ ul.smart_ul li.smart_peer{
   }
   ul.asset li.ass_rarity {
     padding: 3px 0 3px 0;
+  }
+  ul.asset li.ass_standard {
+    padding: 6px;
   }
   #wallet_chooser button span {
     line-height: 20px;

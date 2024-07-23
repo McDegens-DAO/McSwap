@@ -9,26 +9,41 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <!-- metatags -->
     
-    <!-- set and then remove the robots metatag -->
+    <!-- remove to allow indexing -->
     <meta name="robots" content="noindex,nofollow,noarchive">
-    <title>McSwap</title>
-    <meta id="og_title" property="og:title" content="McSwap">
-    <meta id="meta_desc" name="description" content="McSwap is a Trustless P2P OTC NFT/cNFT trade contract and interface." />
-    <meta id="og_desc" property="og:description" content="McSwap is a Trustless P2P OTC NFT/cNFT trade contract and interface.">
-    <meta id="og_url" property="og:url" content="https://mcswap.xyz">
-    <!-- set and then remove the robots metatag -->
-    
+    <!-- remove to allow indexing -->
+
     <!-- metatags -->
-    <meta property="og:type" content="website">
-    <link id="img_icon" rel="icon" href="/img/favicon.png" type="image/png">
-    <meta id="img_a" property="og:image" content="/img/favicon.png">
-    <link id="img_b" rel="icon" href="/img/favicon.png" type="image/png">
-    <link id="img_c" rel="apple-touch-icon" href="/img/favicon.png">
+    <title>McSwap OTC</title>
+    <meta id="meta_desc" name="description" content="McSwap OTC Trustless Contract Creator." />
+    <meta id="og_title" property="og:title" content="McSwap OTC">
+    <meta id="og_desc" property="og:description" content="McSwap OTC Trustless Contract Creator.">
+    <meta id="og_url" property="og:url" content="https://mcswap.xyz">
+    <meta id="img_a" property="og:image" content="https://dev.mcswap.xyz/img/mcswap-card.png" />
+    <meta property="og:type" content="website" />
+    <!-- metatags -->
+
+    <!-- social card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@SolDapper" />
+    <meta name="twitter:creator" content="@SolDapper" />
+    <meta name="twitter:title" content="McSwap OTC" />
+    <meta name="twitter:description" content="McSwap OTC Trustless Contract Creator." />
+    <meta name="twitter:image" content="https://dev.mcswap.xyz/img/mcswap-card.png" />
+    <!-- social card -->
+
+    <!-- icons -->
+    <link id="img_icon" rel="icon" href="https://dev.mcswap.xyz/img/favicon.png" type="image/png" />
+    <link id="img_b" rel="icon" href="https://dev.mcswap.xyz/img/favicon.png" type="image/png" />
+    <link id="img_c" rel="apple-touch-icon" href="https://dev.mcswap.xyz/img/favicon.png" />
+    <!-- icons -->
+
+    <!-- css -->
     <link rel="stylesheet" href="/css/fonts.css">
     <link rel="stylesheet" href="/css/animate.css">
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/custom.css">
-    <!-- metatags -->
+    <!-- css -->
     
   </head>
   <body>
@@ -40,7 +55,7 @@
     <!-- main landing page -->
     <div id="container">
       <div id="content">
-        <div id="center_logo"><img src="/img/logo-300.png" /></div>
+        <div id="center_logo"><img src="/img/logo-otc-300.png" /></div>
       </div>
     </div>
     <!-- main landing page -->
@@ -70,15 +85,15 @@
     </div>
     <!-- tab nav -->
       
-    <!-- proposal creator -->
+    <!-- contract creator -->
     <div class="mc_panel" id="mc_swap_create">
       
       <div class="mc_title">New Contract</div>
       
       <div class="mc_panel_spl">
       <div class="swap_spl_a">
-        <div class="spl_step swap_spl_1">1. Send</div>
-        <div class="swapper">Tokens to send: <span id="sender_total">$0</span></div>
+        <div class="spl_step swap_spl_1">1. Sell</div>
+        <div class="swapper">Tokens to sell: <span id="sender_total">$0</span></div>
         <div class="swapper">
           <img id="spl_img_1" class="spl_img spl_default" src="/img/default_token.png" /><button disabled id="spl_choice_1" class="spl_choice">•••</button><input disabled="disabled" class="spl_field" id="spl_field_1" placeholder="0" /><input disabled class="spl_value" id="spl_value_1" placeholder="0"></input>
         </div>
@@ -103,31 +118,39 @@
         <div class="swapper"><input disabled="disabled" id="spl_owner" data-status="false" placeholder="solana public wallet address" /></div>
         <div class="swapper">
           <div class="swapper_fee spl_tx_total"><span class="swap_label">TX</span><span class="swap_amt">0.0</span><span class="swap_unit">SOL</span></div>
-          <div class="swapper_fee spl_pikl_total"><span class="swap_label">Gas</span><span class="swap_amt">0.1</span><span class="swap_unit_pikl">PIKL</span></div>
+          <div class="swapper_fee spl_pikl_total"><span class="swap_label">Fee</span><span class="swap_amt">0.1</span><span class="swap_unit_pikl">PIKL</span></div>
         </div>
         
-          <div class="priority_label">Priority Lamports</div>
-          <input class="tx_priority" type="text" id="priority_spl" onkeydown="if(event.key==='.'){event.preventDefault();}" oninput="event.target.value = event.target.value.replace(/[^0-9]*/g,'');" />
-          
+          <div class="priority_label">Fee Priority</div>
+          <select class="tx_priority" id="priority_spl">
+            <option value="VeryHigh" >Very High</option>
+            <option value="High" >High</option>
+            <option value="Medium" >Medium</option>
+            <option value="Low" >Low</option>
+            <option value="Min" >Min</option>
+          </select>
+
+<!--           <input class="tx_priority" type="text" id="priority_spl" onkeydown="if(event.key==='.'){event.preventDefault();}" oninput="event.target.value = event.target.value.replace(/[^0-9]*/g,'');" />
+           -->
           <button class="spl_clear" id="spl_clear" >Clear</button><button class="spl_deploy" id="spl_deploy" disabled="disabled">Deploy</button>
       </div>
       <div class="swap_spl_d">
         <div class="spl_step swap_spl_4">4. Copy</div>
-        <div class="swapper">Copy contract details:</div>
+        <div class="swapper">TX Details:</div>
         <div class="swapper">
           <div class="swapper_fee spl_share_sig"><span class="swap_label">Signature</span><span class="swap_val"></span><button class="swap_copy"><img src="/img/copy.svg"></button></div>
-          <div class="swapper_fee spl_share_id"><span class="swap_label">Link</span><span class="swap_val"></span><button class="swap_copy"><img src="/img/copy.svg"></button></div>
+          <div class="swapper_fee spl_share_id"><span class="swap_label">Blink</span><span class="swap_val"></span><button class="swap_copy"><img src="/img/copy.svg"></button></div>
         </div>
       </div>
       </div>
       
       <div class="mc_panel_nft">
       <div class="swap_a active_swap">
-        <div id="swap_step_1">1. Send</div>
+        <div id="swap_step_1">1. Sell</div>
         <input disabled class="types_" id="a_type" />
         <div class="proofs_" id="proofs_a"></div><img src="/img/img-placeholder.png" class="swap_img_a" />
         <div class="swap_detail">
-          <input disabled id="create_a_id" class="swap_id" type="text" placeholder="1. Select asset to send" />
+          <input disabled id="create_a_id" class="swap_id" type="text" placeholder="select asset to sell" />
           <input disabled id="create_a_owner" class="swap_a_owner" type="text" placeholder="your wallet" />
         </div>
       </div>
@@ -143,9 +166,9 @@
       </div>
 
       <div class="swap_c">
-        <div class="swap_c_title">Request $SOL</div><div class="swap_c_value"><img id="token_sol" src="/img/check_default.png"><input disabled id="sol_request" type="text" value="" /></div><div class="swap_c_pikl">Request $<span class="custom_symbol"></span></div><div class="swap_c_token "><img id="token_pikl" src="/img/check_default.png"><input disabled id="pikl_request" type="text" value="" /></div><div class="swap_d">
+        <div class="swap_c_title">$SOL</div><div class="swap_c_value"><img id="token_sol" src="/img/check_default.png"><input disabled id="sol_request" type="text" value="" /></div><div class="swap_c_pikl"><div class="select_token">$<span class="custom_symbol"></span></div></div><div class="swap_c_token "><img id="token_pikl" src="/img/check_default.png"><input disabled id="pikl_request" type="text" value="" /></div><div class="swap_d">
         <div class="request_left">
-        <div class="swap_c_title">Request $USDC</div><div class="swap_c_value"><img id="token_usdc" src="/img/check_default.png"><input disabled id="usdc_request" type="text" value="" /></div></div><div class="request_right"><button disabled id="swap_create">Next</button></div>
+        <div class="swap_c_title">$USDC</div><div class="swap_c_value"><img id="token_usdc" src="/img/check_default.png"><input disabled id="usdc_request" type="text" value="" /></div></div><div class="request_right"><button disabled id="swap_create">Next</button></div>
         </div>
       </div>
 
@@ -172,19 +195,27 @@
         <div class="centerit">
           
 
-        <div class="priority_label">Priority Lamports</div>
-        <input class="tx_priority" type="text" id="priority_nft" onkeydown="if(event.key==='.'){event.preventDefault();}" oninput="event.target.value = event.target.value.replace(/[^0-9]*/g,'');" />
-        
+        <div class="priority_label">Fee Priority</div>
+          <select class="tx_priority" id="priority_nft">
+            <option value="VeryHigh" >Very High</option>
+            <option value="High" >High</option>
+            <option value="Medium" >Medium</option>
+            <option value="Low" >Low</option>
+            <option value="Min" >Min</option>
+          </select>
+          
+<!--         <input class="tx_priority" type="text" id="priority_nft" onkeydown="if(event.key==='.'){event.preventDefault();}" oninput="event.target.value = event.target.value.replace(/[^0-9]*/g,'');" />
+         -->
         <button disabled class="swap_cancel_b">Back</button> <button id="swap_deploy" disabled>Deploy</button>
         </div>
       </div>
 
       <div class="swap_g">
         4. Copy
-        <div class="swapper">Copy contract details:</div>
+        <div class="swapper">TX Details:</div>
         <div class="swapper">
           <div class="swapper_fee share_sig"><span class="swap_label">Signature</span><span class="swap_val"></span><button class="swap_copy"><img src="/img/copy.svg" /></button></div>
-          <div class="swapper_fee share_id"><span class="swap_label">Link</span><span class="swap_val"></span><button class="swap_copy"><img src="/img/copy.svg" /></button></div>
+          <div class="swapper_fee share_id"><span class="swap_label">Blink</span><span class="swap_val"></span><button class="swap_copy"><img src="/img/copy.svg" /></button></div>
         </div>
       </div>
       
@@ -193,9 +224,9 @@
       <div class="swap_last"></div>
       
       </div> 
-    <!-- proposal creator -->
+    <!-- contract creator -->
     
-    <!-- proposal viewer -->
+    <!-- contract viewer -->
     <div class="mc_panel" id="mc_swap_viewer">
       
       <div class="mc_title">Contract Details</div>
@@ -216,7 +247,7 @@
       </div>
       <div class="swap_img_spl"><img src="/img/swap.svg" class="swap_icon"></div>
       <div class="swap_spl_f">
-        <div class="spl_step swap_spl_2">Send</div>
+        <div class="spl_step swap_spl_2">Pay</div>
         <div class="swapper">Required Tokens: <span id="review_send_total">$0</span></div>
         <div class="swapper">
           <img id="spl_img_7" class="spl_img spl_default" src="/img/default_token.png" /><button disabled id="spl_choice_7" class="spl_choice">•••</button><input disabled="disabled" class="spl_field" id="spl_field_7" placeholder="0" /><input disabled class="spl_value" id="spl_value_7" placeholder="0"></input>
@@ -224,21 +255,26 @@
         <div class="swapper">
           <img id="spl_img_8" class="spl_img spl_default" src="/img/default_token.png" /><button disabled id="spl_choice_8" class="spl_choice">•••</button><input disabled="disabled" class="spl_field" id="spl_field_8" placeholder="0" /><input disabled class="spl_value" id="spl_value_8" placeholder="0"></input>
         </div>
-        <div class="swapper">Required From:</div>
+        <div class="swapper">Required Signer:</div>
         <div class="swapper"><input disabled="disabled" id="spl_owner_b" placeholder="solana public wallet address" /></div>
         <div class="swapper">
           <div class="swapper_fee spl_tx_total_x"><span class="swap_label">TX</span><span class="swap_amt">0.0</span><span class="swap_unit">SOL</span></div>
-          <div class="swapper_fee spl_pikl_total_x"><span class="swap_label">Gas</span><span class="swap_amt">0.1</span><span class="swap_unit_pikl">PIKL</span></div>
+          <div class="swapper_fee spl_pikl_total_x"><span class="swap_label">Fee</span><span class="swap_amt">0.1</span><span class="swap_unit_pikl">PIKL</span></div>
         </div>
 
-        <div class="priority_label">Priority Lamports</div>
-        <input class="tx_priority" type="text" id="priority_spl_exec" onkeydown="if(event.key==='.'){event.preventDefault();}" oninput="event.target.value = event.target.value.replace(/[^0-9]*/g,'');" />
-
+        <div class="priority_label">Fee Priority</div>
+        <select class="tx_priority" id="priority_spl_exec">
+          <option value="VeryHigh" >Very High</option>
+          <option value="High" >High</option>
+          <option value="Medium" >Medium</option>
+          <option value="Low" >Low</option>
+          <option value="Min" >Min</option>
+        </select>
         <button class="spl_execute" id="spl_execute" disabled="disabled">Execute</button>
         </div>
       <div class="swap_spl_g">
-        Signature
-        <div class="swapper">Copy tx details:</div>
+        Copy
+        <div class="swapper">TX Details:</div>
         <div class="swapper">
           <div class="swapper_fee share_spl_exec_sig"><span class="swap_label">Signature</span><span class="swap_val"></span><button id="save_spl_exec_sig" class="swap_copy"><img src="/img/copy.svg" /></button></div>
         </div>
@@ -275,10 +311,10 @@
       </div>
       </div>
       <div class="fulfil_c">
-        <div class="fulfil_c_title">$SOL Request</div><div class="fulfil_c_value"><input disabled id="fulfil_sol_request" type="text" value="" /></div><div class="swap_dp"><div class="fulfil_c_pikl">$<span class="custom_symbol"></span> Request</div><div class="fulfil_c_token"><input disabled id="fulfil_pikl_request" type="text" value="" /></div></div>
+        <div class="fulfil_c_title">$SOL</div><div class="fulfil_c_value"><input disabled id="fulfil_sol_request" type="text" value="" /></div><div class="swap_dp"><div class="fulfil_c_pikl">$<span class="custom_symbol"></span></div><div class="fulfil_c_token"><input disabled id="fulfil_pikl_request" type="text" value="" /></div></div>
         <div class="swap_d">
         <div class="request_left">
-          <div class="swap_c_title">$USDC Request</div><div class="fulfil_c_value"><input disabled id="fulfil_usdc_request" type="text" value="" /></div>
+          <div class="swap_c_title">$USDC</div><div class="fulfil_c_value"><input disabled id="fulfil_usdc_request" type="text" value="" /></div>
         </div>
         </div>
       </div>
@@ -301,14 +337,20 @@
           <div class="swapper_fee fee_total"><span class="swap_label">Total</span><span class="swap_amt">0.02591500</span><span class="swap_unit">SOL</span></div>
         </div> -->
         
-        <div class="priority_label">Priority Lamports</div>
-        <input class="tx_priority" type="text" id="priority_nft_exec" onkeydown="if(event.key==='.'){event.preventDefault();}" oninput="event.target.value = event.target.value.replace(/[^0-9]*/g,'');" />
+        <div class="priority_label">Fee Priority</div>
+        <select class="tx_priority" id="priority_nft_exec">
+          <option value="VeryHigh" >Very High</option>
+          <option value="High" >High</option>
+          <option value="Medium" >Medium</option>
+          <option value="Low" >Low</option>
+          <option value="Min" >Min</option>
+        </select>
         
         <button id="swap_execute" disabled>Execute</button>
       </div> 
       <div class="fulfil_f">
         3. Copy
-        <div class="swapper">Copy tx details:</div>
+        <div class="swapper">TX Details:</div>
         <div class="swapper">
           <div class="swapper_fee share_fulfil_sig"><span class="swap_label">Signature</span><span class="swap_val"></span><button id="save_exec_sig" class="swap_copy"><img src="/img/copy.svg" /></button></div>
         </div>
@@ -323,7 +365,7 @@
       <div class="swap_last"></div>
       
       </div>
-    <!-- proposal viewer -->
+    <!-- contract viewer -->
     
     </div>
   </main>
@@ -331,18 +373,18 @@
   <!-- main page scrolling wrapper -->
 
   <!-- social footer links -->
-  <div id="socials">
+  <!-- <div id="socials">
       <a id="set_discord" href="https://discord.com/invite/hXXDvYTQhj" class="socials" target="_blank"><img id="social_discord" />
     </a><a id="set_github" href="https://github.com/McDegens-DAO/McSwap" class="socials" target="_blank"><img id="social_github" />
     </a><a id="set_twitter" href="https://twitter.com/McDegensDAO" class="socials" target="_blank"><img id="social_twitter" /></a>
-  </div>
+  </div> -->
   <!-- social footer links -->
   
-  <!-- overlay -->
+  <!-- main overlay -->
   <div id="cover"><div id="cover_message"></div></div>
-  <!-- overlay -->
+  <!-- main overlay -->
   
-  <!-- sol donations -->
+  <!-- sol donations ui -->
   <div id="donation_box">
     <img id="donation_close" src="/img/close.svg" />
     <div id="donation_banner">
@@ -350,26 +392,45 @@
       <br /><br />
       <div id="donat_address"></div>
     </div>
-    <input id="donation_amount" type="number" value="0" />
+    <input id="donation_amount" type="number" value="" placeholder="0" />
+    <div id="donation_label">Fee Priority</div>
+    <select class="donation_priority" id="donation_priority">
+      <option value="VeryHigh" >Very High</option>
+      <option value="High" >High</option>
+      <option value="Medium" >Medium</option>
+      <option value="Low" >Low</option>
+      <option value="Min" >Min</option>
+    </select>    
     <button id="send_donation">Send Donation</button>
   </div>
-  <!-- sol donations -->
+  <!-- sol donations ui -->
   
-  <!-- nft donations -->
+  <!-- nft transfer ui -->
   <div id="nft_donation_box">
     <div id="nft_donation_name">Name</div>
     <div id="nft_donation_collection">Collection</div>
+    <div id="nft_donation_standard">Standard</div>
     <img id="nft_donation_close" src="/img/close.svg">
     <img id="nft_donation_image" src="/img/favicon.png">
+    <div class="fromto_label">Asset</div>
     <input disabled id="nft_donation_mint" placeholder="mint" value="...">
+    <div class="fromto_label">To</div>
     <input id="nft_donation_addy" placeholder="to wallet" value="">
+    <div id="nft_donation_label">Fee Priority</div>
+    <select class="nft_donation_priority" id="nft_donation_priority">
+      <option value="VeryHigh" >Very High</option>
+      <option value="High" >High</option>
+      <option value="Medium" >Medium</option>
+      <option value="Low" >Low</option>
+      <option value="Min" >Min</option>
+    </select>  
     <button id="nft_send_donation">Transfer</button>
   </div>
-  <!-- nft donations -->
+  <!-- nft transfer ui -->
   
-  <!-- sol donations -->
+  <!-- sol host donations -->
   <img id="donate_sol" src="/img/sol-white.png" />
-  <!-- sol donations -->
+  <!-- sol host donations -->
   
   <!-- wallet -->
   <button class="mcprofile_open"></button>
@@ -377,6 +438,8 @@
   <div id="wallet_box">
     <div id="wallet_title"><span id="wallet_tool"></span> <span id="wallet_filters"></span><button id="wallet_close"><img src="/img/close-left.svg"></button><button id="wallet_refresh" class="refresh_static"><img src="/img/refresh.svg"></button></div>
     <div id="wallet_buttons"><div class="wallet_button"><button id="wallet_cnfts" disabled=""><span class="count">(--)</span> cNFTs</button></div><div class="wallet_button"><button id="wallet_nfts" disabled=""><span class="count">(--)</span> NFTs</button></div><div class="wallet_button"><button id="wallet_connect">Connect</button><button id="wallet_disconnect">Disconnect</button></div></div>
+    <div class="collections" id="cnft_collections"><select id="cnft_collection"></select></div>
+    <div class="collections" id="nft_collections"><select id="nft_collection"></select></div>
     <div id="wallet_list">
     <div id="view_nfts" class="wallet_views"></div>
     <div id="view_cnfts" class="wallet_views"></div>
@@ -387,43 +450,52 @@
   </div>
   <!-- wallet -->
   
-  <!-- requests -->
+  <!-- active sent and received contracts -->
   <button id="requests_open"><img src="/img/notification.svg"></button>
   <div id="requests_box">
     <button id="requests_close"></button>
-<!--     <button id="smart_change_prev"></button>
-    <button id="smart_change_next"></button> -->
-    <button disabled id="next_smart_mode" class="_smart_mode_"><img src="/img/triangle-right.svg" /></button>
-    <button disabled id="prev_smart_mode" class="_smart_mode_"><img src="/img/triangle-left.svg" /></button>
-    <div id="smart_tool_mode">SPL</div>
-    <button id="smart_tool_received" class="smart_tool_title">Received</button><button id="smart_tool_sent" class="smart_tool_title">Sent</button>
+    <button id="next_smart_mode" class="_smart_mode_"><img src="/img/triangle-right.svg" /></button>
+    <button id="prev_smart_mode" class="_smart_mode_"><img src="/img/triangle-left.svg" /></button>
+    <div id="smart_tool_mode" data-mode="spl" data-key="0">SPL</div>
+    <button id="smart_tool_received" class="smart_tool_title">Received</button><button id="smart_tool_sent" class="smart_tool_title">Sent</button><button id="smart_tool_reload" class="smart_tool_title"><img src="/img/refresh.svg"></button>
     <div class="smart_clear"></div>
     <div id="smart_scroll">
       <div id="spl_received" class="sent_received"></div>
       <div id="spl_sent" class="sent_received"></div>
+      <div id="cnft_received" class="sent_received"></div>
+      <div id="cnft_sent" class="sent_received"></div>
+      <div id="nft_received" class="sent_received"></div>
+      <div id="nft_sent" class="sent_received"></div>
+      <div id="pnft_received" class="sent_received"></div>
+      <div id="pnft_sent" class="sent_received"></div>
+      <div id="core_received" class="sent_received"></div>
+      <div id="core_sent" class="sent_received"></div>
     </div>
     <div class="smart_clear"></div>
     <div id="smart_bottom"></div>
   </div>
-  <!-- requests -->
+  <!-- active sent and received contracts -->
   
-  <!-- wallet chooser popup -->
+  <!-- wallet chooser ui -->
   <div id="wallet_chooser">
     <button id="chooser_phantom"><img src="/img/wallet_phantom.png" /> <span>Phantom</span></button>
     <button id="chooser_solflare"><img src="/img/wallet_solflare.png" /> <span>Solflare</span></button>
     <button id="chooser_backpack"><img src="/img/wallet_backpack.png" /> <span>Backpack</span></button>
     <button id="chooser_cancel"><img src="/img/cross.svg" /> <span>Close</span></button>
   </div>
-  <!-- wallet chooser popup -->
+  <!-- wallet chooser ui -->
   
-  <!-- proposal token choices -->
+  <!-- token choices -->
   <img id="token_options_close" src="/img/close.svg">
-  <div id="swap_token_options"><div id="swap_token_list"></div></div>
-  <!-- proposal token choices -->
+  <div id="swap_token_options"><input placeholder="filter by symbol" id="swap_token_filter" type="text" /><div id="swap_token_list"></div></div>
+  <!-- token choices -->
   
   <!-- initial loader -->
   <div id="init_cover"></div>
-  <div id="bob_chooser"></div>
+  <div id="bob_chooser">
+    <select id="bob_chooser_collections"></select><button id="bob_cancel"></button>
+    <div id="bob_chooser_list"></div>
+  </div>
   <div id="init_loader"></div>
   <!-- initial loader -->
   
@@ -431,9 +503,7 @@
   <div id="vrs">•••</div>
   <!-- mcswap dapp version -->
   
-  <!-- imports -->
-  <script src="/js/web3/buffer.js"></script>
-  <script>let Buffer_=require("buffer");const Buffer=Buffer_.Buffer;</script>
+  <!-- includes -->
   <script src="/js/jquery.js"></script>
   <script src="/js/three.min.js"></script>
 <!-- <script src="/js/vanta/vanta.fog.min.js"></script> -->
@@ -443,24 +513,30 @@
   <script src="/js/vanta/vanta.waves.min.js"></script>
   <script src="/js/vanta/vanta.js"></script>
   <script src="/js/nicescroll.js"></script>
-  <script src="/js/web3/solanaWeb3.js"></script>
   <script src="/js/web3/axios.js"></script>
+  <!-- includes -->
+
+  <!-- web3 bundles -->
   <script src="/js/web3/buffer.js"></script>
+  <script>let Buffer_ = require("buffer"); const Buffer = Buffer_.Buffer;</script>
+  <script src="/js/web3/solanaWeb3.js"></script>
   <script src="/js/web3/buffer-layout.js"></script>
-  <script src="/js/web3/spl-token.js"></script>
+  <script src="/js/web3/splToken.js"></script>
+  <script>const splToken = splToken_.default;</script>
   <script src="/js/web3/bn.js"></script>
   <script src="/js/web3/bs58.js"></script>
   <script src="/js/web3/mpl-token-metadata.js"></script>
-  <script src="/js/web3/comp-mod.js"></script>
-  <script>const splAccountCompression_=splAccountCompression.default;</script>
+  <script src="/js/web3/splAccountCompression.js"></script>
+  <script>const splAccountCompression = splAccountCompression_.default;</script>
   <script src="/js/web3/bubblegum.js"></script>
-  <script>const mplBubblegum_=mplBubblegum.default;</script>
-  <!-- imports -->
+  <script>const mplBubblegum = mplBubblegum_.default;</script>
+  <script src="/js/web3/umi.js"></script>
+  <!-- web3 bundles -->
   
-  <!-- js -->
+  <!-- settings and main -->
   <script src="/config/settings.js"></script>
   <script src="/js/main.js"></script>
-  <!-- js -->
+  <!-- settings and main -->
   
   </body>
 </html>
