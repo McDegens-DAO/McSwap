@@ -5,7 +5,7 @@ header("Access-Control-Allow-Methods:GET");if(isset($_SERVER['HTTP_ACCESS_CONTRO
 // ***************************************************************
 // repeat for each rule
 $rule->pathPattern = "/spl*";
-$rule->apiPath = "https://actions.mcdegen.xyz:8444/mcswap-spl-config*";
+$rule->apiPath = "https://www.solana-action-express.com/mcswap-spl-config*";
 $rules[] = $rule;
 // ***************************************************************
 
