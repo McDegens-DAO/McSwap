@@ -16,7 +16,7 @@ We are currently adding Token2022 support and IDLs to all McSwap Protocol Progra
 
 <sup>CORE: <code>EYMc51BuTRTfc5XCYqSWW92risZvMP217N2VYaTdFMHh</code> [View Details](https://solana.fm/address/EYMc51BuTRTfc5XCYqSWW92risZvMP217N2VYaTdFMHh/transactions)</sup>
 
-## Live dApp
+## Demo dApp
 [McSwap.xyz](https://mcswap.xyz)
 
 ## Requirements
