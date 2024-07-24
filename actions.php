@@ -7,6 +7,9 @@ header("Access-Control-Allow-Methods:GET");if(isset($_SERVER['HTTP_ACCESS_CONTRO
 $rule->pathPattern = "/spl*";
 $rule->apiPath = "https://www.solana-action-express.com/mcswap-spl-config*";
 $rules[] = $rule;
+$rule->pathPattern = "/swap*";
+$rule->apiPath = "https://www.solana-action-express.com/mcswap-swap-config*";
+$rules[] = $rule;
 // ***************************************************************
 
 /// output data

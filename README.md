@@ -1,22 +1,30 @@
-# McSwap
-Trustless P2P Contract Creator.
+# McSwap OTC
+Trustless Contract Creator
 
-dApp Version: 1.8 (beta)
+dApp Version: 1.8 (alpha)
 
-This repo is still experimental.
+We are currently adding Token2022 support and IDLs to all McSwap Protocol Programs on Solana.
+
+# McSwap Programs
+<sup>SPL: <code>AAyM7XH9w7ApeSuEat8AwUW1AA7dBuj2vXv7SuUGpNUp</code> [View Details](https://solana.fm/address/AAyM7XH9w7ApeSuEat8AwUW1AA7dBuj2vXv7SuUGpNUp/transactions)</sup>
+
+<sup>NFT: <code>AyJBbGQzUQSvhivZnHMDCCk6eSLupkeBh4fvMAD8T4Xx</code> [View Details](https://solana.fm/address/AyJBbGQzUQSvhivZnHMDCCk6eSLupkeBh4fvMAD8T4Xx/transactions)</sup>
+
+<sup>CNFT: <code>6RUcK9T1hYAZGBxN82ERVDUi4vLAX4hN1zAyy3cU5jav</code> [View Details](https://solana.fm/address/6RUcK9T1hYAZGBxN82ERVDUi4vLAX4hN1zAyy3cU5jav/transactions)</sup>
+
+<sup>PNFT: <code>2bY36scRMEUJHJToVGjJ2uY8PdSrRPr73siNwGbv1ZNT</code> [View Details](https://solana.fm/address/2bY36scRMEUJHJToVGjJ2uY8PdSrRPr73siNwGbv1ZNT/transactions)</sup>
+
+<sup>CORE: <code>EYMc51BuTRTfc5XCYqSWW92risZvMP217N2VYaTdFMHh</code> [View Details](https://solana.fm/address/EYMc51BuTRTfc5XCYqSWW92risZvMP217N2VYaTdFMHh/transactions)</sup>
 
 ## Live dApp
 [McSwap.xyz](https://mcswap.xyz)
-
-## Support
-Create a ticket at our [Discord](https://discord.com/invite/hXXDvYTQhj)
 
 ## Requirements
 * A registered domain name.
 * Basic LAMP web hosting with PHP8+ & SSL.
 * Apache mod_rewrite enabled (usually default).
-* [Helius](https://www.helius.dev) RPC credentials.
-* Coin Market Cap credentials.
+* [Helius RPC](https://www.helius.dev) credentials.
+* [Coin Market Cap API](https://coinmarketcap.com/api/documentation/v1/#section/Quick-Start-Guide) credentials.
 
 ## Install
 1. Navigate to the public_html folder of your server via terminal.
@@ -121,16 +129,6 @@ conf.nft_whitelist = [];
   <!-- social card -->
 ```
 
-Create Contract Shortcuts
-* Apps can also use deeplinks as shortcuts to start new cnFT/NFT trade contracts using your sweet new swap tool.
-```javascript
-https://your-domain.com/propose/ASSET_ID_1
-```
-* Reduce friction by appending a provider name that will connect the user automatically using the given provider.
-```javascript
-https://your-domain.com/propose/ASSET_ID_1/phantom
-```
-
 ## Custom Skin
 1. Copy the "default" skin folder in [css/skins](https://github.com/McDegens-DAO/McSwap/tree/main/css/skins) and give it a unique name.
 2. Replace images in your new folder as needed.
@@ -160,3 +158,51 @@ To:
 User-agent: *
 Allow: /
 ```
+
+## Blinks & Actions
+Coming Soon!
+
+Integrated with the McSwap Actions API out-of-the-box.
+
+OTC Contracts created using McSwap OTC can be executed by the intended peer party via Blink. 
+
+User creates a new contract and sends the provided link to their peer in a private X message to be executed.
+
+**actions.json**
+
+Ref: [actions.php](https://github.com/McDegens-DAO/McSwap/blob/main/actions.php) 
+```php
+<?php header("Access-Control-Allow-Origin:*");header('Access-Control-Max-Age:86400');header('Content-Type:application/json');
+header("Access-Control-Allow-Methods:GET");if(isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS'])){header("Access-Control-Allow-Headers:{$_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']}");}$response=new stdClass;$rules=array();$rule=new stdClass;
+//// define rules below
+
+// ***************************************************************
+// repeat for each rule
+$rule->pathPattern = "/spl*";
+$rule->apiPath = "https://www.solana-action-express.com/mcswap-spl-config*";
+$rules[] = $rule;
+$rule->pathPattern = "/swap*";
+$rule->apiPath = "https://www.solana-action-express.com/mcswap-swap-config*";
+$rules[] = $rule;
+// ***************************************************************
+
+/// output data
+$response->rules=$rules;echo json_encode($response);exit();
+```
+**Social Card**
+
+The Social Card metadata is defined in the [index.html](https://github.com/McDegens-DAO/McSwap/blob/8833957ff89c98e99954b56b661da1a964a1dc88/index.html#L26) file.
+
+```html
+<!-- social card -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:site" content="@SolDapper" />
+<meta name="twitter:creator" content="@SolDapper" />
+<meta name="twitter:title" content="McSwap OTC" />
+<meta name="twitter:description" content="McSwap OTC Trustless Contract Creator." />
+<meta name="twitter:image" content="https://mcswap.xyz/img/mcswap-card.png" />
+<!-- social card -->
+```
+
+## Support
+Create a ticket at our [Discord](https://discord.com/invite/hXXDvYTQhj)
