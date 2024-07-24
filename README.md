@@ -3,7 +3,7 @@ Trustless Contract Creator
 
 dApp Version: 1.8 (alpha)
 
-We are currently adding Token2022 support and IDLs to all McSwap Protocol Programs on Solana.
+We are currently adding Token2022 support and IDLs to all McSwap Protocol Programs on Solana. A Production version of McSwap OTC will be available soon.
 
 # McSwap Programs
 <sup>SPL: <code>AAyM7XH9w7ApeSuEat8AwUW1AA7dBuj2vXv7SuUGpNUp</code> [View Details](https://solana.fm/address/AAyM7XH9w7ApeSuEat8AwUW1AA7dBuj2vXv7SuUGpNUp/transactions)</sup>
