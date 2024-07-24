@@ -163,11 +163,7 @@ Also remove or comment out this [robots metatag](https://github.com/McDegens-DAO
 ## Blinks & Actions
 Coming Soon!
 
-Integrated with the McSwap Actions API out-of-the-box.
-
-OTC Contracts created using McSwap OTC can be executed by the intended peer party via Blink. 
-
-User creates a new contract and sends the provided link to their peer in a private X message to be executed.
+Integrated with the McSwap Actions API out-of-the-box. OTC Contracts created using McSwap OTC can be executed by the intended peer party via Blink. The user creates a new contract and sends the provided link to their peer in a private X message to be executed as a Blink.
 
 **actions.json**
 
