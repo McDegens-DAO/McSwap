@@ -10949,6 +10949,9 @@ $(window).on('load', async function() {
     $("#init_cover").fadeOut(400);
     $("#init_loader").fadeOut(400);
     setTimeout(() => {
+
+      alert("McSwap OTC is currently being tested. Production Launch Soon!");
+
       $("#center_logo").addClass("animate__animated animate__zoomIn").show();
 //       setTimeout(() => {
 //         $("#socials").addClass("animate__animated animate__fadeInUp").show();
