@@ -158,7 +158,7 @@ To:
 User-agent: *
 Allow: /
 ```
-You should also remove or comment out this [robots metatag here](https://github.com/McDegens-DAO/McSwap/blob/4b3c4756b4007810e4e3f83df1412c4e07159415/index.html#L12)
+You should also remove or comment out this [robots metatag](https://github.com/McDegens-DAO/McSwap/blob/4b3c4756b4007810e4e3f83df1412c4e07159415/index.html#L12) in your index.html
 
 ## Blinks & Actions
 Coming Soon!
