@@ -7896,6 +7896,7 @@ $(window).on('load', async function() {
 
     let taker = $("#spl_owner").val();
     let multiply = 1;
+
     let token1Mint = null;
     let token2Mint = null;
     let token3Mint = null;
@@ -7998,6 +7999,71 @@ $(window).on('load', async function() {
     console.log("token4Mint ", token4Mint);
     console.log("token4Amount", token4Amount);
 
+    let is_22_1 = false;
+    let SPL_PROGRAM_1 = splToken.TOKEN_PROGRAM_ID;
+    if(token1Amount > 0){
+      axiosInstance = axios.create({baseURL:conf.cluster});
+      getAsset = await axiosInstance.post(conf.cluster,{jsonrpc:"2.0",method:"getAsset",id:"rpd-op-123",params:{id:token1Mint},}); 
+      if(typeof getAsset.data.result.mint_extensions != "undefined"){
+        SPL_PROGRAM_1 = splToken.TOKEN_2022_PROGRAM_ID;
+        console.log("Token 1 is using Token 2022");
+        console.log(SPL_PROGRAM_1.toString());
+        is_22_1 = true;
+      }
+      else{
+        console.log("Token 1 is using SPL Token");
+        console.log(SPL_PROGRAM_1.toString());
+      }
+    }
+    let is_22_2 = false;
+    let SPL_PROGRAM_2 = splToken.TOKEN_PROGRAM_ID;
+    if(token2Amount > 0){
+      axiosInstance = axios.create({baseURL:conf.cluster});
+      getAsset = await axiosInstance.post(conf.cluster,{jsonrpc:"2.0",method:"getAsset",id:"rpd-op-123",params:{id:token2Mint},}); 
+      if(typeof getAsset.data.result.mint_extensions != "undefined"){
+        SPL_PROGRAM_2 = splToken.TOKEN_2022_PROGRAM_ID;
+        console.log("Token 1 is using Token 2022");
+        console.log(SPL_PROGRAM_2.toString());
+        is_22_2 = true;
+      }
+      else{
+        console.log("Token 1 is using SPL Token");
+        console.log(SPL_PROGRAM_2.toString());
+      }
+    }
+    let is_22_3 = false;
+    let SPL_PROGRAM_3 = splToken.TOKEN_PROGRAM_ID;
+    if(token3Amount > 0){ 
+      axiosInstance = axios.create({baseURL:conf.cluster});
+      getAsset = await axiosInstance.post(conf.cluster,{jsonrpc:"2.0",method:"getAsset",id:"rpd-op-123",params:{id:token3Mint},}); 
+      if(typeof getAsset.data.result.mint_extensions != "undefined"){
+        SPL_PROGRAM_3 = splToken.TOKEN_2022_PROGRAM_ID;
+        console.log("Token 1 is using Token 2022");
+        console.log(SPL_PROGRAM_3.toString());
+        is_22_3 = true;
+      }
+      else{
+        console.log("Token 1 is using SPL Token");
+        console.log(SPL_PROGRAM_3.toString());
+      }
+    }
+    let is_22_4 = false;
+    let SPL_PROGRAM_4 = splToken.TOKEN_PROGRAM_ID;
+    if(token4Amount > 0){ 
+      axiosInstance = axios.create({baseURL:conf.cluster});
+      getAsset = await axiosInstance.post(conf.cluster,{jsonrpc:"2.0",method:"getAsset",id:"rpd-op-123",params:{id:token4Mint},}); 
+      if(typeof getAsset.data.result.mint_extensions != "undefined"){
+        SPL_PROGRAM_4 = splToken.TOKEN_2022_PROGRAM_ID;
+        console.log("Token 1 is using Token 2022");
+        console.log(SPL_PROGRAM_4.toString());
+        is_22_4 = true;
+      }
+      else{
+        console.log("Token 1 is using SPL Token");
+        console.log(SPL_PROGRAM_4.toString());
+      }
+    }
+
     let connection = new solanaWeb3.Connection(conf.cluster, "confirmed");
 
     let tokenSwapProgramId = new solanaWeb3.PublicKey(conf.MCSWAP_SPL_PROGRAM);
@@ -8026,7 +8092,8 @@ $(window).on('load', async function() {
       feeChips = new BN(decodedProgramStateData.fee_chips, 10, "le");
       devTreasury = new solanaWeb3.PublicKey(decodedProgramStateData.dev_treasury);
       mcDegensTreasury = new solanaWeb3.PublicKey(decodedProgramStateData.mcdegens_treasury);
-    } else {
+    } 
+    else {
       console.log("Program State Not Initialized");
       return;
     }
@@ -8035,18 +8102,13 @@ $(window).on('load', async function() {
     console.log("Swap Vault PDA: ", swapVaultPDA[0].toString());
 
     let swapStatePDA = solanaWeb3.PublicKey.findProgramAddressSync([Buffer.from("swap-state"),
-      provider.publicKey.toBytes(), new solanaWeb3.PublicKey(taker).toBytes()
+    provider.publicKey.toBytes(), new solanaWeb3.PublicKey(taker).toBytes()
     ], tokenSwapProgramId);
     console.log("Swap State PDA: ", swapStatePDA[0].toString());
     
     let swapState = null;
     swapState = await connection.getAccountInfo(new solanaWeb3.PublicKey(swapStatePDA[0]));
     console.log("swapState: ", swapState);
-    
-//     $("#spl_deploy, .spl_choice, .spl_field, #spl_owner").prop("disabled", false);
-//     $(".swap_spl_a, .swap_spl_b").addClass("active_spl");
-//     $("#cover").fadeOut(400);
-//     $("#cover_message").html(""); 
     
     if(swapState != null){
       console.log("Error: ", "A pending contract for these two parties already exist!");
@@ -8060,108 +8122,213 @@ $(window).on('load', async function() {
       return;
     }
     
-    let providerPickleATA = await splToken.getAssociatedTokenAddress(new solanaWeb3.PublicKey(pickleMint),
-    provider.publicKey, false, splToken.TOKEN_PROGRAM_ID, splToken.ASSOCIATED_TOKEN_PROGRAM_ID, );
+    let providerPickleATA = await splToken.getAssociatedTokenAddress(new solanaWeb3.PublicKey(pickleMint),provider.publicKey, false, splToken.TOKEN_PROGRAM_ID, splToken.ASSOCIATED_TOKEN_PROGRAM_ID, );
 
-    const tempToken1Account = new solanaWeb3.Keypair();
-    console.log("Temp Token1 Account: ", tempToken1Account.publicKey.toString());
-    temp_rent = await connection.getMinimumBalanceForRentExemption(splToken.AccountLayout.span);
-    let createTempToken1AccountIx = solanaWeb3.SystemProgram.createAccount({
-      programId: splToken.TOKEN_PROGRAM_ID,
-      space: splToken.AccountLayout.span,
-      lamports: temp_rent,
-      fromPubkey: provider.publicKey,
-      newAccountPubkey: tempToken1Account.publicKey,
-    });
-    console.log("Create Temp Token1 Account Ix: ", createTempToken1AccountIx);
+    // token 1 ***************************************************************************
+    let extensionTypes_1 = null;
+    let tempToken1Account = new solanaWeb3.Keypair();
+    let createTempToken1AccountIx = null;
+    let initTempToken1AccountIx = null;
+    let transferToken1Ix = null;
+    let transferFeeBasisPoints_1 = null;
+    if (token1Amount > 0) {
 
-    let initTempToken1AccountIx = splToken.createInitializeAccountInstruction(tempToken1Account.publicKey,
-      new solanaWeb3.PublicKey(token1Mint), tempToken1Account.publicKey, splToken.TOKEN_PROGRAM_ID);
-    console.log("Init Temp Token1 Account Ix: ", initTempToken1AccountIx);
+      let providerToken1ATA = await splToken.getAssociatedTokenAddress(
+        new solanaWeb3.PublicKey(token1Mint),
+        provider.publicKey, 
+        false, 
+        SPL_PROGRAM_1, 
+        splToken.ASSOCIATED_TOKEN_PROGRAM_ID
+      );
 
-    let providerToken1ATA = await splToken.getAssociatedTokenAddress(new solanaWeb3.PublicKey(token1Mint),
-      provider.publicKey, false, splToken.TOKEN_PROGRAM_ID, splToken.ASSOCIATED_TOKEN_PROGRAM_ID, );
+      let accountInfo = await connection.getAccountInfo(providerToken1ATA);
+      console.log("Temp Token1 Account: ", tempToken2Account.publicKey.toString());
+      let space;
+      if(is_22_1===true){space=accountInfo.space;}else{space=splToken.AccountLayout.span;}
+      temp_rent=await connection.getMinimumBalanceForRentExemption(space);
+      createTempToken1AccountIx = solanaWeb3.SystemProgram.createAccount({
+        programId: SPL_PROGRAM_1,
+        space: space,
+        lamports: temp_rent,
+        fromPubkey: provider.publicKey,
+        newAccountPubkey: tempToken1Account.publicKey,
+      });
+      console.log("Create Temp Token1 Account Ix: ", createTempToken1AccountIx);
 
-    console.log("providerToken1ATA", providerToken1ATA.toString());
-    console.log("tempToken1Account.publicKey", tempToken1Account.publicKey.toString());
-    console.log("provider.publicKey", provider.publicKey.toString());
-    console.log("token1Amount", token1Amount);
-    console.log("splToken.TOKEN_PROGRAM_ID", splToken.TOKEN_PROGRAM_ID.toString());
+      initTempToken1AccountIx = splToken.createInitializeAccountInstruction(
+        tempToken1Account.publicKey,
+        new solanaWeb3.PublicKey(token2Mint), 
+        tempToken1Account.publicKey, 
+        SPL_PROGRAM_1
+      );
+      console.log("Init Temp Token1 Account Ix: ", initTempToken1AccountIx);
 
-    let transferToken1Ix = splToken.createTransferInstruction(providerToken1ATA, tempToken1Account.publicKey,
-      provider.publicKey, token1Amount, provider.publicKey, splToken.TOKEN_PROGRAM_ID, );
-    console.log("Transfer Token1 Ix: ", transferToken1Ix);
+      if(is_22_1===true){
+        let mintAccountInfo_1 = await splToken.getMint(connection, new solanaWeb3.PublicKey(token1Mint), "confirmed", SPL_PROGRAM_1);
+        console.log("mintAccountInfo_1 ", mintAccountInfo_1);
+        extensionTypes_1 = splToken.getExtensionTypes(mintAccountInfo_1.tlvData);
+        console.log("extensionTypes_1", extensionTypes_1);
+        if(extensionTypes_1.includes(1)){
+          let extensionTransferFeeConfig = splToken.getExtensionData(splToken.ExtensionType.TransferFeeConfig, mintAccountInfo_1.tlvData);    
+          let data_1 = splToken.TransferFeeConfigLayout.decode(extensionTransferFeeConfig);
+          transferFeeBasisPoints_1 = data_1.newerTransferFee.transferFeeBasisPoints;
+          console.log("transferFeeBasisPoints_1", transferFeeBasisPoints_1);
+        }
+      }
 
+      transferToken1Ix = splToken.createTransferCheckedInstruction(
+        providerToken1ATA,
+        new solanaWeb3.PublicKey(token1Mint),
+        tempToken1Account.publicKey,
+        provider.publicKey,
+        token1Amount,
+        mintAccountInfo_1.decimals,
+        provider.publicKey,
+        SPL_PROGRAM_1,
+      );
+      console.log("Transfer Token1 Ix: ", transferToken1Ix);
+
+    }
+    // token 1 ***************************************************************************
+
+    // token 2 ***************************************************************************
+    let extensionTypes_2 = null;
     let tempToken2Account = new solanaWeb3.Keypair();
     let createTempToken2AccountIx = null;
     let initTempToken2AccountIx = null;
     let transferToken2Ix = null;
-
+    let transferFeeBasisPoints_2 = null;
     if (token2Amount > 0) {
 
+      let providerToken2ATA = await splToken.getAssociatedTokenAddress(
+        new solanaWeb3.PublicKey(token2Mint),
+        provider.publicKey, 
+        false, 
+        SPL_PROGRAM_2, 
+        splToken.ASSOCIATED_TOKEN_PROGRAM_ID
+      );
+      
+      let accountInfo = await connection.getAccountInfo(providerToken2ATA);
       console.log("Temp Token2 Account: ", tempToken2Account.publicKey.toString());
-      temp_rent = await connection.getMinimumBalanceForRentExemption(splToken.AccountLayout.span);
+      let space;
+      if(is_22_2===true){space=accountInfo.space;}else{space=splToken.AccountLayout.span;}
+      temp_rent=await connection.getMinimumBalanceForRentExemption(space);
       createTempToken2AccountIx = solanaWeb3.SystemProgram.createAccount({
-        programId: splToken.TOKEN_PROGRAM_ID,
-        space: splToken.AccountLayout.span,
+        programId: SPL_PROGRAM_2,
+        space: space,
         lamports: temp_rent,
         fromPubkey: provider.publicKey,
         newAccountPubkey: tempToken2Account.publicKey,
       });
       console.log("Create Temp Token2 Account Ix: ", createTempToken2AccountIx);
 
-      initTempToken2AccountIx = splToken.createInitializeAccountInstruction(tempToken2Account.publicKey,
-        new solanaWeb3.PublicKey(token2Mint), tempToken2Account.publicKey, splToken.TOKEN_PROGRAM_ID);
+      initTempToken2AccountIx = splToken.createInitializeAccountInstruction(
+        tempToken2Account.publicKey,
+        new solanaWeb3.PublicKey(token2Mint), 
+        tempToken2Account.publicKey, 
+        SPL_PROGRAM_2
+      );
       console.log("Init Temp Token2 Account Ix: ", initTempToken2AccountIx);
 
-      let providerToken2ATA = await splToken.getAssociatedTokenAddress(new solanaWeb3.PublicKey(token2Mint),
-        provider.publicKey, false, splToken.TOKEN_PROGRAM_ID, splToken.ASSOCIATED_TOKEN_PROGRAM_ID, );
-      transferToken2Ix = splToken.createTransferInstruction(providerToken2ATA, tempToken2Account.publicKey,
-        provider.publicKey, token2Amount, provider.publicKey, splToken.TOKEN_PROGRAM_ID, );
+      if(is_22_2===true){
+        let mintAccountInfo_2 = await splToken.getMint(connection, new solanaWeb3.PublicKey(token2Mint), "confirmed", SPL_PROGRAM_2);
+        console.log("mintAccountInfo_2 ", mintAccountInfo_2);
+        extensionTypes_2 = splToken.getExtensionTypes(mintAccountInfo_2.tlvData);
+        console.log("extensionTypes_2", extensionTypes_2);
+        if(extensionTypes_2.includes(1)){
+          let extensionTransferFeeConfig = splToken.getExtensionData(splToken.ExtensionType.TransferFeeConfig, mintAccountInfo_2.tlvData);    
+          let data_2 = splToken.TransferFeeConfigLayout.decode(extensionTransferFeeConfig);
+          transferFeeBasisPoints_2 = data_2.newerTransferFee.transferFeeBasisPoints;
+          console.log("transferFeeBasisPoints_2", transferFeeBasisPoints_2);
+        }
+      }
+
+      transferToken2Ix = splToken.createTransferCheckedInstruction(
+        providerToken2ATA,
+        new solanaWeb3.PublicKey(token2Mint),
+        tempToken2Account.publicKey,
+        provider.publicKey,
+        token2Amount,
+        mintAccountInfo_2.decimals,
+        provider.publicKey,
+        SPL_PROGRAM_2,
+      );
       console.log("Transfer Token2 Ix: ", transferToken2Ix);
 
     }
+    // token 2 ***************************************************************************
 
+    // token 3 ***************************************************************************
     let createToken3ATA = null;
     let createToken3ATAIx = null;
     let token3ATA = null;
-
     if (token3Mint != "11111111111111111111111111111111") {
-      token3ATA = await splToken.getAssociatedTokenAddress(new solanaWeb3.PublicKey(token3Mint), provider.publicKey,
-        false, splToken.TOKEN_PROGRAM_ID, splToken.ASSOCIATED_TOKEN_PROGRAM_ID, );
+
+      token3ATA = await splToken.getAssociatedTokenAddress(
+        new solanaWeb3.PublicKey(token3Mint),
+        provider.publicKey, 
+        false, 
+        SPL_PROGRAM_3, 
+        splToken.ASSOCIATED_TOKEN_PROGRAM_ID
+      );
       console.log("Token3 ATA: ", token3ATA.toString());
-      let token3ATAresponse = await connection.getAccountInfo(token3ATA);
-      if (token3ATAresponse == null) {
+
+      let accountInfo = await connection.getAccountInfo(token3ATA);
+      if (accountInfo == null) {
         createToken3ATA = true;
-        createToken3ATAIx = splToken.createAssociatedTokenAccountInstruction(provider.publicKey, token3ATA,
-          provider.publicKey, new solanaWeb3.PublicKey(token3Mint), splToken.TOKEN_PROGRAM_ID, splToken.ASSOCIATED_TOKEN_PROGRAM_ID, );
+        createToken3ATAIx = splToken.createAssociatedTokenAccountInstruction(
+          provider.publicKey, 
+          token3ATA,
+          provider.publicKey, 
+          new solanaWeb3.PublicKey(token3Mint), 
+          SPL_PROGRAM_3, 
+          splToken.ASSOCIATED_TOKEN_PROGRAM_ID
+        );
         console.log("Create Token3 ATA Ix: ", createToken3ATAIx);
       } else {
         createToken3ATA = false;
         console.log("Not creating Token3 ATA Ix");
       }
+      
     }
+    // token 3 ***************************************************************************
 
+    // token 4 ***************************************************************************
     let createToken4ATA = false;
-    let token4ATA = null;
     let createToken4ATAIx = null;
-
+    let token4ATA = null;
     if (token4Amount > 0) {
-      token4ATA = await splToken.getAssociatedTokenAddress(new solanaWeb3.PublicKey(token4Mint), provider.publicKey, false,
-        splToken.TOKEN_PROGRAM_ID, splToken.ASSOCIATED_TOKEN_PROGRAM_ID, );
+
+      token4ATA = await splToken.getAssociatedTokenAddress(
+        new solanaWeb4.PublicKey(token4Mint),
+        provider.publicKey, 
+        false, 
+        SPL_PROGRAM_4, 
+        splToken.ASSOCIATED_TOKEN_PROGRAM_ID
+      );
       console.log("Token4 ATA: ", token4ATA.toString());
-      let token4ATAresponse = await connection.getAccountInfo(token4ATA);
-      if (token4ATAresponse == null) {
+
+      let accountInfo = await connection.getAccountInfo(token4ATA);
+      if (accountInfo == null) {
         createToken4ATA = true;
-        createToken4ATAIx = splToken.createAssociatedTokenAccountInstruction(provider.publicKey, token4ATA, provider.publicKey,
-          new solanaWeb3.PublicKey(token4Mint), splToken.TOKEN_PROGRAM_ID, splToken.ASSOCIATED_TOKEN_PROGRAM_ID, );
+        createToken4ATAIx = splToken.createAssociatedTokenAccountInstruction(
+          provider.publicKey, 
+          token4ATA,
+          provider.publicKey, 
+          new solanaWeb3.PublicKey(token4Mint), 
+          SPL_PROGRAM_4, 
+          splToken.ASSOCIATED_TOKEN_PROGRAM_ID
+        );
         console.log("Create Token4 ATA Ix: ", createToken4ATAIx);
       } else {
-        console.log("Not creating Token4 ATA Ix");
         createToken4ATA = false;
+        console.log("Not creating Token4 ATA Ix");
       }
-    }
 
+    }
+    // token 4 ***************************************************************************
+
+    // data ***************************************************************************
     let totalSize = 1 + 32 + 8 + 32 + 8 + 32 + 8;
     console.log("totalSize", totalSize);
 
@@ -8180,12 +8347,25 @@ $(window).on('load', async function() {
       uarray[counter++] = arr[i];
     }
 
-    let token2 = token2Amount;
     byteArray = [0, 0, 0, 0, 0, 0, 0, 0];
-    for (index = 0; index < byteArray.length; index++) {
-      byte = token2 & 0xff;
-      byteArray[index] = byte;
-      token2 = (token2 - byte) / 256;
+    let token2;
+    if(extensionTypes_2.includes(1)){
+      token2 = token2Amount - (token2Amount * (transferFeeBasisPoints_2 / 100 / 100));
+      console.log("token2LessFee ", Math.trunc(token2));
+      for ( index = 0; index < byteArray.length; index ++ ) {
+        byte = token2 & 0xff;
+        byteArray [ index ] = byte;
+        token2 = (token2 - byte) / 256 ;
+      }
+    }
+    else{
+      token2 = token2Amount;
+      console.log("token2 ", Math.trunc(token2));
+      for (index = 0; index < byteArray.length; index++) {
+        byte = token2 & 0xff;
+        byteArray[index] = byte;
+        token2 = (token2 - byte) / 256;
+      }
     }
     for (let i = 0; i < byteArray.length; i++) {
       uarray[counter++] = byteArray[i];
@@ -8224,77 +8404,43 @@ $(window).on('load', async function() {
     }
 
     console.log("Contract Data: ", uarray);
+    // data ***************************************************************************
 
-    const initializeSwapIx = new solanaWeb3.TransactionInstruction({
+    // init ix ***************************************************************************
+    let keys = [
+      { pubkey: provider.publicKey, isSigner: true, isWritable: true }, // 0
+      { pubkey: programStatePDA[0], isSigner: false, isWritable: false }, // 1
+      { pubkey: swapVaultPDA[0], isSigner: false, isWritable: false }, // 2
+      { pubkey: swapStatePDA[0], isSigner: false, isWritable: true }, // 3
+      { pubkey: new solanaWeb3.PublicKey(token1Mint), isSigner: false, isWritable: true }, // 4       
+      { pubkey: tempToken1Account.publicKey, isSigner: true, isWritable: true }, // 5
+      { pubkey: new solanaWeb3.PublicKey(token2Mint), isSigner: false, isWritable: true }, // 6  
+      { pubkey: tempToken2Account.publicKey, isSigner: true, isWritable: true }, // 7
+      { pubkey: providerPickleATA, isSigner: false, isWritable: true }, // 8
+      { pubkey: solanaWeb3.SystemProgram.programId, isSigner: false, isWritable: false }, // 9
+      { pubkey: splToken.TOKEN_PROGRAM_ID, isSigner: false, isWritable: false }, // 10
+      { pubkey: splToken.TOKEN_2022_PROGRAM_ID, isSigner: false, isWritable: false }, // 11
+      { pubkey: devTreasury, isSigner: false, isWritable: true }, // 12
+      { pubkey: mcDegensTreasury, isSigner: false, isWritable: true }, // 13
+    ];
+    let initializeSwapIx = new solanaWeb3.TransactionInstruction({
       programId: tokenSwapProgramId,
       data: Buffer.from(uarray),
-      keys: [{
-          pubkey: provider.publicKey,
-          isSigner: true,
-          isWritable: true
-        }, // 0
-        {
-          pubkey: programStatePDA[0],
-          isSigner: false,
-          isWritable: false
-        }, // 1
-        {
-          pubkey: swapVaultPDA[0],
-          isSigner: false,
-          isWritable: false
-        }, // 2
-        {
-          pubkey: swapStatePDA[0],
-          isSigner: false,
-          isWritable: true
-        }, // 3            
-        {
-          pubkey: tempToken1Account.publicKey,
-          isSigner: true,
-          isWritable: true
-        }, // 4
-        {
-          pubkey: tempToken2Account.publicKey,
-          isSigner: true,
-          isWritable: true
-        }, // 5
-        {
-          pubkey: providerPickleATA,
-          isSigner: false,
-          isWritable: true
-        }, // 6  HERE
-        // { pubkey: tempFeeAccount.publicKey, isSigner: true, isWritable: true }, // 6  HERE
-        {
-          pubkey: solanaWeb3.SystemProgram.programId,
-          isSigner: false,
-          isWritable: false
-        }, // 7
-        {
-          pubkey: splToken.TOKEN_PROGRAM_ID,
-          isSigner: false,
-          isWritable: false
-        }, // 8
-        {
-          pubkey: devTreasury,
-          isSigner: false,
-          isWritable: true
-        }, // 9
-        {
-          pubkey: mcDegensTreasury,
-          isSigner: false,
-          isWritable: true
-        }, // 10
-      ]
+      keys: keys
     });
     console.log("Initialize Swap Ix: ", initializeSwapIx);
+    // init ix ***************************************************************************
 
+    // lookup table **********************************************************************
     let lookupTable = new solanaWeb3.PublicKey(conf.spl_alt); // mainnet    
     lookupTableAccount = await connection.getAddressLookupTable(lookupTable).then((res) => res.value);
     if (!lookupTableAccount) {
       console.log("Could not fetch ALT!");
       return;
     }
-    
+    // lookup table **********************************************************************
+
+    // instructions array ****************************************************************
     let instructions = null;
     if (token2Amount > 0) {
       console.log("debug set 2");
@@ -8393,8 +8539,9 @@ $(window).on('load', async function() {
           ]
       }
     }
-    
-    // ***
+    // instructions array ****************************************************************
+
+    // build tx **************************************************************************
     let priority = $("#priority_spl").val(); 
     instructions.unshift(solanaWeb3.ComputeBudgetProgram.setComputeUnitLimit({units:await getComputeLimit(provider.publicKey,instructions,lookupTableAccount)}));
     instructions.unshift(solanaWeb3.ComputeBudgetProgram.setComputeUnitPrice({microLamports:await getPriorityFeeEstimate(conf.cluster,priority,instructions,lookupTableAccount)}));
@@ -8404,8 +8551,9 @@ $(window).on('load', async function() {
       instructions: instructions,
     }).compileToV0Message([lookupTableAccount]);
     let initializeSwapTx = new solanaWeb3.VersionedTransaction(messageV0);
-    // ***
+    // build tx **************************************************************************
     
+    // do it *****************************************************************************
     try {
       let signedTx = await provider.signTransaction(initializeSwapTx);
       signedTx.sign([tempToken1Account, tempToken2Account]);
@@ -8451,7 +8599,8 @@ $(window).on('load', async function() {
       }, 3000);
       return;
     }
-    
+    // do it *****************************************************************************
+
   }
   
   // spl reverse
