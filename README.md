@@ -271,4 +271,4 @@ php public_html/rpc/fetch_images.php
 ```
 
 ## Support
-Create a ticket at our [Discord](https://discord.com/invite/hXXDvYTQhj) or contact [@SolDapper](https://x.com/SolDapper) on X.
+Create a ticket at [Discord](https://discord.com/invite/hXXDvYTQhj) or contact [@SolDapper](https://x.com/SolDapper) on X.
