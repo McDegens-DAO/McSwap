@@ -1,7 +1,7 @@
 # McSwap OTC
 Trustless Contract Creator
 
-dApp Version: 1.8 (alpha)
+Version: 1.8 (alpha)
 
 Hosting: Basic cPanel
 
