@@ -31,7 +31,7 @@ The McSwap Protocol is comprised of five Solana Programs for creating over-the-c
 
 ## Requirements
 * A registered domain name.
-* Basic LAMP web hosting with PHP8+ & SSL.
+* Basic cPanel web hosting with PHP8+ & SSL.
 * Apache mod_rewrite enabled (usually default).
 * [Helius RPC](https://www.helius.dev) credentials.
 * [Coin Market Cap API](https://coinmarketcap.com/api/documentation/v1/#section/Quick-Start-Guide) credentials.
