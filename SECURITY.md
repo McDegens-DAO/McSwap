@@ -15,4 +15,4 @@ Instead please contact the maintainers at one of the following locations:
 
 Maintainers will respond to security incidents as fast as possible, and will keep you informed of our progress.
 
-The McSwap programs on Solana allow users to create OTC P2P contracts in a variety of token standards.
+The McSwap Programs on Solana allow users to create OTC P2P contracts in a variety of token standards.
