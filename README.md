@@ -229,7 +229,7 @@ The Social Card metadata is defined in the [index.html](https://github.com/McDeg
 The repo comes with a default token list and token image files. Should it become necessary to re-sync 
 with the Jupiter Strict List or Coin Market Cap IDs, you can run the following command from your terminal.
 ```php
-php rpc/jup_sync.php
+php public_html/rpc/jup_sync.php
 ```
 
 **Sync Coin Market Cap IDs**
@@ -238,7 +238,7 @@ php rpc/jup_sync.php
 
 Any tokens in the config/tokens.js file with "cmc":"0" will be checked and updated if listed on CMC. 
 ```php
-php rpc/cmc_sync.php
+php public_html/rpc/cmc_sync.php
 ```
 
 **Fetch Token Images**
@@ -247,7 +247,7 @@ php rpc/cmc_sync.php
 
 Saving the token images on the server allows the images to load much faster and provide a better user experience with the app. You can fetch any new or missing images for your token list by running this command.
 ```php
-php rpc/fetch_images.php
+php public_html/rpc/fetch_images.php
 ```
 
 ## Support
