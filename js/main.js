@@ -7276,6 +7276,7 @@ $(window).on('load', async function() {
     let new_choice = $(this).attr("data-id");
     let new_cmc = $(this).attr("data-cmc");
     let sym = $(this).find(".token_symbol").html();
+    let token_image = $(this).find(".token_image").attr("src");
     sym = sym.replace("(", "", new_choice);
     sym = sym.replace(")", "", new_choice);
     let img = $(this).find("li img").attr("src");
@@ -7318,7 +7319,7 @@ $(window).on('load', async function() {
             }
           }
           $("#top_token_choice .custom_symbol").html(item.symbol);
-          $(".pikl_icon").attr("src", item.image);
+          $(".pikl_icon").attr("src", token_image);
           if ($(".pikl_balance").html() != "") {
             $(".pikl_balance").html("Fetching...");
             mcswap_balances();
@@ -7385,9 +7386,9 @@ $(window).on('load', async function() {
     selected = $(this).attr("id");
     let temp_choices = "";
     if (selected == "spl_choice_3" || selected == "spl_choice_4") {
-      temp_choices += '<ul data-cmc="5426" id="temp_sol" data-id="sol"><li><img src="/img/sol.png"></li><li class="token_symbol">(SOL)</li><li class="token_name">SOL</li></ul>';
+      temp_choices += '<ul data-cmc="5426" id="temp_sol" data-id="sol"><li><img class="token_image" src="/img/sol.png"></li><li class="token_symbol">(SOL)</li><li class="token_name">SOL</li></ul>';
     }
-    temp_choices += '<ul data-cmc="3408" id="temp_usdc" data-id="EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"><li><img src="/img/usdc.png"></li><li class="token_symbol">(USDC)</li><li class="token_name">USD Coin</li></ul>';
+    temp_choices += '<ul data-cmc="3408" id="temp_usdc" data-id="EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"><li><img class="token_image" src="/img/usdc.png"></li><li class="token_symbol">(USDC)</li><li class="token_name">USD Coin</li></ul>';
     $("#swap_token_list").prepend(temp_choices);
     let spl_used = spl_tokens_used();
     $("#swap_token_list ul").each(function() {
@@ -7694,9 +7695,9 @@ $(window).on('load', async function() {
           let token_2_ata = await splToken.getAssociatedTokenAddress(walletMint, walletPublicKey, false, splToken.TOKEN_PROGRAM_ID, splToken.ASSOCIATED_TOKEN_PROGRAM_ID, );
           let response = await connection.getAccountInfo(token_2_ata);
           if (response == null) {
-            console.log("debug 4");
+            // console.log("debug 4");
             min_sol = min_sol + rent;
-            console.log("rent 4", rent);
+            // console.log("rent 4", rent);
           }
         }
       }
@@ -8022,29 +8023,35 @@ $(window).on('load', async function() {
       getAsset = await axiosInstance.post(conf.cluster,{jsonrpc:"2.0",method:"getAsset",id:"rpd-op-123",params:{id:token2Mint},}); 
       if(typeof getAsset.data.result.mint_extensions != "undefined"){
         SPL_PROGRAM_2 = splToken.TOKEN_2022_PROGRAM_ID;
-        console.log("Token 1 is using Token 2022");
+        console.log("Token 2 is using Token 2022");
         console.log(SPL_PROGRAM_2.toString());
         is_22_2 = true;
       }
       else{
-        console.log("Token 1 is using SPL Token");
+        console.log("Token 2 is using SPL Token");
         console.log(SPL_PROGRAM_2.toString());
       }
     }
     let is_22_3 = false;
     let SPL_PROGRAM_3 = splToken.TOKEN_PROGRAM_ID;
+    console.log("TOKEN 3 MINT", token3Mint);
     if(token3Amount > 0){ 
       axiosInstance = axios.create({baseURL:conf.cluster});
-      getAsset = await axiosInstance.post(conf.cluster,{jsonrpc:"2.0",method:"getAsset",id:"rpd-op-123",params:{id:token3Mint},}); 
-      if(typeof getAsset.data.result.mint_extensions != "undefined"){
-        SPL_PROGRAM_3 = splToken.TOKEN_2022_PROGRAM_ID;
-        console.log("Token 1 is using Token 2022");
-        console.log(SPL_PROGRAM_3.toString());
-        is_22_3 = true;
+      if(token3Mint == "11111111111111111111111111111111"){
+        console.log("Token 3 is SOL");
       }
       else{
-        console.log("Token 1 is using SPL Token");
-        console.log(SPL_PROGRAM_3.toString());
+        getAsset = await axiosInstance.post(conf.cluster,{jsonrpc:"2.0",method:"getAsset",id:"rpd-op-123",params:{id:token3Mint},}); 
+        if(typeof getAsset.data.result.mint_extensions != "undefined"){
+          SPL_PROGRAM_3 = splToken.TOKEN_2022_PROGRAM_ID;
+          console.log("Token 3 is using Token 2022");
+          console.log(SPL_PROGRAM_3.toString());
+          is_22_3 = true;
+        }
+        else{
+          console.log("Token 3 is using SPL Token");
+          console.log(SPL_PROGRAM_3.toString());
+        }
       }
     }
     let is_22_4 = false;
@@ -8054,12 +8061,12 @@ $(window).on('load', async function() {
       getAsset = await axiosInstance.post(conf.cluster,{jsonrpc:"2.0",method:"getAsset",id:"rpd-op-123",params:{id:token4Mint},}); 
       if(typeof getAsset.data.result.mint_extensions != "undefined"){
         SPL_PROGRAM_4 = splToken.TOKEN_2022_PROGRAM_ID;
-        console.log("Token 1 is using Token 2022");
+        console.log("Token 4 is using Token 2022");
         console.log(SPL_PROGRAM_4.toString());
         is_22_4 = true;
       }
       else{
-        console.log("Token 1 is using SPL Token");
+        console.log("Token 4 is using SPL Token");
         console.log(SPL_PROGRAM_4.toString());
       }
     }
@@ -8125,7 +8132,7 @@ $(window).on('load', async function() {
     let providerPickleATA = await splToken.getAssociatedTokenAddress(new solanaWeb3.PublicKey(pickleMint),provider.publicKey, false, splToken.TOKEN_PROGRAM_ID, splToken.ASSOCIATED_TOKEN_PROGRAM_ID, );
 
     // token 1 ***************************************************************************
-    let extensionTypes_1 = null;
+    let extensionTypes_1 = [];
     let tempToken1Account = new solanaWeb3.Keypair();
     let createTempToken1AccountIx = null;
     let initTempToken1AccountIx = null;
@@ -8142,7 +8149,7 @@ $(window).on('load', async function() {
       );
 
       let accountInfo = await connection.getAccountInfo(providerToken1ATA);
-      console.log("Temp Token1 Account: ", tempToken2Account.publicKey.toString());
+      console.log("Temp Token1 Account: ", tempToken1Account.publicKey.toString());
       let space;
       if(is_22_1===true){space=accountInfo.space;}else{space=splToken.AccountLayout.span;}
       temp_rent=await connection.getMinimumBalanceForRentExemption(space);
@@ -8157,14 +8164,14 @@ $(window).on('load', async function() {
 
       initTempToken1AccountIx = splToken.createInitializeAccountInstruction(
         tempToken1Account.publicKey,
-        new solanaWeb3.PublicKey(token2Mint), 
+        new solanaWeb3.PublicKey(token1Mint), 
         tempToken1Account.publicKey, 
         SPL_PROGRAM_1
       );
       console.log("Init Temp Token1 Account Ix: ", initTempToken1AccountIx);
 
+      let mintAccountInfo_1 = await splToken.getMint(connection, new solanaWeb3.PublicKey(token1Mint), "confirmed", SPL_PROGRAM_1);
       if(is_22_1===true){
-        let mintAccountInfo_1 = await splToken.getMint(connection, new solanaWeb3.PublicKey(token1Mint), "confirmed", SPL_PROGRAM_1);
         console.log("mintAccountInfo_1 ", mintAccountInfo_1);
         extensionTypes_1 = splToken.getExtensionTypes(mintAccountInfo_1.tlvData);
         console.log("extensionTypes_1", extensionTypes_1);
@@ -8192,7 +8199,7 @@ $(window).on('load', async function() {
     // token 1 ***************************************************************************
 
     // token 2 ***************************************************************************
-    let extensionTypes_2 = null;
+    let extensionTypes_2 = [];
     let tempToken2Account = new solanaWeb3.Keypair();
     let createTempToken2AccountIx = null;
     let initTempToken2AccountIx = null;
@@ -8230,8 +8237,8 @@ $(window).on('load', async function() {
       );
       console.log("Init Temp Token2 Account Ix: ", initTempToken2AccountIx);
 
+      let mintAccountInfo_2 = await splToken.getMint(connection, new solanaWeb3.PublicKey(token2Mint), "confirmed", SPL_PROGRAM_2);
       if(is_22_2===true){
-        let mintAccountInfo_2 = await splToken.getMint(connection, new solanaWeb3.PublicKey(token2Mint), "confirmed", SPL_PROGRAM_2);
         console.log("mintAccountInfo_2 ", mintAccountInfo_2);
         extensionTypes_2 = splToken.getExtensionTypes(mintAccountInfo_2.tlvData);
         console.log("extensionTypes_2", extensionTypes_2);
@@ -8300,7 +8307,7 @@ $(window).on('load', async function() {
     if (token4Amount > 0) {
 
       token4ATA = await splToken.getAssociatedTokenAddress(
-        new solanaWeb4.PublicKey(token4Mint),
+        new solanaWeb3.PublicKey(token4Mint),
         provider.publicKey, 
         false, 
         SPL_PROGRAM_4, 
@@ -8662,11 +8669,50 @@ $(window).on('load', async function() {
       return;
     }
 
-    let token1ATA = await splToken.getAssociatedTokenAddress(token1Mint, provider.publicKey,
-      false, splToken.TOKEN_PROGRAM_ID, splToken.ASSOCIATED_TOKEN_PROGRAM_ID, );
+    let SPL_PROGRAM_1 = splToken.TOKEN_PROGRAM_ID;
+    if(token1Amount > 0){
+      axiosInstance = axios.create({baseURL:conf.cluster});
+      getAsset = await axiosInstance.post(conf.cluster,{jsonrpc:"2.0",method:"getAsset",id:"rpd-op-123",params:{id:token1Mint},}); 
+      if(typeof getAsset.data.result.mint_extensions != "undefined"){
+        SPL_PROGRAM_1 = splToken.TOKEN_2022_PROGRAM_ID;
+        console.log("Token 1 is using Token 2022");
+        console.log(SPL_PROGRAM_1.toString());
+      }
+      else{
+        console.log("Token 1 is using SPL Token");
+        console.log(SPL_PROGRAM_1.toString());
+      }
+    }
+    let token1ATA = await splToken.getAssociatedTokenAddress(
+      token1Mint, 
+      provider.publicKey,
+      false, 
+      SPL_PROGRAM_1, 
+      splToken.ASSOCIATED_TOKEN_PROGRAM_ID
+    );
 
-    let token2ATA = await splToken.getAssociatedTokenAddress(token2Mint, provider.publicKey,
-      false, splToken.TOKEN_PROGRAM_ID, splToken.ASSOCIATED_TOKEN_PROGRAM_ID, );
+
+    let SPL_PROGRAM_2 = splToken.TOKEN_PROGRAM_ID;
+    if(token1Amount > 0){
+      axiosInstance = axios.create({baseURL:conf.cluster});
+      getAsset = await axiosInstance.post(conf.cluster,{jsonrpc:"2.0",method:"getAsset",id:"rpd-op-123",params:{id:token2Mint},}); 
+      if(typeof getAsset.data.result.mint_extensions != "undefined"){
+        SPL_PROGRAM_2 = splToken.TOKEN_2022_PROGRAM_ID;
+        console.log("Token 2 is using Token 2022");
+        console.log(SPL_PROGRAM_2.toString());
+      }
+      else{
+        console.log("Token 2 is using SPL Token");
+        console.log(SPL_PROGRAM_2.toString());
+      }
+    }    
+    let token2ATA = await splToken.getAssociatedTokenAddress(
+      token2Mint, 
+      provider.publicKey,
+      false, 
+      SPL_PROGRAM_2, 
+      splToken.ASSOCIATED_TOKEN_PROGRAM_ID
+    );
 
     var totalSize = 1 + 32;
     console.log("totalSize", totalSize);
@@ -8683,50 +8729,24 @@ $(window).on('load', async function() {
 
     console.log("Data: ", uarray);
 
+
+    let keys = [
+      { pubkey: provider.publicKey, isSigner: true, isWritable: true }, // 0
+      { pubkey: swapVaultPDA[0], isSigner: false, isWritable: false }, // 1
+      { pubkey: swapStatePDA[0], isSigner: false, isWritable: true }, // 2
+      { pubkey: token1Mint, isSigner: false, isWritable: false }, // 3
+      { pubkey: tempToken1Account, isSigner: false, isWritable: true }, // 4
+      { pubkey: token2Mint, isSigner: false, isWritable: false }, // 5
+      { pubkey: tempToken2Account, isSigner: false, isWritable: true }, // 6
+      { pubkey: token1ATA, isSigner: false, isWritable: true }, // 7
+      { pubkey: token2ATA, isSigner: false, isWritable: true }, // 8
+      { pubkey: splToken.TOKEN_PROGRAM_ID, isSigner: false, isWritable: false }, // 9
+      { pubkey: splToken.TOKEN_2022_PROGRAM_ID, isSigner: false, isWritable: false }, // 10
+    ];
     let reverseSwapIx = new solanaWeb3.TransactionInstruction({
       programId: tokenSwapProgramId,
       data: Buffer.from(uarray),
-      keys: [{
-          pubkey: provider.publicKey,
-          isSigner: true,
-          isWritable: true
-        }, // 0
-        {
-          pubkey: swapVaultPDA[0],
-          isSigner: false,
-          isWritable: false
-        }, // 1
-        {
-          pubkey: swapStatePDA[0],
-          isSigner: false,
-          isWritable: true
-        }, // 2
-        {
-          pubkey: tempToken1Account,
-          isSigner: false,
-          isWritable: true
-        }, // 3
-        {
-          pubkey: tempToken2Account,
-          isSigner: false,
-          isWritable: true
-        }, // 4
-        {
-          pubkey: token1ATA,
-          isSigner: false,
-          isWritable: true
-        }, // 5
-        {
-          pubkey: token2ATA,
-          isSigner: false,
-          isWritable: true
-        }, // 6
-        {
-          pubkey: splToken.TOKEN_PROGRAM_ID,
-          isSigner: false,
-          isWritable: false
-        }, // 7
-      ]
+      keys: keys
     });
     console.log("Reverse Swap Ix: ", reverseSwapIx);
     
@@ -8921,70 +8941,125 @@ $(window).on('load', async function() {
     let initTempToken3AccountIx = null;
     let transferToken3Ix = null;
 
+    // token 3 **************************************************************
+    let SPL_PROGRAM_3 = splToken.TOKEN_PROGRAM_ID;
+    if(token3Amount > 0){
+      axiosInstance = axios.create({baseURL:conf.cluster});
+      getAsset = await axiosInstance.post(conf.cluster,{jsonrpc:"2.0",method:"getAsset",id:"rpd-op-123",params:{id:token3Mint},}); 
+      if(typeof getAsset.data.result.mint_extensions != "undefined"){
+        SPL_PROGRAM_3 = splToken.TOKEN_2022_PROGRAM_ID;
+        console.log("Token 3 is using Token 2022");
+        console.log(SPL_PROGRAM_3.toString());
+      }
+      else{
+        console.log("Token 3 is using SPL Token");
+        console.log(SPL_PROGRAM_3.toString());
+      }
+    }
     let providerToken3ATA = providerPickleATA;
     if (token3Mint.toString() != "11111111111111111111111111111111") {
       providerToken3ATA = await splToken.getAssociatedTokenAddress(
         token3Mint,
         provider.publicKey,
         false,
-        splToken.TOKEN_PROGRAM_ID,
+        SPL_PROGRAM_3,
         splToken.ASSOCIATED_TOKEN_PROGRAM_ID,
       );
       console.log("Token 3 Amount", parseInt(token3Amount.toString()));
       console.log("providerToken3ATA", providerToken3ATA);
     }
+    // token 3 **************************************************************
 
+    // token 4 **************************************************************
+    let SPL_PROGRAM_4 = splToken.TOKEN_PROGRAM_ID;
+    if(token4Amount > 0){
+      axiosInstance = axios.create({baseURL:conf.cluster});
+      getAsset = await axiosInstance.post(conf.cluster,{jsonrpc:"2.0",method:"getAsset",id:"rpd-op-123",params:{id:token4Mint},}); 
+      if(typeof getAsset.data.result.mint_extensions != "undefined"){
+        SPL_PROGRAM_4 = splToken.TOKEN_2022_PROGRAM_ID;
+        console.log("Token 4 is using Token 2022");
+        console.log(SPL_PROGRAM_4.toString());
+      }
+      else{
+        console.log("Token 4 is using SPL Token");
+        console.log(SPL_PROGRAM_4.toString());
+      }
+    }
     let providerToken4ATA = providerToken3ATA;
     if (parseInt(token4Amount.toString()) > 0) {
       providerToken4ATA = await splToken.getAssociatedTokenAddress(
         token4Mint,
         provider.publicKey,
         false,
-        splToken.TOKEN_PROGRAM_ID,
+        SPL_PROGRAM_4,
         splToken.ASSOCIATED_TOKEN_PROGRAM_ID,
       );
       console.log("Token 4 Amount", parseInt(token4Amount.toString()));
       console.log("token4Mint", token4Mint.toString());
       console.log("providerToken4ATA", providerToken4ATA);
     }
+    // token 4 **************************************************************
 
+    // token 1 **************************************************************
+    let SPL_PROGRAM_1 = splToken.TOKEN_PROGRAM_ID;
+    if(token1Amount > 0){
+      axiosInstance = axios.create({baseURL:conf.cluster});
+      getAsset = await axiosInstance.post(conf.cluster,{jsonrpc:"2.0",method:"getAsset",id:"rpd-op-123",params:{id:token1Mint},}); 
+      if(typeof getAsset.data.result.mint_extensions != "undefined"){
+        SPL_PROGRAM_1 = splToken.TOKEN_2022_PROGRAM_ID;
+        console.log("Token 1 is using Token 2022");
+        console.log(SPL_PROGRAM_1.toString());
+      }
+      else{
+        console.log("Token 1 is using SPL Token");
+        console.log(SPL_PROGRAM_1.toString());
+      }
+    }
     let createToken1ATA = null;
     let createToken1ATAIx = null;
     let token1ATA = await splToken.getAssociatedTokenAddress(
       token1Mint,
       provider.publicKey,
       false,
-      splToken.TOKEN_PROGRAM_ID,
+      SPL_PROGRAM_1,
       splToken.ASSOCIATED_TOKEN_PROGRAM_ID,
     );
     console.log("Token1 ATA: ", token1ATA.toString());
-
-    await connection.getAccountInfo(token1ATA)
-      .then(function(response) {
-        console.log("token1ATA response ", response);
-        if (response == null) {
-          createToken1ATA = true;
-          createToken1ATAIx = splToken.createAssociatedTokenAccountInstruction(
-            provider.publicKey,
-            token1ATA,
-            provider.publicKey,
-            token1Mint,
-            splToken.TOKEN_PROGRAM_ID,
-            splToken.ASSOCIATED_TOKEN_PROGRAM_ID,
-          )
-          console.log("Create Token1 ATA Ix: ", createToken1ATAIx);
-        } else {
-          createToken1ATA = false;
-        }
-      })
-      .catch(function(error) {
-        error = JSON.stringify(error);
-        error = JSON.parse(error);
-        console.log("Error: ", error);
-        return;
-      });
+    let account_1 = null;
+    account_1 = await connection.getAccountInfo(token1ATA).catch(function(error){});
+    if (account_1 == null) {
+      createToken1ATA = true;
+      createToken1ATAIx = splToken.createAssociatedTokenAccountInstruction(
+        provider.publicKey,
+        token1ATA,
+        provider.publicKey,
+        token1Mint,
+        SPL_PROGRAM_1,
+        splToken.ASSOCIATED_TOKEN_PROGRAM_ID,
+      )
+      console.log("Create Token1 ATA Ix: ", createToken1ATAIx);
+    }
+    else{
+      createToken1ATA = false;
+    }
     console.log("createToken1ATA ", createToken1ATA);
+    // token 1 **************************************************************
 
+    // token 2 **************************************************************
+    let SPL_PROGRAM_2 = splToken.TOKEN_PROGRAM_ID;
+    if(token2Amount > 0){
+      axiosInstance = axios.create({baseURL:conf.cluster});
+      getAsset = await axiosInstance.post(conf.cluster,{jsonrpc:"2.0",method:"getAsset",id:"rpd-op-123",params:{id:token2Mint},}); 
+      if(typeof getAsset.data.result.mint_extensions != "undefined"){
+        SPL_PROGRAM_2 = splToken.TOKEN_2022_PROGRAM_ID;
+        console.log("Token 2 is using Token 2022");
+        console.log(SPL_PROGRAM_2.toString());
+      }
+      else{
+        console.log("Token 2 is using SPL Token");
+        console.log(SPL_PROGRAM_2.toString());
+      }
+    }
     let token2ATA = token1ATA;
     let createToken2ATA = null;
     let createToken2ATAIx = null;
@@ -8993,60 +9068,81 @@ $(window).on('load', async function() {
         token2Mint,
         provider.publicKey,
         false,
-        splToken.TOKEN_PROGRAM_ID,
+        SPL_PROGRAM_2,
         splToken.ASSOCIATED_TOKEN_PROGRAM_ID,
       );
       console.log("Token2 ATA: ", token2ATA.toString());
-
-      await connection.getAccountInfo(token2ATA)
-        .then(function(response) {
-          console.log("token2ATA response ", response);
-          if (response == null) {
-            createToken2ATA = true;
-            createToken2ATAIx = splToken.createAssociatedTokenAccountInstruction(
-              provider.publicKey,
-              token2ATA,
-              provider.publicKey,
-              token2Mint,
-              splToken.TOKEN_PROGRAM_ID,
-              splToken.ASSOCIATED_TOKEN_PROGRAM_ID,
-            )
-            console.log("Create Token2 ATA Ix: ", createToken2ATAIx);
-          } else {
-            createToken2ATA = false;
-          }
-        })
-        .catch(function(error) {
-          error = JSON.stringify(error);
-          error = JSON.parse(error);
-          console.log("Error: ", error);
-          return;
-        });
-      console.log("createToken2ATA ", createToken2ATA);
+      let account_2 = null;
+      account_2 = await connection.getAccountInfo(token2ATA).catch(function(){});
+      if(account_2 == null){
+        createToken2ATA = true;
+        createToken2ATAIx = splToken.createAssociatedTokenAccountInstruction(
+          provider.publicKey,
+          token2ATA,
+          provider.publicKey,
+          token2Mint,
+          splToken.TOKEN_PROGRAM_ID,
+          splToken.ASSOCIATED_TOKEN_PROGRAM_ID,
+        )
+        console.log("Create Token2 ATA Ix: ", createToken2ATAIx);
+      }
+      else{
+        createToken2ATA = false;
+      }
     }
+    console.log("createToken2ATA ", createToken2ATA);
+    // token 2 **************************************************************
 
+    // token 3 **************************************************************
     let token3ATA = initializer;
     if (token3Mint.toString() != "11111111111111111111111111111111") {
+      let SPL_PROGRAM_3 = splToken.TOKEN_PROGRAM_ID;
+      axiosInstance = axios.create({baseURL:conf.cluster});
+      getAsset = await axiosInstance.post(conf.cluster,{jsonrpc:"2.0",method:"getAsset",id:"rpd-op-123",params:{id:token3Mint},}); 
+      if(typeof getAsset.data.result.mint_extensions != "undefined"){
+        SPL_PROGRAM_3 = splToken.TOKEN_2022_PROGRAM_ID;
+        console.log("Token 3 is using Token 2022");
+        console.log(SPL_PROGRAM_3.toString());
+      }
+      else{
+        console.log("Token 3 is using SPL Token");
+        console.log(SPL_PROGRAM_3.toString());
+      }
       token3ATA = await splToken.getAssociatedTokenAddress(
         token3Mint,
         initializer,
         false,
-        splToken.TOKEN_PROGRAM_ID,
+        SPL_PROGRAM_3,
         splToken.ASSOCIATED_TOKEN_PROGRAM_ID,
       );
       console.log("Token3 ATA: ", token3ATA.toString());
     }
+    // token 3 **************************************************************
 
+    // token 4 **************************************************************
     let token4ATA = token3ATA;
     if (parseInt(token4Amount.toString()) > 0) {
+      let SPL_PROGRAM_4 = splToken.TOKEN_PROGRAM_ID;
+      axiosInstance = axios.create({baseURL:conf.cluster});
+      getAsset = await axiosInstance.post(conf.cluster,{jsonrpc:"2.0",method:"getAsset",id:"rpd-op-123",params:{id:token4Mint},}); 
+      if(typeof getAsset.data.result.mint_extensions != "undefined"){
+        SPL_PROGRAM_4 = splToken.TOKEN_2022_PROGRAM_ID;
+        console.log("Token 4 is using Token 2022");
+        console.log(SPL_PROGRAM_4.toString());
+      }
+      else{
+        console.log("Token 4 is using SPL Token");
+        console.log(SPL_PROGRAM_4.toString());
+      }
       token4ATA = await splToken.getAssociatedTokenAddress(
         token4Mint,
         initializer,
         false,
-        splToken.TOKEN_PROGRAM_ID,
+        SPL_PROGRAM_4,
         splToken.ASSOCIATED_TOKEN_PROGRAM_ID, );
       console.log("Token4 ATA: ", token4ATA.toString());
     }
+    // token 4 **************************************************************
 
     let totalSize = 1;
     console.log("totalSize", totalSize);
@@ -9156,9 +9252,7 @@ $(window).on('load', async function() {
     console.log("Swap Tokens Ix: ", swapTokensIx);
 
     let lookupTable = new solanaWeb3.PublicKey(conf.spl_alt);
-    let lookupTableAccount = await connection
-      .getAddressLookupTable(lookupTable)
-      .then((res) => res.value);
+    let lookupTableAccount = await connection.getAddressLookupTable(lookupTable).then((res) => res.value);
     if (!lookupTableAccount) {
       console.log("Could not fetch ALT!");
       return;
@@ -11065,7 +11159,7 @@ $(window).on('load', async function() {
   for (let k = 0; k < spl_tokens.length; k++) {
     let item = spl_tokens[k];
     if(typeof item.img != "undefined" && item.img != false){
-      $("#swap_token_list").append('<ul data-iid="'+k+'" data-cmc="' + item.cmc + '" data-id="' + item.address + '"><li><img src="'+item.img+'" onerror="badImg('+k+')" /></li><li class="token_symbol">(' + item.symbol + ')</li><li class="token_name">' + item.name + '</li></ul>');
+      $("#swap_token_list").append('<ul data-iid="'+k+'" data-cmc="' + item.cmc + '" data-id="' + item.address + '"><li><img class="token_image" src="'+item.img+'" onerror="badImg('+k+')" /></li><li class="token_symbol">(' + item.symbol + ')</li><li class="token_name">' + item.name + '</li></ul>');
     }
   }
   $("#swap_token_list ul[data-id='AVm6WLmMuzdedAMjpXLYmSGjLLPPjjVWNuR6JJhJLWn3']").click();
