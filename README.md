@@ -42,8 +42,11 @@ You can host your own instance of the McSwap OTC App and rebrand it for your com
 * [Coin Market Cap API](https://coinmarketcap.com/api/documentation/v1/#section/Quick-Start-Guide) credentials.
 
 ## Install
+
+• Because we include a default set of token images this process can take a few minutes.
+
 1. Navigate to the public_html folder of your server via terminal.
-2. Run the following command:
+2. Run the following command: 
 ```txt
 git clone https://github.com/McDegens-DAO/McSwap.git && mv McSwap/* . && mv htaccess.txt .htaccess
 ```
