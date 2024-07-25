@@ -8,7 +8,7 @@ We are currently adding Token2022 support and IDLs to all McSwap Protocol Progra
 ## Live Demo Application
 [McSwap.xyz](https://mcswap.xyz)
 
-# McSwap Programs
+## McSwap Programs
 The McSwap Protocol is comprised of five Solana Programs for creating over-the-counter peer-to-peer trade contracts. 
 
 <sup>SPL: <code>AAyM7XH9w7ApeSuEat8AwUW1AA7dBuj2vXv7SuUGpNUp</code> [View Details](https://solana.fm/address/AAyM7XH9w7ApeSuEat8AwUW1AA7dBuj2vXv7SuUGpNUp/transactions)</sup>
