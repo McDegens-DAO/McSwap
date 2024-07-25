@@ -52,7 +52,7 @@ git clone https://github.com/McDegens-DAO/McSwap.git && mv McSwap/* . && mv htac
 ```
 
 ## Configure
-1. Open the RPC proxy config: [config/proxy.php](https://github.com/McDegens-DAO/McSwap/blob/main/config/proxy.php)
+1. Open the proxy config: [config/proxy.php](https://github.com/McDegens-DAO/McSwap/blob/main/config/proxy.php)
 * Add your Helius key.
 * Add your CMC key.
 * Add your domain to the whitelist.
