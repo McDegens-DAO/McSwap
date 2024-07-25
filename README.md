@@ -17,17 +17,20 @@ We are currently adding Token2022 support and IDLs to all McSwap Protocol Progra
 [McSwap.xyz](https://mcswap.xyz) (currently alpha testing)
 
 ## McSwap Programs
-The McSwap Protocol is comprised of five Solana Programs for creating over-the-counter peer-to-peer trade contracts. 
+The McSwap Protocol is comprised of five Solana Programs. The McSwap OTC App interactes with the McSwap Programs to create (OTC) over-the-counter (P2P) peer-to-peer trade contracts between two wallets.
 
-<sup>McSwap-SPL: <code>AAyM7XH9w7ApeSuEat8AwUW1AA7dBuj2vXv7SuUGpNUp</code> [View Details](https://solana.fm/address/AAyM7XH9w7ApeSuEat8AwUW1AA7dBuj2vXv7SuUGpNUp/transactions)</sup>
+<sup>McSwap SPL: <code>AAyM7XH9w7ApeSuEat8AwUW1AA7dBuj2vXv7SuUGpNUp</code> [View Details](https://solana.fm/address/AAyM7XH9w7ApeSuEat8AwUW1AA7dBuj2vXv7SuUGpNUp/transactions)</sup>
 
-<sup>McSwap-NFT: <code>AyJBbGQzUQSvhivZnHMDCCk6eSLupkeBh4fvMAD8T4Xx</code> [View Details](https://solana.fm/address/AyJBbGQzUQSvhivZnHMDCCk6eSLupkeBh4fvMAD8T4Xx/transactions)</sup>
+<sup>McSwap NFT: <code>AyJBbGQzUQSvhivZnHMDCCk6eSLupkeBh4fvMAD8T4Xx</code> [View Details](https://solana.fm/address/AyJBbGQzUQSvhivZnHMDCCk6eSLupkeBh4fvMAD8T4Xx/transactions)</sup>
 
-<sup>McSwap-CNFT: <code>6RUcK9T1hYAZGBxN82ERVDUi4vLAX4hN1zAyy3cU5jav</code> [View Details](https://solana.fm/address/6RUcK9T1hYAZGBxN82ERVDUi4vLAX4hN1zAyy3cU5jav/transactions)</sup>
+<sup>McSwap CNFT: <code>6RUcK9T1hYAZGBxN82ERVDUi4vLAX4hN1zAyy3cU5jav</code> [View Details](https://solana.fm/address/6RUcK9T1hYAZGBxN82ERVDUi4vLAX4hN1zAyy3cU5jav/transactions)</sup>
 
-<sup>McSwap-PNFT: <code>2bY36scRMEUJHJToVGjJ2uY8PdSrRPr73siNwGbv1ZNT</code> [View Details](https://solana.fm/address/2bY36scRMEUJHJToVGjJ2uY8PdSrRPr73siNwGbv1ZNT/transactions)</sup>
+<sup>McSwap PNFT: <code>2bY36scRMEUJHJToVGjJ2uY8PdSrRPr73siNwGbv1ZNT</code> [View Details](https://solana.fm/address/2bY36scRMEUJHJToVGjJ2uY8PdSrRPr73siNwGbv1ZNT/transactions)</sup>
 
-<sup>CORE: <code>EYMc51BuTRTfc5XCYqSWW92risZvMP217N2VYaTdFMHh</code> [View Details](https://solana.fm/address/EYMc51BuTRTfc5XCYqSWW92risZvMP217N2VYaTdFMHh/transactions)</sup>
+<sup>McSwap CORE: <code>EYMc51BuTRTfc5XCYqSWW92risZvMP217N2VYaTdFMHh</code> [View Details](https://solana.fm/address/EYMc51BuTRTfc5XCYqSWW92risZvMP217N2VYaTdFMHh/transactions)</sup>
+
+# Host & Customize Your Own
+You can host your own instance of the McSwap OTC App and rebrand it for your community or project.
 
 ## Requirements
 * A registered domain name.
