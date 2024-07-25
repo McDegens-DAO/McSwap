@@ -26,32 +26,28 @@ $json = file_get_contents('php://input');
 $dat = json_decode($json);
 if (!class_exists('RPCX')) {
 class RPCX {
-  public function __construct($path){
-    $this->path=$path;
-    $this->payload=new stdClass;
-    $this->payload->jsonrpc="2.0";
-    $this->payload->id="rpd-op-123";
-    $this->payload->method="";
-  }
-  public function call($method,$params){
-    $this->payload->method=$method;
-    $this->payload->params=$params;
-    $data=json_encode($this->payload);
-    $ch=curl_init($this->path);
+  public function call($proxy,$payload){
+    $data=json_encode($payload);
+    $ch=curl_init($proxy);
     $options=array( 
-      CURLOPT_URL=>$this->path, 
+      CURLOPT_URL=>$proxy, 
       CURLOPT_RETURNTRANSFER=>true,
       CURLOPT_HTTPHEADER=>array('Content-Type:application/json'),
       CURLOPT_POSTFIELDS=>$data 
     );
     curl_setopt_array($ch,$options);
     $result=json_decode(curl_exec($ch));
-    curl_close( $ch );
+    curl_close($ch);
     return $result;
   }
 }
-$rpcx = new RPCX($path);
+$rpcx = new RPCX();
 }
+$payload = new stdClass;
+$payload->jsonrpc="2.0";
+$payload->id="rpd-op-123";
 if(isset($dat->method) && isset($dat->params)){
-  echo json_encode($rpcx->call($dat->method,$dat->params));
+  $payload->method=$dat->method;
+  $payload->params=$dat->params;
+  echo json_encode($rpcx->call($path,$payload));
 }
