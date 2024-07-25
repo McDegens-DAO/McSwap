@@ -4,8 +4,6 @@ function badImg(iid){
 }
 $(window).on('load', async function() {
   
-  // localStorage.clear();
-  
   var spl_tokens = [];
   let get_spl_tokens = fetch(conf.host + "/config/tokens.json?r=" + Math.random())
   .then((response) => response.json()).then((resp) => {return resp;});
