@@ -234,7 +234,7 @@ php rpc/jup_sync.php
 
 **Sync Coin Market Cap IDs**
 
-• runs after jup_sync but can also be run directly)
+• runs after jup_sync but can also be run directly
 
 Any tokens in the config/tokens.js file with "cmc":"0" will be checked and updated if listed on CMC. 
 ```php
@@ -243,7 +243,7 @@ php rpc/cmc_sync.php
 
 **Fetch Token Images**
 
-• runs after cmc_sync but can also be run directly)
+• runs after cmc_sync but can also be run directly
 
 Saving the token images on the server allows the images to load much faster and provide a better user experience with the app. You can fetch any new or missing images for your token list by running this command.
 ```php
