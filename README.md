@@ -243,6 +243,7 @@ php public_html/rpc/jup_sync.php
 **Sync Coin Market Cap IDs**
 
 • runs after jup_sync but can also be run directly
+
 • a full sync can take roughly 7 minutes or more.
 
 Any tokens in the config/tokens.js file with "cmc":"0" will be checked and the CMC ID will be added if the token is listed on CMC. You can sync the CMC IDs using the following command.
