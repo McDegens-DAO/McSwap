@@ -7875,7 +7875,7 @@ $(window).on('load', async function() {
       .then(function() {
         let openifo = confirm("McSwap OTC : " + $("#vrs").html() + "\nClick Ok for more details.\nClick Cancel to stay here.");
         if (openifo === true) {
-          window.open("https://mcdegen.xyz/mcswap");
+          window.open("https://github.com/McDegens-DAO/McSwap");
         } else {
           return;
         }
