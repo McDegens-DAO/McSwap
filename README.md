@@ -5,6 +5,9 @@ dApp Version: 1.8 (alpha)
 
 We are currently adding Token2022 support and IDLs to all McSwap Protocol Programs on Solana. A Production version of McSwap OTC will be available soon.
 
+## Live Demo Application
+[McSwap.xyz](https://mcswap.xyz)
+
 # McSwap Programs
 The McSwap Protocol is comprised of five Solana Programs for creating over-the-counter peer-to-peer trade contracts. 
 
@@ -17,9 +20,6 @@ The McSwap Protocol is comprised of five Solana Programs for creating over-the-c
 <sup>PNFT: <code>2bY36scRMEUJHJToVGjJ2uY8PdSrRPr73siNwGbv1ZNT</code> [View Details](https://solana.fm/address/2bY36scRMEUJHJToVGjJ2uY8PdSrRPr73siNwGbv1ZNT/transactions)</sup>
 
 <sup>CORE: <code>EYMc51BuTRTfc5XCYqSWW92risZvMP217N2VYaTdFMHh</code> [View Details](https://solana.fm/address/EYMc51BuTRTfc5XCYqSWW92risZvMP217N2VYaTdFMHh/transactions)</sup>
-
-## Live Demo Application
-[McSwap.xyz](https://mcswap.xyz)
 
 ## Requirements
 * A registered domain name.
