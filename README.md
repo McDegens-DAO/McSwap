@@ -3,7 +3,7 @@ Trustless Contract Creator
 
 dApp Version: 1.8 (alpha)
 
-Host: Basic cPanel
+Hosting: Basic cPanel
 
 Blockchain: Solana
 
