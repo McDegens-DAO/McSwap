@@ -3,7 +3,7 @@ Trustless Contract Creator
 
 Version: 1.8 (alpha)
 
-Hosting: Basic cPanel
+Hosting: cPanel
 
 Blockchain: Solana
 
