@@ -253,7 +253,7 @@ php public_html/rpc/cmc_sync.php
 
 **Fetch Token Images**
 
-• runs after jup_syc + cmc_sync but it can also be run directly
+• runs after jup_syc > cmc_sync but can also be run directly
 
 • local images that already exist are skipped
 
