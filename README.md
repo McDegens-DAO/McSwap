@@ -45,7 +45,7 @@ You can host your own instance of the McSwap OTC App and rebrand it for your com
 
 • Because we include a default set of token images this process can take a few minutes.
 
-1. Navigate to the public_html folder of your server via terminal.
+1. Navigate to the public_html folder of your server in your terminal.
 2. Run the following command: 
 ```txt
 git clone https://github.com/McDegens-DAO/McSwap.git && mv McSwap/* . && mv htaccess.txt .htaccess
