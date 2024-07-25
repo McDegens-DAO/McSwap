@@ -8036,11 +8036,11 @@ $(window).on('load', async function() {
     let SPL_PROGRAM_3 = splToken.TOKEN_PROGRAM_ID;
     console.log("TOKEN 3 MINT", token3Mint);
     if(token3Amount > 0){ 
-      axiosInstance = axios.create({baseURL:conf.cluster});
       if(token3Mint == "11111111111111111111111111111111"){
         console.log("Token 3 is SOL");
       }
       else{
+        axiosInstance = axios.create({baseURL:conf.cluster});
         getAsset = await axiosInstance.post(conf.cluster,{jsonrpc:"2.0",method:"getAsset",id:"rpd-op-123",params:{id:token3Mint},}); 
         if(typeof getAsset.data.result.mint_extensions != "undefined"){
           SPL_PROGRAM_3 = splToken.TOKEN_2022_PROGRAM_ID;
@@ -8944,16 +8944,21 @@ $(window).on('load', async function() {
     // token 3 **************************************************************
     let SPL_PROGRAM_3 = splToken.TOKEN_PROGRAM_ID;
     if(token3Amount > 0){
-      axiosInstance = axios.create({baseURL:conf.cluster});
-      getAsset = await axiosInstance.post(conf.cluster,{jsonrpc:"2.0",method:"getAsset",id:"rpd-op-123",params:{id:token3Mint},}); 
-      if(typeof getAsset.data.result.mint_extensions != "undefined"){
-        SPL_PROGRAM_3 = splToken.TOKEN_2022_PROGRAM_ID;
-        console.log("Token 3 is using Token 2022");
-        console.log(SPL_PROGRAM_3.toString());
+      if(token3Mint == "11111111111111111111111111111111"){
+        console.log("Token 3 is SOL");
       }
       else{
-        console.log("Token 3 is using SPL Token");
-        console.log(SPL_PROGRAM_3.toString());
+        axiosInstance = axios.create({baseURL:conf.cluster});
+        getAsset = await axiosInstance.post(conf.cluster,{jsonrpc:"2.0",method:"getAsset",id:"rpd-op-123",params:{id:token3Mint},}); 
+        if(typeof getAsset.data.result.mint_extensions != "undefined"){
+          SPL_PROGRAM_3 = splToken.TOKEN_2022_PROGRAM_ID;
+          console.log("Token 3 is using Token 2022");
+          console.log(SPL_PROGRAM_3.toString());
+        }
+        else{
+          console.log("Token 3 is using SPL Token");
+          console.log(SPL_PROGRAM_3.toString());
+        }
       }
     }
     let providerToken3ATA = providerPickleATA;
