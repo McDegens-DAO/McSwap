@@ -3,7 +3,7 @@ header("Access-Control-Allow-Methods:GET");if(isset($_SERVER['HTTP_ACCESS_CONTRO
 $response=new stdClass;
 $rules=array();
 $rule=new stdClass;
-//// define rules below
+// define rules below
 
 // ***************************************************************
 // repeat for each rule
@@ -15,7 +15,7 @@ $rule->apiPath = "https://www.solana-action-express.com/mcswap-swap-config*";
 $rules[] = $rule;
 // ***************************************************************
 
-/// output data
+// output data
 $response->rules=$rules;
 echo json_encode($response);
 exit();
