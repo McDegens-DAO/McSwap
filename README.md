@@ -172,7 +172,7 @@ header("Access-Control-Allow-Methods:GET");if(isset($_SERVER['HTTP_ACCESS_CONTRO
 $response=new stdClass;
 $rules=array();
 $rule=new stdClass;
-//// define rules below
+// define rules below
 
 // ***************************************************************
 // repeat for each rule
