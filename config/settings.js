@@ -9,14 +9,20 @@ conf.wallet_name = "McSwap OTC (beta)"; // set display name in wallet
 conf.title = "McSwap OTC"; // set app title
 conf.desc = "Trustless P2P Contract Creator.";
 conf.sol = "GUFxwDrsLzSQ27xxTVe4y9BARZ6cENWmjzwe8XPy7AKu"; // set wallet you wish to receive sol donations
-conf.discord = "https://discord.com/invite/hXXDvYTQhj"; // set discord invite
-conf.twitter = "https://twitter.com/McDegensDAO"; // set twitter invite
 conf.scrollbar = "#333333"; // set the color for scroll bars
 conf.default = "nft"; // which asset standard initially loads after connecting nft or cnft
 conf.default_priority = "Medium"; // sets the default priority fee level on load
 conf.wallet_cnft_enabled = true; // enable/disable cnft asset standard display in mcwallet
 conf.wallet_nft_enabled = true; // enable/disable nft asset standard display in mcwallet
 conf.idler = 10; // number of minutes before auto disconnecting wallet for inactivity
+// ************************************************************************************
+
+// ************************************************************************************
+// display bottom social links
+conf.social = true; // true or false
+conf.discord = "https://discord.com/invite/hXXDvYTQhj"; // set discord invite
+conf.github = "https://github.com/McDegens-DAO/McSwap"; // set discord invite
+conf.twitter = "https://twitter.com/McDegensDAO"; // set twitter invite
 // ************************************************************************************
 
 // ************************************************************************************

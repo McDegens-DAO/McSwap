@@ -11182,6 +11182,7 @@ $(window).on('load', async function() {
   });
   $("#center_logo").attr("src", conf.logo);
   $("#set_discord").attr("href", conf.discord);
+  $("#set_github").attr("href", conf.github);
   $("#set_twitter").attr("href", conf.twitter);
   $("#img_icon, #img_b, #img_c").attr("href", conf.logo_icon);
   $("#img_a").attr("content", conf.logo_icon);
@@ -11201,9 +11202,11 @@ $(window).on('load', async function() {
       alert("McSwap OTC is currently being tested. Production Launch Soon!");
 
       $("#center_logo").addClass("animate__animated animate__zoomIn").show();
-//       setTimeout(() => {
-//         $("#socials").addClass("animate__animated animate__fadeInUp").show();
-//       }, 1000);
+      if(conf.social===true){
+        setTimeout(() => {
+          $("#socials").addClass("animate__animated animate__fadeInUp").show();
+        }, 1000);
+      }
     }, 700);
   }, 2000);
   ////////////////////////////////////////////////////////////////////////// 
