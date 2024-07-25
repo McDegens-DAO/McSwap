@@ -200,7 +200,7 @@ To:
 User-agent: *
 Allow: /
 ```
-Also remove or comment out this [robots metatag](https://github.com/McDegens-DAO/McSwap/blob/4b3c4756b4007810e4e3f83df1412c4e07159415/index.html#L12) from your html.
+Also remove or comment out this [robots metatag](https://github.com/McDegens-DAO/McSwap/blob/fb842960a77e4ec893b49549ea642ba847a425cc/index.html#L13) from your html.
 
 ## Blinks & Actions
 The McSwap OTC App is integrated with the McSwap Actions API. OTC Contracts created can be executed by the intended peer party via Blink. The user creates a new contract and sends the provided link to their peer in a private X message to be executed.
@@ -233,7 +233,7 @@ exit();
 ```
 **Social Card**
 
-The Social Card metadata is defined in the [index.html](https://github.com/McDegens-DAO/McSwap/blob/8833957ff89c98e99954b56b661da1a964a1dc88/index.html#L26) file.
+The Social Card metadata is defined in the [index.html](https://github.com/McDegens-DAO/McSwap/blob/fb842960a77e4ec893b49549ea642ba847a425cc/index.html#L26) file.
 
 ```html
 <!-- social card -->
