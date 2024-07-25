@@ -184,7 +184,7 @@ $rule->apiPath = "https://www.solana-action-express.com/mcswap-swap-config*";
 $rules[] = $rule;
 // ***************************************************************
 
-/// output data
+// output data
 $response->rules=$rules;
 echo json_encode($response);
 exit();
