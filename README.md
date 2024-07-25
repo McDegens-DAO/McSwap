@@ -253,7 +253,9 @@ php public_html/rpc/cmc_sync.php
 
 **Fetch Token Images**
 
-• runs after cmc_sync but can also be run directly
+• runs after jup_syc + cmc_sync but it can also be run directly
+
+• local images that already exist are skipped
 
 Saving the token images on the server allows the images to load much faster and provide a better user experience with the app. You can fetch any new or missing images for your token list by running this command.
 ```php
