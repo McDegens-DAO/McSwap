@@ -18,7 +18,7 @@ The McSwap Protocol is comprised of five Solana Programs for creating over-the-c
 
 <sup>CORE: <code>EYMc51BuTRTfc5XCYqSWW92risZvMP217N2VYaTdFMHh</code> [View Details](https://solana.fm/address/EYMc51BuTRTfc5XCYqSWW92risZvMP217N2VYaTdFMHh/transactions)</sup>
 
-## Live Demo dApp
+## Live Demo Application
 [McSwap.xyz](https://mcswap.xyz)
 
 ## Requirements
