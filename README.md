@@ -18,6 +18,13 @@ We are currently adding Token2022 support and IDLs to all McSwap Protocol Progra
 ## Live Demo
 [McSwap.xyz](https://mcswap.xyz) (currently testing)
 
+## Features
+* Direct P2P SPL Asset Swaps/Sales
+* Direct P2P NFT Asset Swaps/Sales
+* Direct P2P CNFT Asset Swaps/Sales
+* Direct P2P PNFT Asset Swaps/Sales
+* Direct P2P CORE Asset Swaps/Sales
+
 ## McSwap Programs
 The McSwap Protocol is comprised of five Solana Programs. The McSwap OTC App interactes with the McSwap Programs to create (OTC) over-the-counter (P2P) peer-to-peer trade contracts between two wallets. Below are the 5 Program IDs.
 
