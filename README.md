@@ -180,7 +180,7 @@ RewriteRule ^css/custom.css$ "/css/skins/YOUR_SKIN_FOLDER/default.css" [L]
 ```
 
 ## SEO
-Open the robots file (optional): [robots.txt](https://github.com/McDegens-DAO/McSwap/blob/main/robots.txt)
+Open the robots file: [robots.txt](https://github.com/McDegens-DAO/McSwap/blob/main/robots.txt)
 * Only make this change if you want search engines to index your app.
 
 Change:
