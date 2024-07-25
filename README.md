@@ -203,7 +203,7 @@ Allow: /
 Also remove or comment out this [robots metatag](https://github.com/McDegens-DAO/McSwap/blob/4b3c4756b4007810e4e3f83df1412c4e07159415/index.html#L12) from your html.
 
 ## Blinks & Actions
-The McSwap OTC app is integrated with the McSwap Actions API out-of-the-box. OTC Contracts created using McSwap OTC can be executed by the intended peer party via Blink. The user creates a new contract and sends the provided link to their peer in a private X message to be executed as a Blink.
+The McSwap OTC App is integrated with the McSwap Actions API. OTC Contracts created can be executed by the intended peer party via Blink. The user creates a new contract and sends the provided link to their peer in a private X message to be executed.
 
 **actions.json**
 
