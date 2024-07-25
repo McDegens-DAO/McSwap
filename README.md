@@ -236,7 +236,7 @@ php public_html/rpc/jup_sync.php
 
 • runs after jup_sync but can also be run directly
 
-Any tokens in the config/tokens.js file with "cmc":"0" will be checked and updated if listed on CMC. 
+Any tokens in the config/tokens.js file with "cmc":"0" will be checked and the CMC ID will be added if the token is listed on CMC. You can sync the CMC IDs using the following command.
 ```php
 php public_html/rpc/cmc_sync.php
 ```
