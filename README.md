@@ -168,7 +168,10 @@ Integrated with the McSwap Actions API out-of-the-box. OTC Contracts created usi
 Ref: [actions.php](https://github.com/McDegens-DAO/McSwap/blob/main/actions.php) 
 ```php
 <?php header("Access-Control-Allow-Origin:*");header('Access-Control-Max-Age:86400');header('Content-Type:application/json');
-header("Access-Control-Allow-Methods:GET");if(isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS'])){header("Access-Control-Allow-Headers:{$_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']}");}$response=new stdClass;$rules=array();$rule=new stdClass;
+header("Access-Control-Allow-Methods:GET");if(isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS'])){header("Access-Control-Allow-Headers:{$_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']}");}
+$response=new stdClass;
+$rules=array();
+$rule=new stdClass;
 //// define rules below
 
 // ***************************************************************
@@ -182,7 +185,9 @@ $rules[] = $rule;
 // ***************************************************************
 
 /// output data
-$response->rules=$rules;echo json_encode($response);exit();
+$response->rules=$rules;
+echo json_encode($response);
+exit();
 ```
 **Social Card**
 
