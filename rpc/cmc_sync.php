@@ -90,6 +90,6 @@ if( isset($autosync) or isset($_GET["sync"]) ){
   file_put_contents(dirname(__DIR__)."/config/tokens.json",json_encode($token_list,JSON_PRETTY_PRINT));
   echo "CMC Sync Complete!\n";
   if(isset($autosync)){
-    require(dirname(__DIR__)."/rpc/get_images.php");
+    require(dirname(__DIR__)."/rpc/fetch_images.php");
   }
 }

@@ -222,6 +222,34 @@ The Social Card metadata is defined in the [index.html](https://github.com/McDeg
 <meta name="twitter:image" content="https://mcswap.xyz/img/mcswap-card.png" />
 <!-- social card -->
 ```
+## Maintenance
+
+**Sync Jupiter Strict List**
+
+The repo comes with a default token list and token image files. Should it become necessary to re-sync 
+with the Jupiter Strict List or Coin Market Cap IDs, you can run the following command from your terminal.
+```php
+// this command will automatically run cmc_sync upon completion
+php rpc/jup_sync.php
+```
+
+**Sync Coin Market Cap IDs**
+
+(runs automatically after jup_sync but can also be run directly)
+
+Any tokens in the config/tokens.js file with "cmc":"0" will be checked and updated if listed on CMC. 
+```php
+php rpc/cmc_sync.php
+```
+
+**Fetch Token Images**
+
+(runs automatically after cmc_sync but can also be run directly)
+
+Saving the token images on the server allows the images to load much faster and provide a better user experience with the app. You can fetch any new or missing images for your token list by running this command.
+```php
+php rpc/fetch_images.php
+```
 
 ## Support
 Create a ticket at our [Discord](https://discord.com/invite/hXXDvYTQhj)

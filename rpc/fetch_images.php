@@ -14,7 +14,12 @@ function file_get_contents_curl($url) {
   return $data; 
 } 
 foreach($token_list as $key => $token) {
-  // if($key < 10){
+
+  $check_for_jpg = dirname(__DIR__)."/data/tokens/".$token->address.".jpg";
+  $check_for_png = dirname(__DIR__)."/data/tokens/".$token->address.".png";
+
+  if(!file_exists($check_for_jpg) and !file_exists($check_for_png)){
+
     $ch = curl_init($token->image);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_exec($ch);
@@ -39,7 +44,9 @@ foreach($token_list as $key => $token) {
         file_put_contents( $name, $content );
       }
     }
-  // }
+
+  }
+  
 }
 // write back to the token list
 file_put_contents(dirname(__DIR__)."/config/tokens.json",json_encode($token_list));
