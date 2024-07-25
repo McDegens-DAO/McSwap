@@ -29,7 +29,7 @@ The McSwap Protocol is comprised of five Solana Programs. The McSwap OTC App int
 
 <sup>McSwap CORE: <code>EYMc51BuTRTfc5XCYqSWW92risZvMP217N2VYaTdFMHh</code> [View Details](https://solana.fm/address/EYMc51BuTRTfc5XCYqSWW92risZvMP217N2VYaTdFMHh/transactions)</sup>
 
-# Host & Customize Your Own
+# Host Your Own
 You can host your own instance of the McSwap OTC App and rebrand it for your community or project.
 
 ## Requirements
