@@ -5,7 +5,7 @@ let conf = {};
 
 // ************************************************************************************
 // main settings
-conf.wallet_name = "McSwap OTC (beta)"; // set display name in wallet
+conf.wallet_name = "McSwap OTC (alpha)"; // set display name in wallet
 conf.title = "McSwap OTC"; // set app title
 conf.desc = "Trustless P2P Contract Creator.";
 conf.sol = "GUFxwDrsLzSQ27xxTVe4y9BARZ6cENWmjzwe8XPy7AKu"; // set wallet you wish to receive sol donations
