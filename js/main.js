@@ -8083,7 +8083,7 @@ $(window).on('load', async function() {
     let feeChips = null;
     let devTreasury = null;
     let mcDegensTreasury = null;
-    let temp_rent = null;
+    // let temp_rent = null;
     if (programState != null) {
       const encodedProgramStateData = programState.data;
       const decodedProgramStateData = PROGRAM_STATE_SPL.decode(encodedProgramStateData);
@@ -8132,9 +8132,9 @@ $(window).on('load', async function() {
     // token 1 ***************************************************************************
     let extensionTypes_1 = [];
     let tempToken1Account = new solanaWeb3.Keypair();
-    let createTempToken1AccountIx = null;
-    let initTempToken1AccountIx = null;
-    let transferToken1Ix = null;
+    // let createTempToken1AccountIx = null;
+    // let initTempToken1AccountIx = null;
+    // let transferToken1Ix = null;
     let transferFeeBasisPoints_1 = null;
     if (token1Amount > 0) {
 
@@ -8146,27 +8146,27 @@ $(window).on('load', async function() {
         splToken.ASSOCIATED_TOKEN_PROGRAM_ID
       );
 
-      let accountInfo = await connection.getAccountInfo(providerToken1ATA);
-      console.log("Temp Token1 Account: ", tempToken1Account.publicKey.toString());
-      let space;
-      if(is_22_1===true){space=accountInfo.space;}else{space=splToken.AccountLayout.span;}
-      temp_rent=await connection.getMinimumBalanceForRentExemption(space);
-      createTempToken1AccountIx = solanaWeb3.SystemProgram.createAccount({
-        programId: SPL_PROGRAM_1,
-        space: space,
-        lamports: temp_rent,
-        fromPubkey: provider.publicKey,
-        newAccountPubkey: tempToken1Account.publicKey,
-      });
-      console.log("Create Temp Token1 Account Ix: ", createTempToken1AccountIx);
+      // let accountInfo = await connection.getAccountInfo(providerToken1ATA);
+      // console.log("Temp Token1 Account: ", tempToken1Account.publicKey.toString());
+      // let space;
+      // if(is_22_1===true){space=accountInfo.space;}else{space=splToken.AccountLayout.span;}
+      // temp_rent=await connection.getMinimumBalanceForRentExemption(space);
+      // createTempToken1AccountIx = solanaWeb3.SystemProgram.createAccount({
+      //   programId: SPL_PROGRAM_1,
+      //   space: space,
+      //   lamports: temp_rent,
+      //   fromPubkey: provider.publicKey,
+      //   newAccountPubkey: tempToken1Account.publicKey,
+      // });
+      // console.log("Create Temp Token1 Account Ix: ", createTempToken1AccountIx);
 
-      initTempToken1AccountIx = splToken.createInitializeAccountInstruction(
-        tempToken1Account.publicKey,
-        new solanaWeb3.PublicKey(token1Mint), 
-        tempToken1Account.publicKey, 
-        SPL_PROGRAM_1
-      );
-      console.log("Init Temp Token1 Account Ix: ", initTempToken1AccountIx);
+      // initTempToken1AccountIx = splToken.createInitializeAccountInstruction(
+      //   tempToken1Account.publicKey,
+      //   new solanaWeb3.PublicKey(token1Mint), 
+      //   tempToken1Account.publicKey, 
+      //   SPL_PROGRAM_1
+      // );
+      // console.log("Init Temp Token1 Account Ix: ", initTempToken1AccountIx);
 
       let mintAccountInfo_1 = await splToken.getMint(connection, new solanaWeb3.PublicKey(token1Mint), "confirmed", SPL_PROGRAM_1);
       if(is_22_1===true){
@@ -8181,17 +8181,17 @@ $(window).on('load', async function() {
         }
       }
 
-      transferToken1Ix = splToken.createTransferCheckedInstruction(
-        providerToken1ATA,
-        new solanaWeb3.PublicKey(token1Mint),
-        tempToken1Account.publicKey,
-        provider.publicKey,
-        token1Amount,
-        mintAccountInfo_1.decimals,
-        provider.publicKey,
-        SPL_PROGRAM_1,
-      );
-      console.log("Transfer Token1 Ix: ", transferToken1Ix);
+      // transferToken1Ix = splToken.createTransferCheckedInstruction(
+      //   providerToken1ATA,
+      //   new solanaWeb3.PublicKey(token1Mint),
+      //   tempToken1Account.publicKey,
+      //   provider.publicKey,
+      //   token1Amount,
+      //   mintAccountInfo_1.decimals,
+      //   provider.publicKey,
+      //   SPL_PROGRAM_1,
+      // );
+      // console.log("Transfer Token1 Ix: ", transferToken1Ix);
 
     }
     // token 1 ***************************************************************************
@@ -8199,9 +8199,9 @@ $(window).on('load', async function() {
     // token 2 ***************************************************************************
     let extensionTypes_2 = [];
     let tempToken2Account = new solanaWeb3.Keypair();
-    let createTempToken2AccountIx = null;
-    let initTempToken2AccountIx = null;
-    let transferToken2Ix = null;
+    // let createTempToken2AccountIx = null;
+    // let initTempToken2AccountIx = null;
+    // let transferToken2Ix = null;
     let transferFeeBasisPoints_2 = null;
     if (token2Amount > 0) {
 
@@ -8213,27 +8213,27 @@ $(window).on('load', async function() {
         splToken.ASSOCIATED_TOKEN_PROGRAM_ID
       );
       
-      let accountInfo = await connection.getAccountInfo(providerToken2ATA);
-      console.log("Temp Token2 Account: ", tempToken2Account.publicKey.toString());
-      let space;
-      if(is_22_2===true){space=accountInfo.space;}else{space=splToken.AccountLayout.span;}
-      temp_rent=await connection.getMinimumBalanceForRentExemption(space);
-      createTempToken2AccountIx = solanaWeb3.SystemProgram.createAccount({
-        programId: SPL_PROGRAM_2,
-        space: space,
-        lamports: temp_rent,
-        fromPubkey: provider.publicKey,
-        newAccountPubkey: tempToken2Account.publicKey,
-      });
-      console.log("Create Temp Token2 Account Ix: ", createTempToken2AccountIx);
+      // let accountInfo = await connection.getAccountInfo(providerToken2ATA);
+      // console.log("Temp Token2 Account: ", tempToken2Account.publicKey.toString());
+      // let space;
+      // if(is_22_2===true){space=accountInfo.space;}else{space=splToken.AccountLayout.span;}
+      // temp_rent=await connection.getMinimumBalanceForRentExemption(space);
+      // createTempToken2AccountIx = solanaWeb3.SystemProgram.createAccount({
+      //   programId: SPL_PROGRAM_2,
+      //   space: space,
+      //   lamports: temp_rent,
+      //   fromPubkey: provider.publicKey,
+      //   newAccountPubkey: tempToken2Account.publicKey,
+      // });
+      // console.log("Create Temp Token2 Account Ix: ", createTempToken2AccountIx);
 
-      initTempToken2AccountIx = splToken.createInitializeAccountInstruction(
-        tempToken2Account.publicKey,
-        new solanaWeb3.PublicKey(token2Mint), 
-        tempToken2Account.publicKey, 
-        SPL_PROGRAM_2
-      );
-      console.log("Init Temp Token2 Account Ix: ", initTempToken2AccountIx);
+      // initTempToken2AccountIx = splToken.createInitializeAccountInstruction(
+      //   tempToken2Account.publicKey,
+      //   new solanaWeb3.PublicKey(token2Mint), 
+      //   tempToken2Account.publicKey, 
+      //   SPL_PROGRAM_2
+      // );
+      // console.log("Init Temp Token2 Account Ix: ", initTempToken2AccountIx);
 
       let mintAccountInfo_2 = await splToken.getMint(connection, new solanaWeb3.PublicKey(token2Mint), "confirmed", SPL_PROGRAM_2);
       if(is_22_2===true){
@@ -8248,17 +8248,17 @@ $(window).on('load', async function() {
         }
       }
 
-      transferToken2Ix = splToken.createTransferCheckedInstruction(
-        providerToken2ATA,
-        new solanaWeb3.PublicKey(token2Mint),
-        tempToken2Account.publicKey,
-        provider.publicKey,
-        token2Amount,
-        mintAccountInfo_2.decimals,
-        provider.publicKey,
-        SPL_PROGRAM_2,
-      );
-      console.log("Transfer Token2 Ix: ", transferToken2Ix);
+      // transferToken2Ix = splToken.createTransferCheckedInstruction(
+      //   providerToken2ATA,
+      //   new solanaWeb3.PublicKey(token2Mint),
+      //   tempToken2Account.publicKey,
+      //   provider.publicKey,
+      //   token2Amount,
+      //   mintAccountInfo_2.decimals,
+      //   provider.publicKey,
+      //   SPL_PROGRAM_2,
+      // );
+      // console.log("Transfer Token2 Ix: ", transferToken2Ix);
 
     }
     // token 2 ***************************************************************************
@@ -8334,7 +8334,7 @@ $(window).on('load', async function() {
     // token 4 ***************************************************************************
 
     // data ***************************************************************************
-    let totalSize = 1 + 32 + 8 + 32 + 8 + 32 + 8;
+    let totalSize = 1 + 32 + 8 + 8 + 32 + 8 + 32 + 8;
     console.log("totalSize", totalSize);
 
     let uarray = new Uint8Array(totalSize);
@@ -8350,6 +8350,30 @@ $(window).on('load', async function() {
     arr = Array.prototype.slice.call(Buffer.from(takerb58), 0);
     for (let i = 0; i < arr.length; i++) {
       uarray[counter++] = arr[i];
+    }
+
+    byteArray = [0, 0, 0, 0, 0, 0, 0, 0];
+    let token1;
+    if(extensionTypes_1.includes(1)){
+      token1 = token1Amount - (token1Amount * (transferFeeBasisPoints_1 / 100 / 100));
+      console.log("token1LessFee ", Math.trunc(token1));
+      for ( index = 0; index < byteArray.length; index ++ ) {
+        byte = token1 & 0xff;
+        byteArray [ index ] = byte;
+        token1 = (token1 - byte) / 256 ;
+      }
+    }
+    else{
+      token1 = token1Amount;
+      console.log("token1 ", Math.trunc(token1));
+      for (index = 0; index < byteArray.length; index++) {
+        byte = token1 & 0xff;
+        byteArray[index] = byte;
+        token1 = (token1 - byte) / 256;
+      }
+    }
+    for (let i = 0; i < byteArray.length; i++) {
+      uarray[counter++] = byteArray[i];
     }
 
     byteArray = [0, 0, 0, 0, 0, 0, 0, 0];
@@ -8417,16 +8441,18 @@ $(window).on('load', async function() {
       { pubkey: programStatePDA[0], isSigner: false, isWritable: false }, // 1
       { pubkey: swapVaultPDA[0], isSigner: false, isWritable: false }, // 2
       { pubkey: swapStatePDA[0], isSigner: false, isWritable: true }, // 3
-      { pubkey: new solanaWeb3.PublicKey(token1Mint), isSigner: false, isWritable: true }, // 4       
+      { pubkey: new solanaWeb3.PublicKey(token1Mint), isSigner: false, isWritable: true }, // 4        
       { pubkey: tempToken1Account.publicKey, isSigner: true, isWritable: true }, // 5
-      { pubkey: new solanaWeb3.PublicKey(token2Mint), isSigner: false, isWritable: true }, // 6  
-      { pubkey: tempToken2Account.publicKey, isSigner: true, isWritable: true }, // 7
-      { pubkey: providerPickleATA, isSigner: false, isWritable: true }, // 8
-      { pubkey: solanaWeb3.SystemProgram.programId, isSigner: false, isWritable: false }, // 9
-      { pubkey: splToken.TOKEN_PROGRAM_ID, isSigner: false, isWritable: false }, // 10
-      { pubkey: splToken.TOKEN_2022_PROGRAM_ID, isSigner: false, isWritable: false }, // 11
-      { pubkey: devTreasury, isSigner: false, isWritable: true }, // 12
-      { pubkey: mcDegensTreasury, isSigner: false, isWritable: true }, // 13
+      { pubkey: providerToken1ATA, isSigner: false, isWritable: true }, // 6 HERE
+      { pubkey: new solanaWeb3.PublicKey(token2Mint), isSigner: false, isWritable: true }, // 7
+      { pubkey: tempToken2Account.publicKey, isSigner: true, isWritable: true }, // 8
+      { pubkey: providerToken2ATA, isSigner: false, isWritable: true }, // 9 HERE
+      { pubkey: providerPickleATA, isSigner: false, isWritable: true }, // 10
+      { pubkey: solanaWeb3.SystemProgram.programId, isSigner: false, isWritable: false }, // 11
+      { pubkey: splToken.TOKEN_PROGRAM_ID, isSigner: false, isWritable: false }, // 12
+      { pubkey: splToken.TOKEN_2022_PROGRAM_ID, isSigner: false, isWritable: false }, // 13
+      { pubkey: devTreasury, isSigner: false, isWritable: true }, // 14
+      { pubkey: mcDegensTreasury, isSigner: false, isWritable: true }, // 15
     ];
     let initializeSwapIx = new solanaWeb3.TransactionInstruction({
       programId: tokenSwapProgramId,
@@ -8452,12 +8478,12 @@ $(window).on('load', async function() {
       if (createToken3ATA == true && createToken4ATA) {
         console.log("1");
         instructions = [
-          createTempToken1AccountIx,
-          initTempToken1AccountIx,
-          transferToken1Ix,
-          createTempToken2AccountIx,
-          initTempToken2AccountIx,
-          transferToken2Ix,
+          // createTempToken1AccountIx,
+          // initTempToken1AccountIx,
+          // transferToken1Ix,
+          // createTempToken2AccountIx,
+          // initTempToken2AccountIx,
+          // transferToken2Ix,
           createToken3ATAIx,
           createToken4ATAIx,
           initializeSwapIx
@@ -8466,12 +8492,12 @@ $(window).on('load', async function() {
       else if (createToken3ATA) {
         console.log("2");
           instructions = [
-            createTempToken1AccountIx,
-            initTempToken1AccountIx,
-            transferToken1Ix,
-            createTempToken2AccountIx,
-            initTempToken2AccountIx,
-            transferToken2Ix,
+            // createTempToken1AccountIx,
+            // initTempToken1AccountIx,
+            // transferToken1Ix,
+            // createTempToken2AccountIx,
+            // initTempToken2AccountIx,
+            // transferToken2Ix,
             createToken3ATAIx,
             initializeSwapIx
           ]
@@ -8479,12 +8505,12 @@ $(window).on('load', async function() {
       else if (createToken4ATA) {
         console.log("3");
           instructions = [
-            createTempToken1AccountIx,
-            initTempToken1AccountIx,
-            transferToken1Ix,
-            createTempToken2AccountIx,
-            initTempToken2AccountIx,
-            transferToken2Ix,
+            // createTempToken1AccountIx,
+            // initTempToken1AccountIx,
+            // transferToken1Ix,
+            // createTempToken2AccountIx,
+            // initTempToken2AccountIx,
+            // transferToken2Ix,
             createToken4ATAIx,
             initializeSwapIx
           ]
@@ -8492,12 +8518,12 @@ $(window).on('load', async function() {
       else {
         console.log("4");
           instructions = [
-            createTempToken1AccountIx,
-            initTempToken1AccountIx,
-            transferToken1Ix,
-            createTempToken2AccountIx,
-            initTempToken2AccountIx,
-            transferToken2Ix,
+            // createTempToken1AccountIx,
+            // initTempToken1AccountIx,
+            // transferToken1Ix,
+            // createTempToken2AccountIx,
+            // initTempToken2AccountIx,
+            // transferToken2Ix,
             initializeSwapIx,
           ]
       }
@@ -8506,9 +8532,9 @@ $(window).on('load', async function() {
       if (createToken3ATA == true && createToken4ATA == true) {
         console.log("5");
           instructions = [
-            createTempToken1AccountIx,
-            initTempToken1AccountIx,
-            transferToken1Ix,
+            // createTempToken1AccountIx,
+            // initTempToken1AccountIx,
+            // transferToken1Ix,
             createToken3ATAIx,
             createToken4ATAIx,
             initializeSwapIx
@@ -8517,9 +8543,9 @@ $(window).on('load', async function() {
       else if (createToken3ATA) {
         console.log("6");
           instructions = [
-            createTempToken1AccountIx,
-            initTempToken1AccountIx,
-            transferToken1Ix,
+            // createTempToken1AccountIx,
+            // initTempToken1AccountIx,
+            // transferToken1Ix,
             createToken3ATAIx,
             initializeSwapIx
           ]
@@ -8527,9 +8553,9 @@ $(window).on('load', async function() {
       else if (createToken4ATA) {
         console.log("7");
           instructions = [
-            createTempToken1AccountIx,
-            initTempToken1AccountIx,
-            transferToken1Ix,
+            // createTempToken1AccountIx,
+            // initTempToken1AccountIx,
+            // transferToken1Ix,
             createToken4ATAIx,
             initializeSwapIx
           ]
@@ -8537,9 +8563,9 @@ $(window).on('load', async function() {
       else {
         console.log("8");
           instructions = [
-            createTempToken1AccountIx,
-            initTempToken1AccountIx,
-            transferToken1Ix,
+            // createTempToken1AccountIx,
+            // initTempToken1AccountIx,
+            // transferToken1Ix,
             initializeSwapIx
           ]
       }
