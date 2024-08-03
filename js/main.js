@@ -8136,9 +8136,10 @@ $(window).on('load', async function() {
     // let initTempToken1AccountIx = null;
     // let transferToken1Ix = null;
     let transferFeeBasisPoints_1 = null;
+    let providerToken1ATA = null;
     if (token1Amount > 0) {
 
-      let providerToken1ATA = await splToken.getAssociatedTokenAddress(
+      providerToken1ATA = await splToken.getAssociatedTokenAddress(
         new solanaWeb3.PublicKey(token1Mint),
         provider.publicKey, 
         false, 
@@ -8203,9 +8204,10 @@ $(window).on('load', async function() {
     // let initTempToken2AccountIx = null;
     // let transferToken2Ix = null;
     let transferFeeBasisPoints_2 = null;
+    let providerToken2ATA = null;
     if (token2Amount > 0) {
 
-      let providerToken2ATA = await splToken.getAssociatedTokenAddress(
+      providerToken2ATA = await splToken.getAssociatedTokenAddress(
         new solanaWeb3.PublicKey(token2Mint),
         provider.publicKey, 
         false, 
