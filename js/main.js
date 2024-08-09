@@ -8132,9 +8132,6 @@ $(window).on('load', async function() {
     // token 1 ***************************************************************************
     let extensionTypes_1 = [];
     let tempToken1Account = new solanaWeb3.Keypair();
-    // let createTempToken1AccountIx = null;
-    // let initTempToken1AccountIx = null;
-    // let transferToken1Ix = null;
     let transferFeeBasisPoints_1 = null;
     let providerToken1ATA = null;
     if (token1Amount > 0) {
@@ -8200,11 +8197,8 @@ $(window).on('load', async function() {
     // token 2 ***************************************************************************
     let extensionTypes_2 = [];
     let tempToken2Account = new solanaWeb3.Keypair();
-    // let createTempToken2AccountIx = null;
-    // let initTempToken2AccountIx = null;
-    // let transferToken2Ix = null;
     let transferFeeBasisPoints_2 = null;
-    let providerToken2ATA = null;
+    let providerToken2ATA = new solanaWeb3.PublicKey("11111111111111111111111111111111");
     if (token2Amount > 0) {
 
       providerToken2ATA = await splToken.getAssociatedTokenAddress(
