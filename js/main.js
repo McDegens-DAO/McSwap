@@ -9787,6 +9787,7 @@ $(window).on('load', async function() {
         }}
         // ***********************************************************************
 
+        console.log("accounts", accounts);
         if(accounts.length == 0){
           $(".smart_loader").remove();
         }
