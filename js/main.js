@@ -405,7 +405,7 @@ $(window).on('load', async function() {
     console.log("priority fee estimate", data);
     return data;
   }
-  async function getComputeLimit(opti_payer,opti_ix,opti_tables=false) {
+  async function getComputeLimit(opti_ix,opti_tables=false) {
     let opti_sim_limit = solanaWeb3.ComputeBudgetProgram.setComputeUnitLimit({units:1400000});
     let re_ix = [];
     for (let o in opti_ix) {re_ix.push(opti_ix[o]);}
@@ -1501,7 +1501,7 @@ $(window).on('load', async function() {
       }
       // ***
       let priority = $("#nft_donation_priority").val(); 
-      instructions.unshift(solanaWeb3.ComputeBudgetProgram.setComputeUnitLimit({units:await getComputeLimit(provider.publicKey,instructions)}));
+      instructions.unshift(solanaWeb3.ComputeBudgetProgram.setComputeUnitLimit({units:await getComputeLimit(instructions)}));
       instructions.unshift(solanaWeb3.ComputeBudgetProgram.setComputeUnitPrice({microLamports:await getPriorityFeeEstimate(conf.cluster,priority,instructions)}));
       let messageV0 = new solanaWeb3.TransactionMessage({
         payerKey: provider.publicKey,
@@ -2222,7 +2222,7 @@ $(window).on('load', async function() {
     
     // ***
     let priority = $("#nft_donation_priority").val(); 
-    instructions.unshift(solanaWeb3.ComputeBudgetProgram.setComputeUnitLimit({units:await getComputeLimit(provider.publicKey,instructions)}));
+    instructions.unshift(solanaWeb3.ComputeBudgetProgram.setComputeUnitLimit({units:await getComputeLimit(instructions)}));
     instructions.unshift(solanaWeb3.ComputeBudgetProgram.setComputeUnitPrice({microLamports:await getPriorityFeeEstimate(conf.cluster,priority,instructions)}));
     let messageV0 = new solanaWeb3.TransactionMessage({
       payerKey: provider.publicKey,
@@ -3923,7 +3923,7 @@ $(window).on('load', async function() {
        
         // ***
         let priority = $("#priority_nft").val(); 
-        instructions.unshift(solanaWeb3.ComputeBudgetProgram.setComputeUnitLimit({units:await getComputeLimit(provider.publicKey,instructions,lookupTableAccount)}));
+        instructions.unshift(solanaWeb3.ComputeBudgetProgram.setComputeUnitLimit({units:await getComputeLimit(instructions,lookupTableAccount)}));
         instructions.unshift(solanaWeb3.ComputeBudgetProgram.setComputeUnitPrice({microLamports:await getPriorityFeeEstimate(conf.cluster,priority,instructions,lookupTableAccount)}));
         let messageV0 = new solanaWeb3.TransactionMessage({
           payerKey: provider.publicKey,
@@ -4234,7 +4234,7 @@ $(window).on('load', async function() {
         
         // ***
         let priority = $("#priority_nft").val(); 
-        instructions.unshift(solanaWeb3.ComputeBudgetProgram.setComputeUnitLimit({units:await getComputeLimit(provider.publicKey,instructions)}));
+        instructions.unshift(solanaWeb3.ComputeBudgetProgram.setComputeUnitLimit({units:await getComputeLimit(instructions)}));
         instructions.unshift(solanaWeb3.ComputeBudgetProgram.setComputeUnitPrice({microLamports:await getPriorityFeeEstimate(conf.cluster,priority,instructions)}));
         let messageV0 = new solanaWeb3.TransactionMessage({
           payerKey: provider.publicKey,
@@ -4486,7 +4486,7 @@ $(window).on('load', async function() {
 
         // ***
         let priority = $("#priority_nft").val(); 
-        instructions.unshift(solanaWeb3.ComputeBudgetProgram.setComputeUnitLimit({units:await getComputeLimit(provider.publicKey,instructions)}));
+        instructions.unshift(solanaWeb3.ComputeBudgetProgram.setComputeUnitLimit({units:await getComputeLimit(instructions)}));
         instructions.unshift(solanaWeb3.ComputeBudgetProgram.setComputeUnitPrice({microLamports:await getPriorityFeeEstimate(conf.cluster,priority,instructions)}));
         let messageV0 = new solanaWeb3.TransactionMessage({
           payerKey: provider.publicKey,
@@ -4890,7 +4890,7 @@ $(window).on('load', async function() {
         
         // ***
         let priority = $("#priority_nft_exec").val(); 
-        instructions.unshift(solanaWeb3.ComputeBudgetProgram.setComputeUnitLimit({units:await getComputeLimit(provider.publicKey,instructions,lookupTableAccount)}));
+        instructions.unshift(solanaWeb3.ComputeBudgetProgram.setComputeUnitLimit({units:await getComputeLimit(instructions,lookupTableAccount)}));
         instructions.unshift(solanaWeb3.ComputeBudgetProgram.setComputeUnitPrice({microLamports:await getPriorityFeeEstimate(conf.cluster,priority,instructions,lookupTableAccount)}));
         let messageV0 = new solanaWeb3.TransactionMessage({
           payerKey: provider.publicKey,
@@ -5202,7 +5202,7 @@ $(window).on('load', async function() {
 
         // ***
         let priority = $("#priority_nft_exec").val(); 
-        instructions.unshift(solanaWeb3.ComputeBudgetProgram.setComputeUnitLimit({units:await getComputeLimit(provider.publicKey,instructions,lookupTableAccount)}));
+        instructions.unshift(solanaWeb3.ComputeBudgetProgram.setComputeUnitLimit({units:await getComputeLimit(instructions,lookupTableAccount)}));
         instructions.unshift(solanaWeb3.ComputeBudgetProgram.setComputeUnitPrice({microLamports:await getPriorityFeeEstimate(conf.cluster,priority,instructions,lookupTableAccount)}));
         let messageV0 = new solanaWeb3.TransactionMessage({
           payerKey: provider.publicKey,
@@ -5468,7 +5468,7 @@ $(window).on('load', async function() {
         
         // ***
         let priority = $("#priority_nft_exec").val(); 
-        instructions.unshift(solanaWeb3.ComputeBudgetProgram.setComputeUnitLimit({units:await getComputeLimit(provider.publicKey,instructions)}));
+        instructions.unshift(solanaWeb3.ComputeBudgetProgram.setComputeUnitLimit({units:await getComputeLimit(instructions)}));
         instructions.unshift(solanaWeb3.ComputeBudgetProgram.setComputeUnitPrice({microLamports:await getPriorityFeeEstimate(conf.cluster,priority,instructions)}));
         let messageV0 = new solanaWeb3.TransactionMessage({
           payerKey: provider.publicKey,
@@ -5634,7 +5634,7 @@ $(window).on('load', async function() {
         
         // ***
         let priority = $("#priority_nft_exec").val(); 
-        instructions.unshift(solanaWeb3.ComputeBudgetProgram.setComputeUnitLimit({units:await getComputeLimit(provider.publicKey,instructions,false)}));
+        instructions.unshift(solanaWeb3.ComputeBudgetProgram.setComputeUnitLimit({units:await getComputeLimit(instructions,false)}));
         instructions.unshift(solanaWeb3.ComputeBudgetProgram.setComputeUnitPrice({microLamports:await getPriorityFeeEstimate(conf.cluster,priority,instructions,false)}));
         let messageV0 = new solanaWeb3.TransactionMessage({
           payerKey: provider.publicKey,
@@ -6829,7 +6829,7 @@ $(window).on('load', async function() {
       
       // ***
       let priority = $("#priority_nft_exec").val(); 
-      instructions.unshift(solanaWeb3.ComputeBudgetProgram.setComputeUnitLimit({units:await getComputeLimit(provider.publicKey,instructions)}));
+      instructions.unshift(solanaWeb3.ComputeBudgetProgram.setComputeUnitLimit({units:await getComputeLimit(instructions)}));
       instructions.unshift(solanaWeb3.ComputeBudgetProgram.setComputeUnitPrice({microLamports:await getPriorityFeeEstimate(conf.cluster,priority,instructions)}));
       let messageV0 = new solanaWeb3.TransactionMessage({
         payerKey: provider.publicKey,
@@ -6948,7 +6948,7 @@ $(window).on('load', async function() {
       
       // ***
       let priority = $("#priority_nft_exec").val(); 
-      instructions.unshift(solanaWeb3.ComputeBudgetProgram.setComputeUnitLimit({units:await getComputeLimit(provider.publicKey,instructions)}));
+      instructions.unshift(solanaWeb3.ComputeBudgetProgram.setComputeUnitLimit({units:await getComputeLimit(instructions)}));
       instructions.unshift(solanaWeb3.ComputeBudgetProgram.setComputeUnitPrice({microLamports:await getPriorityFeeEstimate(conf.cluster,priority,instructions)}));
       let messageV0 = new solanaWeb3.TransactionMessage({
         payerKey: provider.publicKey,
@@ -7108,7 +7108,7 @@ $(window).on('load', async function() {
       
       // ***
       let priority = $("#priority_nft_exec").val(); 
-      instructions.unshift(solanaWeb3.ComputeBudgetProgram.setComputeUnitLimit({units:await getComputeLimit(provider.publicKey,instructions)}));
+      instructions.unshift(solanaWeb3.ComputeBudgetProgram.setComputeUnitLimit({units:await getComputeLimit(instructions)}));
       instructions.unshift(solanaWeb3.ComputeBudgetProgram.setComputeUnitPrice({microLamports:await getPriorityFeeEstimate(conf.cluster,priority,instructions)}));
       let messageV0 = new solanaWeb3.TransactionMessage({
         payerKey: provider.publicKey,
@@ -7194,7 +7194,7 @@ $(window).on('load', async function() {
       let instructions = [reverseSwapIx];
       // ***
       let priority = $("#priority_nft_exec").val(); 
-      instructions.unshift(solanaWeb3.ComputeBudgetProgram.setComputeUnitLimit({units:await getComputeLimit(provider.publicKey,instructions)}));
+      instructions.unshift(solanaWeb3.ComputeBudgetProgram.setComputeUnitLimit({units:await getComputeLimit(instructions)}));
       instructions.unshift(solanaWeb3.ComputeBudgetProgram.setComputeUnitPrice({microLamports:await getPriorityFeeEstimate(conf.cluster,priority,instructions)}));
       let messageV0 = new solanaWeb3.TransactionMessage({
         payerKey: provider.publicKey,
@@ -8570,7 +8570,7 @@ $(window).on('load', async function() {
 
     // build tx **************************************************************************
     let priority = $("#priority_spl").val(); 
-    instructions.unshift(solanaWeb3.ComputeBudgetProgram.setComputeUnitLimit({units:await getComputeLimit(provider.publicKey,instructions,lookupTableAccount)}));
+    instructions.unshift(solanaWeb3.ComputeBudgetProgram.setComputeUnitLimit({units:await getComputeLimit(instructions,lookupTableAccount)}));
     instructions.unshift(solanaWeb3.ComputeBudgetProgram.setComputeUnitPrice({microLamports:await getPriorityFeeEstimate(conf.cluster,priority,instructions,lookupTableAccount)}));
     let messageV0 = new solanaWeb3.TransactionMessage({
       payerKey: provider.publicKey,
@@ -8774,7 +8774,7 @@ $(window).on('load', async function() {
     
     // ***
     let priority = $("#priority_spl_exec").val(); 
-    instructions.unshift(solanaWeb3.ComputeBudgetProgram.setComputeUnitLimit({units:await getComputeLimit(provider.publicKey,instructions)}));
+    instructions.unshift(solanaWeb3.ComputeBudgetProgram.setComputeUnitLimit({units:await getComputeLimit(instructions)}));
     instructions.unshift(solanaWeb3.ComputeBudgetProgram.setComputeUnitPrice({microLamports:await getPriorityFeeEstimate(conf.cluster,priority,instructions)}));
     let messageV0 = new solanaWeb3.TransactionMessage({
       payerKey: provider.publicKey,
@@ -9305,7 +9305,7 @@ $(window).on('load', async function() {
     
     // ***
     let priority = $("#priority_spl_exec").val(); 
-    instructions.unshift(solanaWeb3.ComputeBudgetProgram.setComputeUnitLimit({units:await getComputeLimit(provider.publicKey,instructions,lookupTableAccount)}));
+    instructions.unshift(solanaWeb3.ComputeBudgetProgram.setComputeUnitLimit({units:await getComputeLimit(instructions,lookupTableAccount)}));
     instructions.unshift(solanaWeb3.ComputeBudgetProgram.setComputeUnitPrice({microLamports:await getPriorityFeeEstimate(conf.cluster,priority,instructions,lookupTableAccount)}));
     messageV0 = new solanaWeb3.TransactionMessage({
       payerKey: provider.publicKey,
