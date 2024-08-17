@@ -6403,7 +6403,7 @@ $(window).on('load', async function() {
               } 
             }
           }
-          console.log("do_cmc", do_cmc);
+          // console.log("do_cmc", do_cmc);
           await review_usd_value(do_cmc, do_id, do_symbol, do_ele.val(), do_decimals);        
         
         }
@@ -8669,13 +8669,15 @@ $(window).on('load', async function() {
     let tempToken1Account = null;
     let token2Mint = null;
     let tempToken2Account = null;
+    let token1Amount = 0;
+
     if (swapState != null) {
       let encodedSwapStateData = swapState.data;
       let decodedSwapStateData = SWAP_SPL_STATE.decode(encodedSwapStateData);
       console.log("swapState - is_initialized: ", decodedSwapStateData.is_initialized);
       console.log("swapState - initializer: ", new solanaWeb3.PublicKey(decodedSwapStateData.initializer).toString());
       console.log("swapState - token1_mint: ", new solanaWeb3.PublicKey(decodedSwapStateData.token1_mint).toString());
-      console.log("swapState - token1_amount", new BN(decodedSwapStateData.token1Amount, 10, "le").toString());
+      token1Amount = new BN(decodedSwapStateData.token1Amount, 10, "le").toString();
       console.log("swapState - temp_token1_account", new solanaWeb3.PublicKey(decodedSwapStateData.temp_token1_account).toString());
       console.log("swapState - token2_mint: ", new solanaWeb3.PublicKey(decodedSwapStateData.token2_mint).toString());
       console.log("swapState - token2_amount", new BN(decodedSwapStateData.token2Amount, 10, "le").toString());
@@ -8684,6 +8686,7 @@ $(window).on('load', async function() {
       tempToken1Account = new solanaWeb3.PublicKey(decodedSwapStateData.temp_token1_account);
       token2Mint = new solanaWeb3.PublicKey(decodedSwapStateData.token2_mint);
       tempToken2Account = new solanaWeb3.PublicKey(decodedSwapStateData.temp_token2_account);
+
     } else {
       console.log("Swap Not Initialized");
       return;
@@ -9177,102 +9180,38 @@ $(window).on('load', async function() {
     uarray[counter++] = 1; // 1 = token_swap SwapNFTs instruction
     console.log("Data: ", uarray);
 
+    let keys = [
+      { pubkey: provider.publicKey, isSigner: true, isWritable: true }, // 0
+      { pubkey: initializer, isSigner: false, isWritable: true }, // 1
+      { pubkey: programStatePDA[0], isSigner: false, isWritable: false }, // 2
+      { pubkey: swapVaultPDA[0], isSigner: false, isWritable: false }, // 3
+      { pubkey: swapStatePDA[0], isSigner: false, isWritable: true }, // 4
+      { pubkey: tempToken1Account, isSigner: false, isWritable: true }, // 5
+      { pubkey: tempToken2Account, isSigner: false, isWritable: true }, // 6
+      { pubkey: providerToken3ATA, isSigner: false, isWritable: true }, // 7
+      { pubkey: providerToken4ATA, isSigner: false, isWritable: true }, // 8
+      { pubkey: token1ATA, isSigner: false, isWritable: true }, // 9
+      { pubkey: token2ATA, isSigner: false, isWritable: true }, // 10
+      { pubkey: token3ATA, isSigner: false, isWritable: true }, // 11
+      { pubkey: token4ATA, isSigner: false, isWritable: true }, // 12
+      { pubkey: token1Mint, isSigner: false, isWritable: true }, // 13 
+      { pubkey: token2Mint, isSigner: false, isWritable: true }, // 14 
+      { pubkey: token3Mint, isSigner: false, isWritable: true }, // 15 
+      { pubkey: token4Mint, isSigner: false, isWritable: true }, // 16 
+      { pubkey: providerPickleATA, isSigner: false, isWritable: true }, // 17
+      { pubkey: splToken.TOKEN_PROGRAM_ID, isSigner: false, isWritable: false }, // 18
+      { pubkey: splToken.TOKEN_2022_PROGRAM_ID, isSigner: false, isWritable: false }, // 19 
+      { pubkey: solanaWeb3.SystemProgram.programId, isSigner: false, isWritable: false }, // 20
+      { pubkey: devTreasury, isSigner: false, isWritable: true }, // 21
+      { pubkey: mcDegensTreasury, isSigner: false, isWritable: true }, // 22
+    ];
+
     let swapTokensIx = new solanaWeb3.TransactionInstruction({
       programId: tokenSwapProgramId,
       data: Buffer.from(
         uarray
       ),
-      keys: [{
-          pubkey: provider.publicKey,
-          isSigner: true,
-          isWritable: true
-        }, // 0
-        {
-          pubkey: initializer,
-          isSigner: false,
-          isWritable: true
-        }, // 1
-        {
-          pubkey: programStatePDA[0],
-          isSigner: false,
-          isWritable: false
-        }, // 2
-        {
-          pubkey: swapVaultPDA[0],
-          isSigner: false,
-          isWritable: false
-        }, // 3
-        {
-          pubkey: swapStatePDA[0],
-          isSigner: false,
-          isWritable: true
-        }, // 4
-        {
-          pubkey: tempToken1Account,
-          isSigner: false,
-          isWritable: true
-        }, // 5
-        {
-          pubkey: tempToken2Account,
-          isSigner: false,
-          isWritable: true
-        }, // 6
-        {
-          pubkey: providerToken3ATA,
-          isSigner: false,
-          isWritable: true
-        }, // 7  HERE
-        {
-          pubkey: providerToken4ATA,
-          isSigner: false,
-          isWritable: true
-        }, // 8  HERE
-        {
-          pubkey: token1ATA,
-          isSigner: false,
-          isWritable: true
-        }, // 9
-        {
-          pubkey: token2ATA,
-          isSigner: false,
-          isWritable: true
-        }, // 10
-        {
-          pubkey: token3ATA,
-          isSigner: false,
-          isWritable: true
-        }, // 11
-        {
-          pubkey: token4ATA,
-          isSigner: false,
-          isWritable: true
-        }, // 12
-        {
-          pubkey: providerPickleATA,
-          isSigner: false,
-          isWritable: true
-        }, // 13  HERE
-        {
-          pubkey: splToken.TOKEN_PROGRAM_ID,
-          isSigner: false,
-          isWritable: false
-        }, // 14
-        {
-          pubkey: solanaWeb3.SystemProgram.programId,
-          isSigner: false,
-          isWritable: false
-        }, // 15  HERE
-        {
-          pubkey: devTreasury,
-          isSigner: false,
-          isWritable: true
-        }, // 16
-        {
-          pubkey: mcDegensTreasury,
-          isSigner: false,
-          isWritable: true
-        }, // 17
-      ]
+      keys: keys
     });
     console.log("Swap Tokens Ix: ", swapTokensIx);
 
@@ -9821,7 +9760,10 @@ $(window).on('load', async function() {
         let img_3 = default_img;
         let img_4 = default_img;
         for (let i = 0; i < list_spl.length; i++) {
+
           if (!$("ul[data-spl_sent='" + list_spl[i].acct + "']").length) {
+
+
             for (let t = 0; t < spl_tokens.length; t++) {
               let tokn = spl_tokens[t];
               if (tokn.address == list_spl[i].token_1_mint) {
@@ -9835,6 +9777,8 @@ $(window).on('load', async function() {
                 break;
               }
             }
+
+
             if (list_spl[i].token_2_amount > 0) {
               for (let t = 0; t < spl_tokens.length; t++) {
                 let tokn = spl_tokens[t];
@@ -9866,6 +9810,8 @@ $(window).on('load', async function() {
               let amt = await decimal_joe(list_spl[i].token_2_amount, list_spl[i].token_2_decimals);
               list_spl[i].token_2_amt = amt;
             }
+
+
             for (let t = 0; t < spl_tokens.length; t++) {
               let tokn = spl_tokens[t];
               if (list_spl[i].token_3_mint == "11111111111111111111111111111111") {
@@ -9895,6 +9841,8 @@ $(window).on('load', async function() {
                 break;
               }
             }
+
+
             if (list_spl[i].token_4_amount > 0) {
               for (let t = 0; t < spl_tokens.length; t++) {
                 let tokn = spl_tokens[t];
@@ -9904,7 +9852,7 @@ $(window).on('load', async function() {
                   list_spl[i].token_4_image = "/img/usdc.png";
                   list_spl[i].token_4_decimals = 6;
                   let amt = await decimal_joe(list_spl[i].token_4_amount, list_spl[i].token_4_decimals);
-                  list_spl[i].amt = amt;
+                  list_spl[i].token_4_amt = amt;
                   break;
                 } else if (tokn.address == list_spl[i].token_4_mint) {
                   list_spl[i].token_4_name = tokn.name;
@@ -9926,6 +9874,8 @@ $(window).on('load', async function() {
               let amt = await decimal_joe(list_spl[i].token_4_amount, list_spl[i].token_4_decimals);
               list_spl[i].token_4_amt = amt;
             }
+
+
             let item_date = new Date((list_spl[i].utime * 1000));
             item_date = item_date.toLocaleDateString('en-US') + " " + item_date.toLocaleTimeString('en-US');
             let changes = '';
@@ -9984,7 +9934,7 @@ $(window).on('load', async function() {
                 break;
               }
             }
-            
+
             if (list_spl[i].token_2_amount > 0) {
               for (let t = 0; t < spl_tokens.length; t++) {
                 let tokn = spl_tokens[t];
@@ -10017,6 +9967,7 @@ $(window).on('load', async function() {
               list_spl[i].token_2_amt = amt;
             }
 
+
             for (let t = 0; t < spl_tokens.length; t++) {
               let tokn = spl_tokens[t];
               if (list_spl[i].token_3_mint == "11111111111111111111111111111111") {
@@ -10046,6 +9997,7 @@ $(window).on('load', async function() {
               }
             }
             
+
             if (list_spl[i].token_4_amount > 0) {
               for (let t = 0; t < spl_tokens.length; t++) {
                 let tokn = spl_tokens[t];
@@ -10055,7 +10007,7 @@ $(window).on('load', async function() {
                   list_spl[i].token_4_image = "/img/usdc.png";
                   list_spl[i].token_4_decimals = 6;
                   let amt = await decimal_joe(list_spl[i].token_4_amount, list_spl[i].token_4_decimals);
-                  list_spl[i].amt = amt;
+                  list_spl[i].token_4_amt = amt;
                   break;
                 } else if (tokn.address == list_spl[i].token_4_mint) {
                   list_spl[i].token_4_name = tokn.name;
@@ -10077,6 +10029,7 @@ $(window).on('load', async function() {
               list_spl[i].token_4_amt = amt;
             }
             
+
             let item_date = new Date((list_spl[i].utime * 1000));
             item_date = item_date.toLocaleDateString('en-US') + " " + item_date.toLocaleTimeString('en-US');
             
