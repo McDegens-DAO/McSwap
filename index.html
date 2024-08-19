@@ -514,8 +514,8 @@
 
   <!-- web3 bundles -->
   <script src="/js/lib/buffer.js"></script>
-  <script>let Buffer_ = require("buffer"); const Buffer = Buffer_.Buffer;</script>
-  <script src="/js/lib/solanaWeb3.js"></script>
+  <script>const Buffer = require("buffer").Buffer;</script>
+  <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
   <script src="/js/lib/buffer-layout.js"></script>
   <script src="/js/lib/splToken.js"></script>
   <script>const splToken = splToken_.default;</script>
