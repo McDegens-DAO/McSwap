@@ -372,14 +372,14 @@ $(window).on('load', async function() {
     if(tables==false){
       _msg = new solanaWeb3.TransactionMessage({
         payerKey: provider.publicKey,
-        recentBlockhash: (await connection.getRecentBlockhash('confirmed')).blockhash,
+        recentBlockhash: (await connection.getLatestBlockhash('confirmed')).blockhash,
         instructions: instructions,
       }).compileToV0Message([]);
     }
     else{
       _msg = new solanaWeb3.TransactionMessage({
         payerKey: provider.publicKey,
-        recentBlockhash: (await connection.getRecentBlockhash('confirmed')).blockhash,
+        recentBlockhash: (await connection.getLatestBlockhash('confirmed')).blockhash,
         instructions: instructions,
       }).compileToV0Message([tables]);
     }
@@ -415,14 +415,14 @@ $(window).on('load', async function() {
     if(opti_tables == false){
       opti_msg = new solanaWeb3.TransactionMessage({
         payerKey: provider.publicKey,
-        recentBlockhash: (await connection.getRecentBlockhash('confirmed')).blockhash,
+        recentBlockhash: (await connection.getLatestBlockhash('confirmed')).blockhash,
         instructions: opti_ix,
       }).compileToV0Message([]);
     }
     else{
       opti_msg = new solanaWeb3.TransactionMessage({
         payerKey: provider.publicKey,
-        recentBlockhash: (await connection.getRecentBlockhash('confirmed')).blockhash,
+        recentBlockhash: (await connection.getLatestBlockhash('confirmed')).blockhash,
         instructions: opti_ix,
       }).compileToV0Message([opti_tables]);
     }
@@ -966,7 +966,7 @@ $(window).on('load', async function() {
         instructions.unshift(solanaWeb3.ComputeBudgetProgram.setComputeUnitPrice({microLamports:await getPriorityFeeEstimate(conf.cluster,priority,instructions)}));
         let messageV0 = new solanaWeb3.TransactionMessage({
           payerKey: provider.publicKey,
-          recentBlockhash: (await connection.getRecentBlockhash('confirmed')).blockhash,
+          recentBlockhash: (await connection.getLatestBlockhash('confirmed')).blockhash,
           instructions: instructions,
         }).compileToV0Message([]);
         let transferTx = new solanaWeb3.VersionedTransaction(messageV0);
@@ -1505,7 +1505,7 @@ $(window).on('load', async function() {
       instructions.unshift(solanaWeb3.ComputeBudgetProgram.setComputeUnitPrice({microLamports:await getPriorityFeeEstimate(conf.cluster,priority,instructions)}));
       let messageV0 = new solanaWeb3.TransactionMessage({
         payerKey: provider.publicKey,
-        recentBlockhash: (await connection.getRecentBlockhash('confirmed')).blockhash,
+        recentBlockhash: (await connection.getLatestBlockhash('confirmed')).blockhash,
         instructions: instructions,
       }).compileToV0Message([]);
       let tx = new solanaWeb3.VersionedTransaction(messageV0);
@@ -1641,7 +1641,7 @@ $(window).on('load', async function() {
       // instructions.unshift(solanaWeb3.ComputeBudgetProgram.setComputeUnitPrice({microLamports:await getPriorityFeeEstimate(conf.cluster,priority,instructions)}));
       // let messageV0 = new solanaWeb3.TransactionMessage({
       //   payerKey: provider.publicKey,
-      //   recentBlockhash: (await connection.getRecentBlockhash('confirmed')).blockhash,
+      //   recentBlockhash: (await connection.getLatestBlockhash('confirmed')).blockhash,
       //   instructions: instructions,
       // }).compileToV0Message([]);
       // let tx = new solanaWeb3.VersionedTransaction(messageV0);
@@ -2226,7 +2226,7 @@ $(window).on('load', async function() {
     instructions.unshift(solanaWeb3.ComputeBudgetProgram.setComputeUnitPrice({microLamports:await getPriorityFeeEstimate(conf.cluster,priority,instructions)}));
     let messageV0 = new solanaWeb3.TransactionMessage({
       payerKey: provider.publicKey,
-      recentBlockhash: (await connection.getRecentBlockhash('confirmed')).blockhash,
+      recentBlockhash: (await connection.getLatestBlockhash('confirmed')).blockhash,
       instructions: instructions,
     }).compileToV0Message([]);
     let tx = new solanaWeb3.VersionedTransaction(messageV0);
@@ -3163,10 +3163,24 @@ $(window).on('load', async function() {
         let createSwapTokenATA = false; 
         let swapTokenATA = null;
         let createSwapTokenATAIx = null;
-        
+
         if(swapTokenMint.toString() != "11111111111111111111111111111111"){
+
+          let SPL_TOKEN = splToken.TOKEN_PROGRAM_ID;
+          axiosInstance = axios.create({baseURL:conf.cluster});
+          getAsset = await axiosInstance.post(conf.cluster,{jsonrpc:"2.0",method:"getAsset",id:"rpd-op-123",params:{id:swapTokenMint.toString()},}); 
+          if(typeof getAsset.data.result.mint_extensions != "undefined"){
+            SPL_PROGRAM = splToken.TOKEN_2022_PROGRAM_ID;
+            console.log("Token using Token 2022");
+            console.log(SPL_TOKEN.toString());
+          }
+          else{
+            console.log("Token using SPL Token");
+            console.log(SPL_TOKEN.toString());
+          }
+
           swapTokenATA = await splToken.getAssociatedTokenAddress(swapTokenMint,provider.publicKey,
-          false,splToken.TOKEN_PROGRAM_ID,splToken.ASSOCIATED_TOKEN_PROGRAM_ID,);
+          false,SPL_TOKEN,splToken.ASSOCIATED_TOKEN_PROGRAM_ID,);
           console.log("Swap Token ATA: ", swapTokenATA.toString());    
           let response_b = null;
           response_b = await connection.getAccountInfo(swapTokenATA).catch(function(error) {});
@@ -3174,12 +3188,13 @@ $(window).on('load', async function() {
           if (response_b == null) {
             createSwapTokenATA = true;
             createSwapTokenATAIx = splToken.createAssociatedTokenAccountInstruction(provider.publicKey,swapTokenATA,provider.publicKey,
-            swapTokenMint,splToken.TOKEN_PROGRAM_ID,splToken.ASSOCIATED_TOKEN_PROGRAM_ID,);
+            swapTokenMint,SPL_TOKEN,splToken.ASSOCIATED_TOKEN_PROGRAM_ID,);
             console.log("Create Swap Token ATA Ix: ", createSwapTokenATAIx); 
           }
+          
         }
         
-        let totalSize = 1 + 1 + 32 + 32 + 32 + 8 + 32 + 8;
+        var totalSize = 1 + 1 + 32 + 32 + 8 + 32 + 8; // HERE
         console.log("totalSize", totalSize);
         
         let uarray = new Uint8Array(totalSize);
@@ -3191,12 +3206,6 @@ $(window).on('load', async function() {
         } 
         else {
             uarray[counter++] = 0;
-        }
-        
-        let mintb58 = bs58.decode(mint);
-        let arr = Array.prototype.slice.call(Buffer.from(mintb58), 0);
-        for (let i = 0; i < arr.length; i++) {
-            uarray[counter++] = arr[i];
         }
 
         let takerb58 = bs58.decode(taker);
@@ -3318,39 +3327,37 @@ $(window).on('load', async function() {
           }
         }
         
-        // ***
-        let priority = $("#priority_nft").val(); 
         
-//         let units = await getComputeLimit(provider.publicKey,instructions,static_lookupTableAccount);
-        let units = 85000;
-        instructions.unshift(solanaWeb3.ComputeBudgetProgram.setComputeUnitLimit({units:units}));
-        let feeEstimate = await getPriorityFeeEstimate(conf.cluster,priority,instructions,static_lookupTableAccount);
-        instructions.unshift(solanaWeb3.ComputeBudgetProgram.setComputeUnitPrice({microLamports:feeEstimate}));
+        // build tx **************************************************************************
+        let priority = $("#priority_nft").val(); 
+        instructions.unshift(solanaWeb3.ComputeBudgetProgram.setComputeUnitLimit({units:await getComputeLimit(instructions,static_lookupTableAccount)}));
+        instructions.unshift(solanaWeb3.ComputeBudgetProgram.setComputeUnitPrice({microLamports:await getPriorityFeeEstimate(conf.cluster,priority,instructions,static_lookupTableAccount)}));
         let messageV0 = new solanaWeb3.TransactionMessage({
           payerKey: provider.publicKey,
-          recentBlockhash: (await connection.getRecentBlockhash('confirmed')).blockhash,
+          recentBlockhash: (await connection.getLatestBlockhash('confirmed')).blockhash,
           instructions: instructions,
         }).compileToV0Message([static_lookupTableAccount]);
         let initializeSwapTx = new solanaWeb3.VersionedTransaction(messageV0);
-        // ***        
-        
-        // make sure the user has enough SOL
-        let sol_balance = $(".sol_balance").html();
-        sol_balance = sol_balance * 1000000000;
-        sol_balance = parseInt(sol_balance);
-        let sol_needed = usageFee + feeEstimate + 2000000;
-        console.log("sol needed: ", sol_needed);
-        console.log("sol balance: ", sol_balance);
-        if(sol_needed > sol_balance){
-          $(".swap_cancel_b, #swap_deploy").prop("disabled", false);
-          $("#swap_deploying").removeClass("provisioning").html("3. Deploy");
-          $("#cover_message").html("Not enough SOL!");
-          setTimeout(() => {
-            $("#cover").fadeOut(400);
-            $("#cover_message").html("");
-          }, 3000);
-          return;
-        }
+        // build tx **************************************************************************
+
+
+        // // make sure the user has enough SOL
+        // let sol_balance = $(".sol_balance").html();
+        // sol_balance = sol_balance * 1000000000;
+        // sol_balance = parseInt(sol_balance);
+        // let sol_needed = usageFee + feeEstimate + 2000000;
+        // console.log("sol needed: ", sol_needed);
+        // console.log("sol balance: ", sol_balance);
+        // if(sol_needed > sol_balance){
+        //   $(".swap_cancel_b, #swap_deploy").prop("disabled", false);
+        //   $("#swap_deploying").removeClass("provisioning").html("3. Deploy");
+        //   $("#cover_message").html("Not enough SOL!");
+        //   setTimeout(() => {
+        //     $("#cover").fadeOut(400);
+        //     $("#cover_message").html("");
+        //   }, 3000);
+        //   return;
+        // }
         
         try {
           $("#cover_message").html("Requesting Approval...");
@@ -3862,7 +3869,7 @@ $(window).on('load', async function() {
 //           let computePriceIx = solanaWeb3.ComputeBudgetProgram.setComputeUnitPrice({microLamports: parseInt($("#priority_nft").val()),});
 //           let mcswapMessageV0 = new solanaWeb3.TransactionMessage({
 //               payerKey: provider.publicKey,
-//               recentBlockhash: (await connection.getRecentBlockhash('confirmed')).blockhash,
+//               recentBlockhash: (await connection.getLatestBlockhash('confirmed')).blockhash,
 //               instructions: [computePriceIx, createALTIx, extendALTIx],
 //           }).compileToV0Message([msLookupTableAccount]);
           
@@ -3927,7 +3934,7 @@ $(window).on('load', async function() {
         instructions.unshift(solanaWeb3.ComputeBudgetProgram.setComputeUnitPrice({microLamports:await getPriorityFeeEstimate(conf.cluster,priority,instructions,lookupTableAccount)}));
         let messageV0 = new solanaWeb3.TransactionMessage({
           payerKey: provider.publicKey,
-          recentBlockhash: (await connection.getRecentBlockhash('confirmed')).blockhash,
+          recentBlockhash: (await connection.getLatestBlockhash('confirmed')).blockhash,
           instructions: instructions,
         }).compileToV0Message([lookupTableAccount]);
         let tx = new solanaWeb3.VersionedTransaction(messageV0);
@@ -4238,7 +4245,7 @@ $(window).on('load', async function() {
         instructions.unshift(solanaWeb3.ComputeBudgetProgram.setComputeUnitPrice({microLamports:await getPriorityFeeEstimate(conf.cluster,priority,instructions)}));
         let messageV0 = new solanaWeb3.TransactionMessage({
           payerKey: provider.publicKey,
-          recentBlockhash: (await connection.getRecentBlockhash('confirmed')).blockhash,
+          recentBlockhash: (await connection.getLatestBlockhash('confirmed')).blockhash,
           instructions: instructions,
         }).compileToV0Message([]);
         let tx = new solanaWeb3.VersionedTransaction(messageV0);
@@ -4490,7 +4497,7 @@ $(window).on('load', async function() {
         instructions.unshift(solanaWeb3.ComputeBudgetProgram.setComputeUnitPrice({microLamports:await getPriorityFeeEstimate(conf.cluster,priority,instructions)}));
         let messageV0 = new solanaWeb3.TransactionMessage({
           payerKey: provider.publicKey,
-          recentBlockhash: (await connection.getRecentBlockhash('confirmed')).blockhash,
+          recentBlockhash: (await connection.getLatestBlockhash('confirmed')).blockhash,
           instructions: instructions,
         }).compileToV0Message([]);
         let tx = new solanaWeb3.VersionedTransaction(messageV0);
@@ -4846,7 +4853,7 @@ $(window).on('load', async function() {
 //           let computePriceIx = solanaWeb3.ComputeBudgetProgram.setComputeUnitPrice({microLamports: parseInt($("#priority_nft_exec").val()),});
 //           let mcswapMessageV0 = new solanaWeb3.TransactionMessage({
 //               payerKey: provider.publicKey,
-//               recentBlockhash: (await connection.getRecentBlockhash('confirmed')).blockhash,
+//               recentBlockhash: (await connection.getLatestBlockhash('confirmed')).blockhash,
 //               instructions: [computePriceIx, createALTIx, extendALTIx],
 //           }).compileToV0Message([msLookupTableAccount]);
           
@@ -4894,7 +4901,7 @@ $(window).on('load', async function() {
         instructions.unshift(solanaWeb3.ComputeBudgetProgram.setComputeUnitPrice({microLamports:await getPriorityFeeEstimate(conf.cluster,priority,instructions,lookupTableAccount)}));
         let messageV0 = new solanaWeb3.TransactionMessage({
           payerKey: provider.publicKey,
-          recentBlockhash: (await connection.getRecentBlockhash('confirmed')).blockhash,
+          recentBlockhash: (await connection.getLatestBlockhash('confirmed')).blockhash,
           instructions: instructions,
         }).compileToV0Message([lookupTableAccount]);
         let tx = new solanaWeb3.VersionedTransaction(messageV0);
@@ -5206,7 +5213,7 @@ $(window).on('load', async function() {
         instructions.unshift(solanaWeb3.ComputeBudgetProgram.setComputeUnitPrice({microLamports:await getPriorityFeeEstimate(conf.cluster,priority,instructions,lookupTableAccount)}));
         let messageV0 = new solanaWeb3.TransactionMessage({
           payerKey: provider.publicKey,
-          recentBlockhash: (await connection.getRecentBlockhash('confirmed')).blockhash,
+          recentBlockhash: (await connection.getLatestBlockhash('confirmed')).blockhash,
           instructions: instructions,
         }).compileToV0Message([lookupTableAccount]);
         let swapNFTSTx = new solanaWeb3.VersionedTransaction(messageV0);
@@ -5472,7 +5479,7 @@ $(window).on('load', async function() {
         instructions.unshift(solanaWeb3.ComputeBudgetProgram.setComputeUnitPrice({microLamports:await getPriorityFeeEstimate(conf.cluster,priority,instructions)}));
         let messageV0 = new solanaWeb3.TransactionMessage({
           payerKey: provider.publicKey,
-          recentBlockhash: (await connection.getRecentBlockhash('confirmed')).blockhash,
+          recentBlockhash: (await connection.getLatestBlockhash('confirmed')).blockhash,
           instructions: instructions,
         }).compileToV0Message([]);
         let swapPNFTsTx = new solanaWeb3.VersionedTransaction(messageV0);
@@ -5638,7 +5645,7 @@ $(window).on('load', async function() {
         instructions.unshift(solanaWeb3.ComputeBudgetProgram.setComputeUnitPrice({microLamports:await getPriorityFeeEstimate(conf.cluster,priority,instructions,false)}));
         let messageV0 = new solanaWeb3.TransactionMessage({
           payerKey: provider.publicKey,
-          recentBlockhash: (await connection.getRecentBlockhash('confirmed')).blockhash,
+          recentBlockhash: (await connection.getLatestBlockhash('confirmed')).blockhash,
           instructions: instructions,
         }).compileToV0Message([]);
         let swapNFTSTx = new solanaWeb3.VersionedTransaction(messageV0);
@@ -6833,7 +6840,7 @@ $(window).on('load', async function() {
       instructions.unshift(solanaWeb3.ComputeBudgetProgram.setComputeUnitPrice({microLamports:await getPriorityFeeEstimate(conf.cluster,priority,instructions)}));
       let messageV0 = new solanaWeb3.TransactionMessage({
         payerKey: provider.publicKey,
-        recentBlockhash: (await connection.getRecentBlockhash('confirmed')).blockhash,
+        recentBlockhash: (await connection.getLatestBlockhash('confirmed')).blockhash,
         instructions: instructions,
       }).compileToV0Message([]);
       let reverseSwapTx = new solanaWeb3.VersionedTransaction(messageV0);
@@ -6937,7 +6944,7 @@ $(window).on('load', async function() {
           { pubkey: swapStatePDA[0], isSigner: false, isWritable: true }, // 2
           { pubkey: tempMintAccount, isSigner: false, isWritable: true }, // 3
           { pubkey: initializerMintATA, isSigner: false, isWritable: true }, // 4
-          { pubkey: new solanaWeb3.PublicKey(mint), isSigner: false, isWritable: true }, // 6  HERE
+          { pubkey: new solanaWeb3.PublicKey(assetId), isSigner: false, isWritable: true }, // 6
           { pubkey: splToken.TOKEN_PROGRAM_ID, isSigner: false, isWritable: false }, // 7
           { pubkey: new solanaWeb3.PublicKey(conf.TOKEN_2022_PROGRAM_ID), isSigner: false, isWritable: false }, // 8  HERE
         ]
@@ -6952,7 +6959,7 @@ $(window).on('load', async function() {
       instructions.unshift(solanaWeb3.ComputeBudgetProgram.setComputeUnitPrice({microLamports:await getPriorityFeeEstimate(conf.cluster,priority,instructions)}));
       let messageV0 = new solanaWeb3.TransactionMessage({
         payerKey: provider.publicKey,
-        recentBlockhash: (await connection.getRecentBlockhash('confirmed')).blockhash,
+        recentBlockhash: (await connection.getLatestBlockhash('confirmed')).blockhash,
         instructions: instructions,
       }).compileToV0Message([]);
       let reverseSwapTx = new solanaWeb3.VersionedTransaction(messageV0);
@@ -7112,7 +7119,7 @@ $(window).on('load', async function() {
       instructions.unshift(solanaWeb3.ComputeBudgetProgram.setComputeUnitPrice({microLamports:await getPriorityFeeEstimate(conf.cluster,priority,instructions)}));
       let messageV0 = new solanaWeb3.TransactionMessage({
         payerKey: provider.publicKey,
-        recentBlockhash: (await connection.getRecentBlockhash('confirmed')).blockhash,
+        recentBlockhash: (await connection.getLatestBlockhash('confirmed')).blockhash,
         instructions: instructions,
       }).compileToV0Message([]);
       let reverseSwapTx = new solanaWeb3.VersionedTransaction(messageV0);
@@ -7198,7 +7205,7 @@ $(window).on('load', async function() {
       instructions.unshift(solanaWeb3.ComputeBudgetProgram.setComputeUnitPrice({microLamports:await getPriorityFeeEstimate(conf.cluster,priority,instructions)}));
       let messageV0 = new solanaWeb3.TransactionMessage({
         payerKey: provider.publicKey,
-        recentBlockhash: (await connection.getRecentBlockhash('confirmed')).blockhash,
+        recentBlockhash: (await connection.getLatestBlockhash('confirmed')).blockhash,
         instructions: instructions,
       }).compileToV0Message([]);
       let reverseSwapTx = new solanaWeb3.VersionedTransaction(messageV0);
@@ -8574,7 +8581,7 @@ $(window).on('load', async function() {
     instructions.unshift(solanaWeb3.ComputeBudgetProgram.setComputeUnitPrice({microLamports:await getPriorityFeeEstimate(conf.cluster,priority,instructions,lookupTableAccount)}));
     let messageV0 = new solanaWeb3.TransactionMessage({
       payerKey: provider.publicKey,
-      recentBlockhash: (await connection.getRecentBlockhash('confirmed')).blockhash,
+      recentBlockhash: (await connection.getLatestBlockhash('confirmed')).blockhash,
       instructions: instructions,
     }).compileToV0Message([lookupTableAccount]);
     let initializeSwapTx = new solanaWeb3.VersionedTransaction(messageV0);
@@ -8781,7 +8788,7 @@ $(window).on('load', async function() {
     instructions.unshift(solanaWeb3.ComputeBudgetProgram.setComputeUnitPrice({microLamports:await getPriorityFeeEstimate(conf.cluster,priority,instructions)}));
     let messageV0 = new solanaWeb3.TransactionMessage({
       payerKey: provider.publicKey,
-      recentBlockhash: (await connection.getRecentBlockhash('confirmed')).blockhash,
+      recentBlockhash: (await connection.getLatestBlockhash('confirmed')).blockhash,
       instructions: instructions,
     }).compileToV0Message([]);
     let reverseSwapTx = new solanaWeb3.VersionedTransaction(messageV0);
@@ -9248,7 +9255,7 @@ $(window).on('load', async function() {
     instructions.unshift(solanaWeb3.ComputeBudgetProgram.setComputeUnitPrice({microLamports:await getPriorityFeeEstimate(conf.cluster,priority,instructions,lookupTableAccount)}));
     messageV0 = new solanaWeb3.TransactionMessage({
       payerKey: provider.publicKey,
-      recentBlockhash: (await connection.getRecentBlockhash('confirmed')).blockhash,
+      recentBlockhash: (await connection.getLatestBlockhash('confirmed')).blockhash,
       instructions: instructions,
     }).compileToV0Message([lookupTableAccount]);
     let swapTokensTx = new solanaWeb3.VersionedTransaction(messageV0);
