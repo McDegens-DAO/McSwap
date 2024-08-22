@@ -2033,6 +2033,7 @@ $(window).on('load', async function() {
     provider = wallet_provider();
     if (provider.publicKey.toString() == $("#create_b_owner").val()) {
       alert("Same Owner!");
+      $("#create_b_owner").prop("disabled",false);
       return;
     }
     $("#mc_swap_create .mc_title").html("Fetching Asset...");

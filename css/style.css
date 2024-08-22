@@ -3603,6 +3603,16 @@ button#mode_nft{
   margin-top: 0;
 }
 
+.spl_pikl_total span.swap_label,
+.spl_pikl_total_x span.swap_label{
+  color: #f1f1f1;
+}
+
+.spl_pikl_total span.swap_amt,
+.spl_pikl_total_x span.swap_amt{
+  color: #87a02f;
+}
+
 .spl_tx_total_x,
 .spl_tx_total {
   display: none;
