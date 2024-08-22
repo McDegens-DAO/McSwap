@@ -4584,7 +4584,7 @@ $(window).on('load', async function() {
         //console.log(balance_error);
         $("#cover_message").html("Error! " + balance_error);
         $("#swap_execute").prop("disabled", false);
-        $("#swap_executing").removeClass("provisioning").html("2. Execute Contract");
+        $("#swap_executing").removeClass("provisioning").html("Execute Contract");
         setTimeout(() => {
           $("#cover_message").html("");
           $("#cover").fadeOut(400);
@@ -4920,7 +4920,7 @@ $(window).on('load', async function() {
           if(final != "finalized"){
             $("#cover_message").html(final);
             setTimeout(function(){
-              $("#swap_executing").removeClass("provisioning").html("2. Execute Contract");
+              $("#swap_executing").removeClass("provisioning").html("Execute Contract");
               $("#cover").fadeOut(400);
               $("#cover_message").html("");
               $("#swap_execute").prop("disabled",false);
@@ -4928,7 +4928,7 @@ $(window).on('load', async function() {
             return;
           }
           $("#cover_message").html("Success!...");
-          $("#swap_executing").removeClass("provisioning").html("2. Execute Contract");
+          $("#swap_executing").removeClass("provisioning").html("Execute Contract");
           $(".fulfil_e").removeClass("active_swap");
           $(".fulfil_f").addClass("active_swap");
           $("#nav_shop, #nav_compose, .ass_donate, .ass_swap, #wallet_disconnect, #wallet_refresh, #wallet_nfts, #wallet_cnfts, .mcprofile_close").prop("disabled", false);
@@ -4955,7 +4955,7 @@ $(window).on('load', async function() {
           console.log(error);
           $("#cover_message").html("Transaction Failed!");
           setTimeout(function(){$("#cover").fadeOut(400);$("#cover_message").html("");$("#swap_execute").prop("disabled",false);},3000);
-          $("#swap_executing").removeClass("provisioning").html("2. Execute Contract");
+          $("#swap_executing").removeClass("provisioning").html("Execute Contract");
           return;
         }
         
@@ -5006,7 +5006,7 @@ $(window).on('load', async function() {
         else{
           $("#cover_message").html("Program Error!");
           $("#swap_execute").prop("disabled", false);
-          $("#swap_executing").removeClass("provisioning").html("2. Execute Contract");
+          $("#swap_executing").removeClass("provisioning").html("Execute Contract");
           setTimeout(() => {
             $("#cover_message").html("");
             $("#cover").fadeOut(400);
@@ -5023,7 +5023,7 @@ $(window).on('load', async function() {
         .catch(function(error) {
           $("#cover_message").html("Program Error!");
           $("#swap_execute").prop("disabled", false);
-          $("#swap_executing").removeClass("provisioning").html("2. Execute Contract");
+          $("#swap_executing").removeClass("provisioning").html("Execute Contract");
           setTimeout(() => {
             $("#cover_message").html("");
             $("#cover").fadeOut(400);
@@ -5066,7 +5066,7 @@ $(window).on('load', async function() {
         else {
           $("#cover_message").html("Contract does not exist!");
           $("#swap_execute").prop("disabled", false);
-          $("#swap_executing").removeClass("provisioning").html("2. Execute Contract");
+          $("#swap_executing").removeClass("provisioning").html("Execute Contract");
           setTimeout(() => {
             $("#cover_message").html("");
             $("#cover").fadeOut(400);
@@ -5074,12 +5074,12 @@ $(window).on('load', async function() {
           return;
         }
         
-        let SPL_PROGRAM = null;
         let axiosInstance = null;
-
-        SPL_PROGRAM_2 = null;
-        SPL_PROGRAM = splToken.TOKEN_PROGRAM_ID;
         axiosInstance = axios.create({baseURL:conf.cluster});
+
+        //////////////////////////////////////////////////////////////////
+        // alice mint
+        let SPL_PROGRAM = splToken.TOKEN_PROGRAM_ID;
         getAsset = await axiosInstance.post(conf.cluster,{jsonrpc:"2.0",method:"getAsset",id:"rpd-op-123",params:{id:initializerMint.toString()},}); 
         if(typeof getAsset.data.result.mint_extensions != "undefined"){
           SPL_PROGRAM = splToken.TOKEN_2022_PROGRAM_ID;
@@ -5100,7 +5100,6 @@ $(window).on('load', async function() {
         splToken.ASSOCIATED_TOKEN_PROGRAM_ID,);
         console.log("Initializer Mint ATA: ", initializerMintATA.toString());        
         let ataACCT = null;
-        SPL_PROGRAM_2 = SPL_PROGRAM;
         ataACCT = await connection.getAccountInfo(initializerMintATA)
         .catch(function(error){});
         if (ataACCT == null) {
@@ -5117,44 +5116,60 @@ $(window).on('load', async function() {
           createInitializerMintATA = false;
         }
         console.log("createInitializerMintATA: "+createInitializerMintATA);
-        
+        //////////////////////////////////////////////////////////////////
+
         let providerSwapMintATA = new solanaWeb3.PublicKey("11111111111111111111111111111111");
         let initializerSwapMintATA = new solanaWeb3.PublicKey("11111111111111111111111111111111");
 
+        //////////////////////////////////////////////////////////////////
+        // bob mint
+        let SPL_PROGRAM_2 = splToken.TOKEN_PROGRAM_ID;
         if (swapMint != "11111111111111111111111111111111") {  
-          SPL_PROGRAM = splToken.TOKEN_PROGRAM_ID;
           axiosInstance = axios.create({baseURL:conf.cluster});
           getAsset = await axiosInstance.post(conf.cluster,{jsonrpc:"2.0",method:"getAsset",id:"rpd-op-123",params:{id:swapMint},}); 
           if(typeof getAsset.data.result.mint_extensions != "undefined"){
-            SPL_PROGRAM = splToken.TOKEN_2022_PROGRAM_ID;
+            SPL_PROGRAM_2 = splToken.TOKEN_2022_PROGRAM_ID;
             console.log("Using Token 2022");
-            console.log(SPL_PROGRAM.toString());
+            console.log(SPL_PROGRAM_2.toString());
           }
           else{
             console.log("Using SPL Token");
-            console.log(SPL_PROGRAM.toString());
+            console.log(SPL_PROGRAM_2.toString());
           }
           providerSwapMintATA = await splToken.getAssociatedTokenAddress(
           new solanaWeb3.PublicKey(swapMint),provider.publicKey,false,
-          SPL_PROGRAM,splToken.ASSOCIATED_TOKEN_PROGRAM_ID,);          
+          SPL_PROGRAM_2,splToken.ASSOCIATED_TOKEN_PROGRAM_ID,);   
           initializerSwapMintATA = await splToken.getAssociatedTokenAddress(
           new solanaWeb3.PublicKey(swapMint),initializer,false,
-          SPL_PROGRAM,splToken.ASSOCIATED_TOKEN_PROGRAM_ID,);
+          SPL_PROGRAM_2,splToken.ASSOCIATED_TOKEN_PROGRAM_ID,);
           console.log("Initializer Swap Mint ATA: ", initializerSwapMintATA.toString());
         }
-        
         let providerMintATA = await splToken.getAssociatedTokenAddress(
         initializerMint,provider.publicKey,false,
-        SPL_PROGRAM_2,splToken.ASSOCIATED_TOKEN_PROGRAM_ID,);        
+        SPL_PROGRAM_2,splToken.ASSOCIATED_TOKEN_PROGRAM_ID,);
+        //////////////////////////////////////////////////////////////////
 
+        //////////////////////////////////////////////////////////////////
+        // token
+        let SPL_PROGRAM_3 = splToken.TOKEN_PROGRAM_ID;
+        getAsset = await axiosInstance.post(conf.cluster,{jsonrpc:"2.0",method:"getAsset",id:"rpd-op-123",params:{id:swapTokenMint.toString()},}); 
+        if(typeof getAsset.data.result.mint_extensions != "undefined"){
+          SPL_PROGRAM_3 = splToken.TOKEN_2022_PROGRAM_ID;
+          console.log("Using Token 2022");
+          console.log(SPL_PROGRAM.toString());
+        }
+        else{
+          console.log("Using SPL Token");
+          console.log(SPL_PROGRAM.toString());
+        }
         let providerTokenATA = await splToken.getAssociatedTokenAddress(
         swapTokenMint,provider.publicKey,false,
-        splToken.TOKEN_PROGRAM_ID,splToken.ASSOCIATED_TOKEN_PROGRAM_ID,);
-        
+        SPL_PROGRAM_3,splToken.ASSOCIATED_TOKEN_PROGRAM_ID,);
         let initializerTokenATA = await splToken.getAssociatedTokenAddress(
         swapTokenMint,initializer,false,
-        splToken.TOKEN_PROGRAM_ID,splToken.ASSOCIATED_TOKEN_PROGRAM_ID,);
-        
+        SPL_PROGRAM_3,splToken.ASSOCIATED_TOKEN_PROGRAM_ID,);
+        //////////////////////////////////////////////////////////////////
+
         let totalSize = 1;
         console.log("totalSize", totalSize);
         
@@ -5170,17 +5185,17 @@ $(window).on('load', async function() {
           { pubkey: swapStatePDA[0], isSigner: false, isWritable: true }, // 3
           { pubkey: swapVaultPDA[0], isSigner: false, isWritable: false }, // 4
           { pubkey: tempMintAccount, isSigner: false, isWritable: true }, // 5
-          { pubkey: providerMintATA, isSigner: false, isWritable: true }, // 6
-          { pubkey: new solanaWeb3.PublicKey(mint), isSigner: false, isWritable: true }, // 7  HERE
+          { pubkey: initializerMintATA, isSigner: false, isWritable: true }, // 6
+          { pubkey: new solanaWeb3.PublicKey(mint), isSigner: false, isWritable: true }, // 7
           { pubkey: providerSwapMintATA, isSigner: false, isWritable: true }, // 8
           { pubkey: initializerSwapMintATA, isSigner: false, isWritable: true }, // 9
-          { pubkey: new solanaWeb3.PublicKey(swapMint), isSigner: false, isWritable: true }, // 10  HERE
+          { pubkey: new solanaWeb3.PublicKey(swapMint), isSigner: false, isWritable: true }, // 10
           { pubkey: providerTokenATA, isSigner: false, isWritable: true }, // 11
           { pubkey: initializerTokenATA, isSigner: false, isWritable: true }, // 12
-          { pubkey: swapTokenMint, isSigner: false, isWritable: true }, // 13  HERE
+          { pubkey: swapTokenMint, isSigner: false, isWritable: true }, // 13
           { pubkey: solanaWeb3.SystemProgram.programId, isSigner: false, isWritable: false }, // 14
           { pubkey: splToken.TOKEN_PROGRAM_ID, isSigner: false, isWritable: false }, // 15
-          { pubkey: new solanaWeb3.PublicKey(conf.TOKEN_2022_PROGRAM_ID), isSigner: false, isWritable: false }, // 16  HERE
+          { pubkey: splToken.TOKEN_2022_PROGRAM_ID, isSigner: false, isWritable: false }, // 16
           { pubkey: devTreasury, isSigner: false, isWritable: true }, // 17
           { pubkey: mcDegensTreasury, isSigner: false, isWritable: true }, // 18
         ];
@@ -5235,12 +5250,12 @@ $(window).on('load', async function() {
               $("#cover_message").html("");
               $("#cover").fadeOut(400);
               $("#swap_execute").prop("disabled", false);
-              $("#swap_executing").removeClass("provisioning").html("2. Execute Contract");
+              $("#swap_executing").removeClass("provisioning").html("Execute Contract");
             },3000);
             return;
           }
           $("#cover_message").html("Success!");
-          $("#swap_executing").removeClass("provisioning").html("2. Execute Contract");
+          $("#swap_executing").removeClass("provisioning").html("Execute Contract");
           $(".fulfil_e").removeClass("active_swap");
           $(".fulfil_f").addClass("active_swap");
           $("#nav_shop, #nav_compose, .ass_donate, .ass_swap, #wallet_disconnect, #wallet_refresh, #wallet_nfts, #wallet_cnfts, .mcprofile_close").prop("disabled", false);
@@ -5268,7 +5283,7 @@ $(window).on('load', async function() {
           $("#cover_message").html("");
           $("#cover").fadeOut(400);
           $("#swap_execute").prop("disabled", false);
-          $("#swap_executing").removeClass("provisioning").html("2. Execute Contract");
+          $("#swap_executing").removeClass("provisioning").html("Execute Contract");
           return;
         }
         
@@ -5502,12 +5517,12 @@ $(window).on('load', async function() {
               $("#cover_message").html("");
               $("#cover").fadeOut(400);
               $("#swap_execute").prop("disabled", false);
-              $("#swap_executing").removeClass("provisioning").html("2. Execute Contract");
+              $("#swap_executing").removeClass("provisioning").html("Execute Contract");
             },3000);
             return;
           }
           $("#cover_message").html("Success!");
-          $("#swap_executing").removeClass("provisioning").html("2. Execute Contract");
+          $("#swap_executing").removeClass("provisioning").html("Execute Contract");
           $(".fulfil_e").removeClass("active_swap");
           $(".fulfil_f").addClass("active_swap");
           $("#nav_shop, #nav_compose, .ass_donate, .ass_swap, #wallet_disconnect, #wallet_refresh, #wallet_nfts, #wallet_cnfts, .mcprofile_close").prop("disabled", false);
@@ -5535,7 +5550,7 @@ $(window).on('load', async function() {
           $("#cover_message").html("");
           $("#cover").fadeOut(400);
           $("#swap_execute").prop("disabled", false);
-          $("#swap_executing").removeClass("provisioning").html("2. Execute Contract");
+          $("#swap_executing").removeClass("provisioning").html("Execute Contract");
           return;
         }        
         
@@ -5668,12 +5683,12 @@ $(window).on('load', async function() {
               $("#cover_message").html("");
               $("#cover").fadeOut(400);
               $("#swap_execute").prop("disabled", false);
-              $("#swap_executing").removeClass("provisioning").html("2. Execute Contract");
+              $("#swap_executing").removeClass("provisioning").html("Execute Contract");
             },3000);
             return;
           }
           $("#cover_message").html("Success!");
-          $("#swap_executing").removeClass("provisioning").html("2. Execute Contract");
+          $("#swap_executing").removeClass("provisioning").html("Execute Contract");
           $(".fulfil_e").removeClass("active_swap");
           $(".fulfil_f").addClass("active_swap");
           $("#nav_shop, #nav_compose, .ass_donate, .ass_swap, #wallet_disconnect, #wallet_refresh, #wallet_nfts, #wallet_cnfts, .mcprofile_close").prop("disabled", false);
@@ -5700,7 +5715,7 @@ $(window).on('load', async function() {
           $("#cover_message").html("");
           $("#cover").fadeOut(400);
           $("#swap_execute").prop("disabled", false);
-          $("#swap_executing").removeClass("provisioning").html("2. Execute Contract");
+          $("#swap_executing").removeClass("provisioning").html("Execute Contract");
           return;
         }
 
