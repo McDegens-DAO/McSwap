@@ -2997,6 +2997,7 @@ $(window).on('load', async function() {
     }
   });
   
+
   // deploy proposal
   async function deploy_proposal() {
     
@@ -4564,6 +4565,7 @@ $(window).on('load', async function() {
     
   }
   $(document).delegate("#swap_deploy", "click", deploy_proposal);
+  
   
   // execute swap
   async function execute_swap() {
