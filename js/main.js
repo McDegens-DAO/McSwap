@@ -3171,7 +3171,7 @@ $(window).on('load', async function() {
           axiosInstance = axios.create({baseURL:conf.cluster});
           getAsset = await axiosInstance.post(conf.cluster,{jsonrpc:"2.0",method:"getAsset",id:"rpd-op-123",params:{id:swapTokenMint.toString()},}); 
           if(typeof getAsset.data.result.mint_extensions != "undefined"){
-            SPL_PROGRAM = splToken.TOKEN_2022_PROGRAM_ID;
+            SPL_TOKEN = splToken.TOKEN_2022_PROGRAM_ID;
             console.log("Token using Token 2022");
             console.log(SPL_TOKEN.toString());
           }
@@ -3188,8 +3188,14 @@ $(window).on('load', async function() {
           console.log("response_b: ", response_b);    
           if (response_b == null) {
             createSwapTokenATA = true;
-            createSwapTokenATAIx = splToken.createAssociatedTokenAccountInstruction(provider.publicKey,swapTokenATA,provider.publicKey,
-            swapTokenMint,SPL_TOKEN,splToken.ASSOCIATED_TOKEN_PROGRAM_ID,);
+            createSwapTokenATAIx = splToken.createAssociatedTokenAccountInstruction(
+              provider.publicKey,
+              swapTokenATA,
+              provider.publicKey,
+              swapTokenMint,
+              SPL_TOKEN,
+              splToken.ASSOCIATED_TOKEN_PROGRAM_ID
+            );
             console.log("Create Swap Token ATA Ix: ", createSwapTokenATAIx); 
           }
           
@@ -4566,7 +4572,7 @@ $(window).on('load', async function() {
   }
   $(document).delegate("#swap_deploy", "click", deploy_proposal);
   
-  
+
   // execute swap
   async function execute_swap() {
     provider = wallet_provider();
