@@ -5803,6 +5803,7 @@ $(window).on('load', async function() {
     $("#scroll_wrapper").getNiceScroll(0).doScrollTop(0, 1000);
   });
   
+  
   // swap viewer
   async function swap_viewer() {
     let pathArray = window.location.pathname.split('/');
