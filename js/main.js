@@ -3458,8 +3458,8 @@ $(window).on('load', async function() {
         let taker = $("#create_b_owner").val();     
         let swapSol = $("#sol_request").val();
         swapLamports = swapSol * conf.billion;
-        swapLamports = parseInt(swapLamports);
-        
+        swapLamports = parseInt(swapLamports);       
+
         let multiplier = 1;
         if ($("#pikl_request").val() > 0) {
           swapTokenMint = new solanaWeb3.PublicKey($(".swap_c_pikl").attr("data-id"));
@@ -3485,8 +3485,11 @@ $(window).on('load', async function() {
         else {
           console.log("requesting no tokens");
           swapTokenMint = new solanaWeb3.PublicKey("11111111111111111111111111111111");
-        }        
+        }
         
+        swapTokens = swapTokens * multiplier;
+        swapTokens = parseInt(swapTokens);
+
 //         if ($("#usdc_request").val() > 0) {
 //           console.log("usdc request");
 //           swapTokenMint = new solanaWeb3.PublicKey(conf.usdc);
@@ -3518,8 +3521,8 @@ $(window).on('load', async function() {
         
 //         console.log("swapSol", swapSol);
 //         console.log("swapLamports", swapLamports);
-//         console.log("assetId", assetId);
-//         console.log("swapAssetId", swapAssetId);
+        console.log("assetId", assetId);
+        console.log("swapAssetId", swapAssetId);
 //         console.log("Bob", taker);
         
         let isSwap = true;
@@ -3556,7 +3559,7 @@ $(window).on('load', async function() {
         let axiosInstance = axios.create({baseURL: conf.cluster,});
         
         let getAsset = await axiosInstance.post(conf.cluster,{jsonrpc:"2.0",method:"getAsset",id:"rpd-op-123",params:{id:assetId},});
-//         console.log("getAsset ", getAsset);
+        console.log("getAsset ", getAsset);
 //         console.log("data_hash ", getAsset.data.result.compression.data_hash);
 //         console.log("creator_hash ", getAsset.data.result.compression.creator_hash);
 //         console.log("leaf_id ", getAsset.data.result.compression.leaf_id);        
@@ -3657,13 +3660,27 @@ $(window).on('load', async function() {
         let tokenATA = null;
         let createTokenATA = null;
         let createTokenATAIx = null;
-        
+
         if (swapTokens > 0) {
+
+          let CNFT_TOKEN_PROGRAM = splToken.TOKEN_PROGRAM_ID;
+          axiosInstance = axios.create({baseURL:conf.cluster});
+          let getStandard = await axiosInstance.post(conf.cluster,{jsonrpc:"2.0",method:"getAsset",id:"rpd-op-123",params:{id:swapTokenMint.toString()},}); 
+          if(typeof getStandard.data.result.mint_extensions != "undefined"){
+            CNFT_TOKEN_PROGRAM = splToken.TOKEN_2022_PROGRAM_ID;
+            console.log("Using Token 2022");
+            console.log(CNFT_TOKEN_PROGRAM.toString());
+          }
+          else{
+            console.log("Using SPL Token");
+            console.log(CNFT_TOKEN_PROGRAM.toString());
+          }
+
           tokenATA = await splToken.getAssociatedTokenAddress(
             swapTokenMint,
             provider.publicKey,
             false,
-            splToken.TOKEN_PROGRAM_ID,
+            CNFT_TOKEN_PROGRAM,
             splToken.ASSOCIATED_TOKEN_PROGRAM_ID,
           );
 //           console.log("Token ATA: ", tokenATA.toString());
@@ -3677,13 +3694,14 @@ $(window).on('load', async function() {
             tokenATA,
             provider.publicKey,
             swapTokenMint,
-            splToken.TOKEN_PROGRAM_ID,
+            CNFT_TOKEN_PROGRAM,
             splToken.ASSOCIATED_TOKEN_PROGRAM_ID,);
 //             console.log("Create Token ATA Ix: ", createTokenATAIx);    
           }
           else {createTokenATA = false;}
         }
-        
+
+
         let totalSize = 1 + 1 + 32 + 32 + 32 + 32 + 8 + 32 + 32 + 32 + 32 + 32 + 32 + 32 + 8 + 1 + 8 + 32 + 8;
 //         console.log("totalSize", totalSize);        
         
@@ -3803,6 +3821,11 @@ $(window).on('load', async function() {
             uarray[counter++] = arr[i];
         }
 
+        console.log("swapTokens data", swapTokens);
+
+
+        
+
         byteArray = [0, 0, 0, 0, 0, 0, 0, 0];
         for (index = 0; index < byteArray.length; index ++ ) {
             byte = swapTokens & 0xff;
@@ -3811,9 +3834,7 @@ $(window).on('load', async function() {
         }
         for (let i = 0; i < byteArray.length; i++) {
             uarray[counter++] = byteArray[i];
-        }
-
-//         console.log("Contract Data: ", uarray);        
+        }      
         
         /////////////////////////////////////////////////////////////////
         
@@ -4761,9 +4782,43 @@ $(window).on('load', async function() {
         if (getAsset.data.result.ownership.owner == swapVaultPDA || swapLeafOwner == swapVaultPDA) { 
 //           console.log("One or both cNFTs are already in the Swap Vault");
           return;
-        }            
-        let providerTokenATA = await splToken.getAssociatedTokenAddress(swapTokenMint,provider.publicKey,false,splToken.TOKEN_PROGRAM_ID,splToken.ASSOCIATED_TOKEN_PROGRAM_ID,);
-        let initializerTokenATA = await splToken.getAssociatedTokenAddress(swapTokenMint,swapInitializer,false,splToken.TOKEN_PROGRAM_ID,splToken.ASSOCIATED_TOKEN_PROGRAM_ID,);
+        }           
+        
+        //////////////////////////////////////////////////////////////////
+
+        console.log("token:", swapTokenMint.toString());
+
+        let TOKEN_PROGRAM = splToken.TOKEN_PROGRAM_ID;
+
+        getAsset = await axiosInstance.post(conf.cluster,{jsonrpc:"2.0",method:"getAsset",id:"rpd-op-123",params:{id:swapTokenMint.toString()},}); 
+        if(typeof getAsset.data.result.mint_extensions != "undefined"){
+          TOKEN_PROGRAM = splToken.TOKEN_2022_PROGRAM_ID;
+          console.log("Using Token 2022");
+          console.log(TOKEN_PROGRAM.toString());
+        }
+        else{
+          console.log("Using SPL Token");
+          console.log(TOKEN_PROGRAM.toString());
+        }
+
+        initializerTokenATA = await splToken.getAssociatedTokenAddress(
+        swapTokenMint,
+        swapInitializer,
+        false,
+        TOKEN_PROGRAM,
+        splToken.ASSOCIATED_TOKEN_PROGRAM_ID,);
+        console.log("Initializer Mint ATA: ", initializerTokenATA.toString());  
+
+        providerTokenATA = await splToken.getAssociatedTokenAddress(
+        swapTokenMint,
+        provider.publicKey,
+        false,
+        TOKEN_PROGRAM,
+        splToken.ASSOCIATED_TOKEN_PROGRAM_ID);
+        console.log("Provider Mint ATA: ", providerTokenATA.toString());  
+
+        //////////////////////////////////////////////////////////////////
+
         var totalSize = 1 + 32 + 32 + 1 + 1;
 
         var uarray = new Uint8Array(totalSize);
@@ -4797,18 +4852,23 @@ $(window).on('load', async function() {
           { pubkey: new solanaWeb3.PublicKey(getAssetProof.data.result.tree_id), isSigner: false, isWritable: true }, // 5
           { pubkey: swapTreeAuthorityPDA, isSigner: false, isWritable: false }, // 6
           { pubkey: new solanaWeb3.PublicKey(swapTreeId), isSigner: false, isWritable: true }, // 7 
-          { pubkey: new solanaWeb3.PublicKey(swapDelegate), isSigner: false, isWritable: true }, // 8  HERE
-          { pubkey: mplBubblegum.PROGRAM_ID, isSigner: false, isWritable: false }, // 9
-          { pubkey: splAccountCompression.PROGRAM_ID, isSigner: false, isWritable: false }, // 10
-          { pubkey: splAccountCompression.SPL_NOOP_PROGRAM_ID, isSigner: false, isWritable: false }, // 11
-          { pubkey: solanaWeb3.SystemProgram.programId, isSigner: false, isWritable: false }, // 12
-          { pubkey: splToken.TOKEN_PROGRAM_ID, isSigner: false, isWritable: false }, // 13
-          { pubkey: programStatePDA[0], isSigner: false, isWritable: false }, // 14  HERE Changed cNFTProgramStatePDA to programStatePDA :)
-          { pubkey: providerTokenATA, isSigner: false, isWritable: true }, // 15  HERE Changed tempTokenAccount to providerTokenATA
-          { pubkey: initializerTokenATA, isSigner: false, isWritable: true }, // 16
-          { pubkey: devTreasury, isSigner: false, isWritable: true }, // 17
-          { pubkey: mcDegensTreasury, isSigner: false, isWritable: true }, // 18
+          { pubkey: new solanaWeb3.PublicKey(swapDelegate), isSigner: false, isWritable: true }, // 8
+          { pubkey: new solanaWeb3.PublicKey(swapTokenMint), isSigner: false, isWritable: true }, // 9
+          { pubkey: new solanaWeb3.PublicKey(conf.BUBBLEGUM_PROGRAM_ID), isSigner: false, isWritable: false }, // 10
+          { pubkey: splAccountCompression.PROGRAM_ID, isSigner: false, isWritable: false }, // 11
+          { pubkey: splAccountCompression.SPL_NOOP_PROGRAM_ID, isSigner: false, isWritable: false }, // 12
+          { pubkey: solanaWeb3.SystemProgram.programId, isSigner: false, isWritable: false }, // 13
+          { pubkey: splToken.TOKEN_PROGRAM_ID, isSigner: false, isWritable: false }, // 14
+          { pubkey: splToken.TOKEN_2022_PROGRAM_ID, isSigner: false, isWritable: false }, // 15
+          { pubkey: programStatePDA[0], isSigner: false, isWritable: false }, // 16
+          { pubkey: providerTokenATA, isSigner: false, isWritable: true }, // 17
+          { pubkey: initializerTokenATA, isSigner: false, isWritable: true }, // 18
+          { pubkey: devTreasury, isSigner: false, isWritable: true }, // 19
+          { pubkey: mcDegensTreasury, isSigner: false, isWritable: true }, // 20
         ];
+
+        console.log("keys:", keys);
+
         for (let i = 0; i < proof.length; i++) {
             keys.push(proof[i]);
         }    
@@ -4906,7 +4966,7 @@ $(window).on('load', async function() {
         }
         
         if (!lookupTableAccount) {
-//           console.log("Could not fetch ALT!");
+          console.log("Could not fetch ALT!");
           return;
         }
         
@@ -6810,6 +6870,7 @@ $(window).on('load', async function() {
       }
       uarray[counter++] = proof.length;
       // console.log("Contract Data: ", uarray);
+
       let keys = [{
           pubkey: provider.publicKey,
           isSigner: true,
@@ -6836,7 +6897,7 @@ $(window).on('load', async function() {
           isWritable: true
         }, // 4
         {
-          pubkey: mplBubblegum.PROGRAM_ID,
+          pubkey: new solanaWeb3.PublicKey(conf.BUBBLEGUM_PROGRAM_ID),
           isSigner: false,
           isWritable: false
         }, // 5
@@ -10146,7 +10207,7 @@ $(window).on('load', async function() {
             
             if(list_[i].swap_sol_amount > 0){
               let amt = await decimal_joe(list_[i].swap_sol_amount, 9);
-              list_[i].swap_tokens_amount = amt;
+              list_[i].swap_sol_amount = amt;
             }
             
             let item_date = new Date((list_[i].utime * 1000));
@@ -10204,6 +10265,7 @@ $(window).on('load', async function() {
             if(!$("[data-cnft_sent='"+list_[i].acct+"']").length){
               $("#cnft_sent").prepend('<ul class="cnft_sent smart_ul" data-cnft_sent="' + list_[i].acct + '">' + smart_item + '</ul>');
             }
+
           }
         }
       }
@@ -10341,7 +10403,7 @@ $(window).on('load', async function() {
             
             if(list_[i].swap_sol_amount > 0){
               let amt = await decimal_joe(list_[i].swap_sol_amount, 9);
-              list_[i].swap_tokens_amount = amt;
+              list_[i].swap_sol_amount = amt;
             }
             
             let item_date = new Date((list_[i].utime * 1000));
@@ -10536,7 +10598,7 @@ $(window).on('load', async function() {
             
             if(list_[i].swap_sol_amount > 0){
               let amt = await decimal_joe(list_[i].swap_sol_amount, 9);
-              list_[i].swap_tokens_amount = amt;
+              list_[i].swap_sol_amount = amt;
             }
             
             let item_date = new Date((list_[i].utime * 1000));
@@ -10732,7 +10794,7 @@ $(window).on('load', async function() {
             
             if(list_[i].swap_sol_amount > 0){
               let amt = await decimal_joe(list_[i].swap_sol_amount, 9);
-              list_[i].swap_tokens_amount = amt;
+              list_[i].swap_sol_amount = amt;
             }
             
             let item_date = new Date((list_[i].utime * 1000));

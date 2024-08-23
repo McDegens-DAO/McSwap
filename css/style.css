@@ -4102,6 +4102,7 @@ ul.smart_ul li.smart_row_box{
 .smart_default_nft{
   display: inline-block;
   width: calc(33.3% - 10px);
+  height: 42.72px;
   margin: 0 5px 0 5px;
   border-radius: 6px;
 }
