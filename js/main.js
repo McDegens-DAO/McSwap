@@ -251,6 +251,7 @@ $(window).on('load', async function() {
     }
   ];
   
+  // displays the current pikl gas in the ui
   let connection = new solanaWeb3.Connection(conf.cluster, "confirmed");
   let SPL_FEE_PROGRAM = new solanaWeb3.PublicKey(conf.MCSWAP_SPL_PROGRAM);
   let SPL_FEE_PROGRAM_PDA = solanaWeb3.PublicKey.findProgramAddressSync([Buffer.from("program-state")],SPL_FEE_PROGRAM);
@@ -259,7 +260,11 @@ $(window).on('load', async function() {
   let encodedProgramStateData = SPL_FEE_PROGRAM_STATE.data;
   let decodedProgramStateData = PROGRAM_STATE_SPL.decode(encodedProgramStateData);
   conf.chips_fee = parseInt(new BN(decodedProgramStateData.fee_chips, 10, "le").toString());
-  
+  const gas_chips = conf.chips_fee/1000000000;
+  const gas_fee = Number.parseFloat(gas_chips).toFixed(9);
+  $(".spl_pikl_total span.swap_amt, .spl_pikl_total_x span.swap_amt").html(gas_fee);
+  // displays the current pikl gas in the ui
+
   // notifications
   function notify(title, body, icon) {
     if (!("Notification" in window)) {
@@ -2033,7 +2038,6 @@ $(window).on('load', async function() {
     provider = wallet_provider();
     if (provider.publicKey.toString() == $("#create_b_owner").val()) {
       alert("Same Owner!");
-      $("#create_b_owner").prop("disabled",false);
       return;
     }
     $("#mc_swap_create .mc_title").html("Fetching Asset...");
@@ -2455,6 +2459,7 @@ $(window).on('load', async function() {
       $("#mc_swap_create .mc_title").html("New Contract");
       alert("Same Owner!");
       $("#create_b_id").prop("disabled", false).val("");
+      $("#create_b_owner").prop("disabled",false);
       validate_details();
       return;
     }
@@ -2806,6 +2811,10 @@ $(window).on('load', async function() {
   $(document).delegate("#fetch_c", "click", async function() {
     let bobs_wallet = $("#create_b_owner").val();
     if(bobs_wallet.length < 32){return;}
+    if($("#create_a_owner").val() == $("#create_b_owner").val()){
+      alert("Same Owner!");
+      return;
+    }
     $("#cover").fadeIn(400);
     $("#cover_message").html("Fetching Available Assets...");
     $("#init_loader").fadeIn(400);
