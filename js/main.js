@@ -600,7 +600,12 @@ $(window).on('load', async function() {
         $("#wallet_disconnect").show().css({
           "display": "block"
         });
-        $("#wallet_cnfts").prop("disabled", false).click();
+        if(conf.default == "nft"){
+          $("#wallet_nfts").prop("disabled", false).click();
+        }
+        else{
+          $("#wallet_cnfts").prop("disabled", false).click();
+        }
         $("#nav_compose, #nav_view, .mode_switch").prop("disabled", false);
         $(".sent_received").hide();
         $(".smart_tool_title").removeClass("smart_active");
@@ -1368,7 +1373,7 @@ $(window).on('load', async function() {
             ass.collection.name = "Unknown";
           }      
           item += '<li class="ass_collection">' + ass.collection.name + '</li>';
-          item += '<li class="ass_options"><button disabled class="ass_meta">Details</button><button disabled class="ass_donate">Transfer</button><button disabled data-wallet="' + provider.publicKey.toString() + '" data-mint="' + ass.mint + '" class="ass_sell">Market</button><button disabled data-wallet="' + provider.publicKey.toString() + '" data-pnft="' + ass.pnft + '" data-core="' + ass.core + '" data-t22="' + ass.t22 + '" data-mint="' + ass.mint + '" class="ass_swap">OTC</button></li>';
+          item += '<li class="ass_options"><button disabled class="ass_meta">Details</button><button disabled class="ass_donate">Collection</button><button disabled data-wallet="' + provider.publicKey.toString() + '" data-mint="' + ass.mint + '" class="ass_sell">Market</button><button disabled data-wallet="' + provider.publicKey.toString() + '" data-pnft="' + ass.pnft + '" data-core="' + ass.core + '" data-t22="' + ass.t22 + '" data-mint="' + ass.mint + '" class="ass_swap">OTC</button></li>';
           item += '<li><img src="' + ass.image + '" class="ass_img" /></li>';
           item += '<li class="clear"></li>';
           item += '</ul>';
@@ -1408,30 +1413,37 @@ $(window).on('load', async function() {
     window.open(conf.nft_explorer + mint);
   });
   $(document).delegate("#view_nfts button.ass_donate", "click", async function() {
-    let locked = $(this).parent().parent().find("img.islocked").length;
-    if(locked == 1){
-      $("#cover").fadeIn(400);
-      $("#cover_message").html("Non-Transferable Asset!");
-      setTimeout(function(){
-        $("#cover").fadeOut(400);
-        $("#cover_message").html("");
-      },3000);
-      return;
+    const view_collection = $("#nft_collection").val();
+    if(view_collection == "unknown"){
+      alert("This asset is not in a collection!");
     }
-    $(".ass_donate").prop("disabled", true);
-    let mint = $(this).parent().parent().attr("data-id");
-    let standard = $(this).parent().parent().find(".ass_standard").html();
-    $("#cover").fadeIn(400);
-    $("#nft_donation_box").show().addClass("animate__animated animate__zoomInDown");
-    let main = $("ul[data-id='" + mint + "']");
-    let src = main.find(".ass_img").attr("src");
-    let name = main.find(".ass_name").html();
-    let collection = main.find(".ass_collection").html();
-    $("#nft_donation_image").attr("src", src);
-    $("#nft_donation_name").html(name);
-    $("#nft_donation_collection").html(collection);
-    $("#nft_donation_standard").html(standard);
-    $("#nft_donation_mint").val(mint);
+    else{
+      window.open(conf.nft_explorer + view_collection);
+    }
+    // let locked = $(this).parent().parent().find("img.islocked").length;
+    // if(locked == 1){
+    //   $("#cover").fadeIn(400);
+    //   $("#cover_message").html("Non-Transferable Asset!");
+    //   setTimeout(function(){
+    //     $("#cover").fadeOut(400);
+    //     $("#cover_message").html("");
+    //   },3000);
+    //   return;
+    // }
+    // $(".ass_donate").prop("disabled", true);
+    // let mint = $(this).parent().parent().attr("data-id");
+    // let standard = $(this).parent().parent().find(".ass_standard").html();
+    // $("#cover").fadeIn(400);
+    // $("#nft_donation_box").show().addClass("animate__animated animate__zoomInDown");
+    // let main = $("ul[data-id='" + mint + "']");
+    // let src = main.find(".ass_img").attr("src");
+    // let name = main.find(".ass_name").html();
+    // let collection = main.find(".ass_collection").html();
+    // $("#nft_donation_image").attr("src", src);
+    // $("#nft_donation_name").html(name);
+    // $("#nft_donation_collection").html(collection);
+    // $("#nft_donation_standard").html(standard);
+    // $("#nft_donation_mint").val(mint);
   });
   $(document).delegate("#nft_donation_close", "click", async function() {
     $("#nft_donation_box").removeClass().addClass("animate__animated animate__zoomOut");
@@ -1582,6 +1594,16 @@ $(window).on('load', async function() {
       let blockhash = (await connection.getLatestBlockhash()).toString();
       console.log("blockhash", blockhash);
       // return txBuilder.toTransaction(blockhash);
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1993,7 +2015,7 @@ $(window).on('load', async function() {
       item += '<li class="ass_standard">CNFT</li>';
       item += '<li class="ass_name">' + ass.name + '</li>';
       item += '<li class="ass_collection">' + ass.collection.name + '</li>';
-      item += '<li class="ass_options"><button disabled class="ass_meta">Details</button><button disabled class="ass_donate">Transfer</button><button disabled data-wallet="' + provider.publicKey.toString() + '" data-mint="' + ass.mint + '" class="ass_sell">Market</button><button disabled class="ass_swap">OTC</button></li>';
+      item += '<li class="ass_options"><button disabled class="ass_meta">Details</button><button disabled class="ass_donate">Collection</button><button disabled data-wallet="' + provider.publicKey.toString() + '" data-mint="' + ass.mint + '" class="ass_sell">Market</button><button disabled class="ass_swap">OTC</button></li>';
       item += '<li><img src="' + ass.image + '" class="ass_img" /></li>';
       item += '<li class="clear"></li>';
       let tags = "";
@@ -2103,21 +2125,28 @@ $(window).on('load', async function() {
     window.open(conf.sell_cnft + "/" + $(this).data("mint"));
   });
   $(document).delegate("#view_cnfts button.ass_donate", "click", async function() {
-    $(".ass_donate").prop("disabled", true);
-    $("#nft_send_donation").attr("id", "cnft_send_donation");
-    let mint = $(this).parent().parent().attr("data-id");
-    let standard = $(this).parent().parent().find(".ass_standard").html();
-    $("#cover").fadeIn(400);
-    $("#nft_donation_box").show().addClass("animate__animated animate__zoomInDown");
-    let main = $("ul[data-id='" + mint + "']");
-    let src = main.find(".ass_img").attr("src");
-    let name = main.find(".ass_name").html();
-    let collection = main.find(".ass_collection").html();
-    $("#nft_donation_image").attr("src", src);
-    $("#nft_donation_name").html(name);
-    $("#nft_donation_collection").html(collection);
-    $("#nft_donation_standard").html(standard);
-    $("#nft_donation_mint").val(mint);
+    const view_collection = $("#cnft_collection").val();
+    if(view_collection == "unknown"){
+      alert("This asset is not in a collection!");
+    }
+    else{
+      window.open(conf.cnft_explorer + view_collection);
+    }
+    // $(".ass_donate").prop("disabled", true);
+    // $("#nft_send_donation").attr("id", "cnft_send_donation");
+    // let mint = $(this).parent().parent().attr("data-id");
+    // let standard = $(this).parent().parent().find(".ass_standard").html();
+    // $("#cover").fadeIn(400);
+    // $("#nft_donation_box").show().addClass("animate__animated animate__zoomInDown");
+    // let main = $("ul[data-id='" + mint + "']");
+    // let src = main.find(".ass_img").attr("src");
+    // let name = main.find(".ass_name").html();
+    // let collection = main.find(".ass_collection").html();
+    // $("#nft_donation_image").attr("src", src);
+    // $("#nft_donation_name").html(name);
+    // $("#nft_donation_collection").html(collection);
+    // $("#nft_donation_standard").html(standard);
+    // $("#nft_donation_mint").val(mint);
   });
   $(document).delegate("#cnft_send_donation", "click", async function() {
     provider = wallet_provider();
@@ -4154,25 +4183,43 @@ $(window).on('load', async function() {
           }
         }        
         console.log("createSwapMintATA: ", createSwapMintATA); 
+      
+        console.log("swapTokenMint: ", swapTokenMint.toString()); 
         
+        let PNFT_TOKEN_PROGRAM = splToken.TOKEN_PROGRAM_ID;
+
         let createSwapTokenATA = false;
         let createSwapTokenATAIx = null;
         let swapTokenATA = null;
         let swapTokenInfo = null;
         if(swapTokenMint != "11111111111111111111111111111111"){
+
+          axiosInstance = axios.create({baseURL:conf.cluster});
+          let getStandard = await axiosInstance.post(conf.cluster,{jsonrpc:"2.0",method:"getAsset",id:"rpd-op-123",params:{id:swapTokenMint.toString()},}); 
+          console.log("getStandard", getStandard);
+          if(typeof getStandard.data.result.mint_extensions != "undefined"){
+            PNFT_TOKEN_PROGRAM = splToken.TOKEN_2022_PROGRAM_ID;
+            console.log("Using Token 2022");
+            console.log(PNFT_TOKEN_PROGRAM.toString());
+          }
+
           swapTokenATA = await splToken.getAssociatedTokenAddress(swapTokenMint,provider.publicKey,false,
-          splToken.TOKEN_PROGRAM_ID,splToken.ASSOCIATED_TOKEN_PROGRAM_ID,);
+          PNFT_TOKEN_PROGRAM,
+          splToken.ASSOCIATED_TOKEN_PROGRAM_ID,);
           console.log("Swap Token ATA: ", swapTokenATA.toString());         
           swapTokenInfo = await connection.getAccountInfo(swapTokenATA).catch(function(){});        
           if (swapTokenInfo == null) {
             createSwapTokenATA = true;
             createSwapTokenATAIx = splToken.createAssociatedTokenAccountInstruction(provider.publicKey,swapTokenATA,
-            provider.publicKey,swapTokenMint,splToken.TOKEN_PROGRAM_ID,splToken.ASSOCIATED_TOKEN_PROGRAM_ID,);
+            provider.publicKey,swapTokenMint,
+            PNFT_TOKEN_PROGRAM,
+            splToken.ASSOCIATED_TOKEN_PROGRAM_ID,);
             console.log("createSwapTokenATAIx: ", createSwapTokenATAIx);
           }
           else {
             createSwapTokenATA = false;
           }
+
         }
         console.log("createSwapTokenATA: ", createSwapTokenATA); 
         
@@ -4427,29 +4474,43 @@ $(window).on('load', async function() {
           assetCollection = getAsset.data.result.grouping[0].group_value;
         }
 
-        let createSwapTokenATA = null; 
+        let createSwapTokenATA = false; 
         let createSwapTokenATAIx = null;
+        let CORE_TOKEN_PROGRAM = splToken.TOKEN_PROGRAM_ID;
 
         if(swapTokens > 0){
-          let swapTokenATA = await splToken.getAssociatedTokenAddress(swapTokenMint,provider.publicKey,false,splToken.TOKEN_PROGRAM_ID,splToken.ASSOCIATED_TOKEN_PROGRAM_ID,);
+
+          axiosInstance = axios.create({baseURL:conf.cluster});
+          getAsset = await axiosInstance.post(conf.cluster,{jsonrpc:"2.0",method:"getAsset",id:"rpd-op-123",params:{id:swapTokenMint.toString()},}); 
+          if(typeof getAsset.data.result.mint_extensions != "undefined"){
+            CORE_TOKEN_PROGRAM = splToken.TOKEN_2022_PROGRAM_ID;
+            console.log("Using Token 2022");
+            console.log(CORE_TOKEN_PROGRAM.toString());
+          }
+          else{
+            console.log("Using SPL Token");
+            console.log(CORE_TOKEN_PROGRAM.toString());
+          }
+
+          let swapTokenATA = await splToken.getAssociatedTokenAddress(swapTokenMint,provider.publicKey,false,
+          CORE_TOKEN_PROGRAM,
+          splToken.ASSOCIATED_TOKEN_PROGRAM_ID,);
           console.log("Swap Token ATA: ", swapTokenATA.toString());    
           let tokenAccount = null;
           tokenAccount = await connection.getAccountInfo(swapTokenATA).catch(function(){});
           if (tokenAccount == null) {
             createSwapTokenATA = true;
             createSwapTokenATAIx = splToken.createAssociatedTokenAccountInstruction(
-                provider.publicKey,
-                swapTokenATA,
-                provider.publicKey,
-                swapTokenMint,
-                splToken.TOKEN_PROGRAM_ID,
-                splToken.ASSOCIATED_TOKEN_PROGRAM_ID,
+              provider.publicKey,
+              swapTokenATA,
+              provider.publicKey,
+              swapTokenMint,
+              CORE_TOKEN_PROGRAM,
+              splToken.ASSOCIATED_TOKEN_PROGRAM_ID,
             )
             console.log("Create Swap Token ATA Ix: ", createSwapTokenATAIx); 
-          } 
-          else {
-            createSwapMintATA = false;
           }
+
         }
 
         var totalSize = 1 + 1 + 32 + 32 + 8 + 32 + 8;
@@ -5505,12 +5566,31 @@ $(window).on('load', async function() {
         takerTokenMint.toBytes(),Buffer.from("token_record"),takerTokenDestinationATA.toBytes()],mplProgramid,);
         console.log("Taker Token Record Destination PDA ", tokenRecordDesinationPDA[0].toString());        
         
+        let PNFT_TOKEN_PROGRAM = splToken.TOKEN_PROGRAM_ID;
+        if (swapTokenMint != "11111111111111111111111111111111") {  
+          axiosInstance = axios.create({baseURL:conf.cluster});
+          getAsset = await axiosInstance.post(conf.cluster,{jsonrpc:"2.0",method:"getAsset",id:"rpd-op-123",params:{id:swapTokenMint.toString()},}); 
+          if(typeof getAsset.data.result.mint_extensions != "undefined"){
+            PNFT_TOKEN_PROGRAM = splToken.TOKEN_2022_PROGRAM_ID;
+            console.log("Using Token 2022");
+            console.log(PNFT_TOKEN_PROGRAM.toString());
+          }
+          else{
+            console.log("Using SPL Token");
+            console.log(PNFT_TOKEN_PROGRAM.toString());
+          }
+        }
+        
         let swapTokenATA = await splToken.getAssociatedTokenAddress(swapTokenMint,
-        provider.publicKey,false,splToken.TOKEN_PROGRAM_ID,splToken.ASSOCIATED_TOKEN_PROGRAM_ID,);
+        provider.publicKey,false,
+        PNFT_TOKEN_PROGRAM,
+        splToken.ASSOCIATED_TOKEN_PROGRAM_ID,);
         console.log("Swap Token ATA: ", swapTokenATA.toString());        
         
         let initializerSwapTokenATA = await splToken.getAssociatedTokenAddress(swapTokenMint,
-        initializer,false,splToken.TOKEN_PROGRAM_ID,splToken.ASSOCIATED_TOKEN_PROGRAM_ID,);
+        initializer,false,
+        PNFT_TOKEN_PROGRAM,
+        splToken.ASSOCIATED_TOKEN_PROGRAM_ID,);
         console.log("Initializer Swap Token ATA: ", initializerSwapTokenATA.toString());
         
         let totalSize = 1;
@@ -5544,20 +5624,25 @@ $(window).on('load', async function() {
               { pubkey: takerTokenRecordPDA[0], isSigner: false, isWritable: true }, // 17
               { pubkey: takerTokenRecordDesinationPDA[0], isSigner: false, isWritable: true }, // 18
               { pubkey: swapTokenATA, isSigner: false, isWritable: true }, // 19
-              { pubkey: initializerSwapTokenATA, isSigner: false, isWritable: true }, // 20            
+              { pubkey: swapTokenMint, isSigner: false, isWritable: true }, // 20
+              { pubkey: initializerSwapTokenATA, isSigner: false, isWritable: true }, // 21            
               { pubkey: solanaWeb3.SystemProgram.programId, isSigner: false, isWritable: false }, // 21
-              { pubkey: solanaWeb3.SYSVAR_INSTRUCTIONS_PUBKEY, isSigner: false, isWritable: false }, // 22
-              { pubkey: splToken.TOKEN_PROGRAM_ID, isSigner: false, isWritable: false }, // 23
-              { pubkey: splATAProgramId, isSigner: false, isWritable: false }, // 25
-              { pubkey: mplProgramid, isSigner: false, isWritable: false }, // 25
-              { pubkey: mplAuthRulesProgramId, isSigner: false, isWritable: false }, // 26
-              { pubkey: mplAuthRulesAccount, isSigner: false, isWritable: false }, // 27
-              { pubkey: devTreasury, isSigner: false, isWritable: true }, // 28
-              { pubkey: mcDegensTreasury, isSigner: false, isWritable: true }, // 29
+              { pubkey: solanaWeb3.SYSVAR_INSTRUCTIONS_PUBKEY, isSigner: false, isWritable: false }, // 23
+              { pubkey: splToken.TOKEN_PROGRAM_ID, isSigner: false, isWritable: false }, // 24
+              { pubkey: splToken.TOKEN_2022_PROGRAM_ID, isSigner: false, isWritable: false }, // 25
+              { pubkey: splATAProgramId, isSigner: false, isWritable: false }, // 26
+              { pubkey: mplProgramid, isSigner: false, isWritable: false }, // 27
+              { pubkey: mplAuthRulesProgramId, isSigner: false, isWritable: false }, // 28
+              { pubkey: mplAuthRulesAccount, isSigner: false, isWritable: false }, // 29
+              { pubkey: devTreasury, isSigner: false, isWritable: true }, // 30
+              { pubkey: mcDegensTreasury, isSigner: false, isWritable: true }, // 31
             ]
         });
         console.log("Swap pNFTs Ix: ", swapPNFTsIx);
         
+        let lookupTable = new solanaWeb3.PublicKey("F33TuQuCtiSpTjsCv4h51E2q48Wt5tyr469Lxb4Mgazu"); // mainnet    
+        let lookupTableAccount = await connection.getAddressLookupTable(lookupTable).then((res) => res.value);
+
         let instructions = null;
         if (createTokenDestinationATA == true) {
           instructions = [createTokenDestinationATAIx,swapPNFTsIx];
@@ -5568,13 +5653,13 @@ $(window).on('load', async function() {
         
         // ***
         let priority = $("#priority_nft_exec").val(); 
-        instructions.unshift(solanaWeb3.ComputeBudgetProgram.setComputeUnitLimit({units:await getComputeLimit(instructions)}));
-        instructions.unshift(solanaWeb3.ComputeBudgetProgram.setComputeUnitPrice({microLamports:await getPriorityFeeEstimate(conf.cluster,priority,instructions)}));
+        instructions.unshift(solanaWeb3.ComputeBudgetProgram.setComputeUnitLimit({units:await getComputeLimit(instructions,lookupTableAccount)}));
+        instructions.unshift(solanaWeb3.ComputeBudgetProgram.setComputeUnitPrice({microLamports:await getPriorityFeeEstimate(conf.cluster,priority,instructions,lookupTableAccount)}));
         let messageV0 = new solanaWeb3.TransactionMessage({
           payerKey: provider.publicKey,
           recentBlockhash: (await connection.getLatestBlockhash('confirmed')).blockhash,
           instructions: instructions,
-        }).compileToV0Message([]);
+        }).compileToV0Message([lookupTableAccount]);
         let swapPNFTsTx = new solanaWeb3.VersionedTransaction(messageV0);
         // ***        
         
@@ -5636,7 +5721,6 @@ $(window).on('load', async function() {
 
       if ($("#c_type").val() == "CORE") {
 
-       
         // core
         let coreNftSwapProgramId = new solanaWeb3.PublicKey(conf.MCSWAP_CORE_PROGRAM);
         let mplCoreProgramId = new solanaWeb3.PublicKey(conf.CORE_PROGRAM_ID);  
@@ -5705,8 +5789,25 @@ $(window).on('load', async function() {
         if(typeof getAsset.data.result.grouping != "undefined" && typeof getAsset.data.result.grouping[0] != "undefined" && typeof getAsset.data.result.grouping[0].group_value != "undefined"){
           swapAssetCollection = getAsset.data.result.grouping[0].group_value;
         }
-        let providerTokenATA = await splToken.getAssociatedTokenAddress(swapTokenMint,provider.publicKey,false,splToken.TOKEN_PROGRAM_ID,splToken.ASSOCIATED_TOKEN_PROGRAM_ID,);
-        let initializerTokenATA = await splToken.getAssociatedTokenAddress(swapTokenMint,initializer,false,splToken.TOKEN_PROGRAM_ID,splToken.ASSOCIATED_TOKEN_PROGRAM_ID,);
+
+        let CORE_TOKEN_PROGRAM = splToken.TOKEN_PROGRAM_ID;
+        if (swapTokenMint != "11111111111111111111111111111111") {  
+          axiosInstance = axios.create({baseURL:conf.cluster});
+          getAsset = await axiosInstance.post(conf.cluster,{jsonrpc:"2.0",method:"getAsset",id:"rpd-op-123",params:{id:swapTokenMint.toString()},}); 
+          if(typeof getAsset.data.result.mint_extensions != "undefined"){
+            CORE_TOKEN_PROGRAM = splToken.TOKEN_2022_PROGRAM_ID;
+            console.log("Using Token 2022");
+            console.log(CORE_TOKEN_PROGRAM.toString());
+          }
+          else{
+            console.log("Using SPL Token");
+            console.log(CORE_TOKEN_PROGRAM.toString());
+          }
+        }
+
+        let providerTokenATA = await splToken.getAssociatedTokenAddress(swapTokenMint,provider.publicKey,false,CORE_TOKEN_PROGRAM,splToken.ASSOCIATED_TOKEN_PROGRAM_ID,);
+        let initializerTokenATA = await splToken.getAssociatedTokenAddress(swapTokenMint,initializer,false,CORE_TOKEN_PROGRAM,splToken.ASSOCIATED_TOKEN_PROGRAM_ID,);
+        
         let totalSize = 1;
         let uarray = new Uint8Array(totalSize);    
         let counter = 0;    
@@ -5722,12 +5823,14 @@ $(window).on('load', async function() {
           { pubkey: new solanaWeb3.PublicKey(swapAsset), isSigner: false, isWritable: true }, // 7
           { pubkey: new solanaWeb3.PublicKey(swapAssetCollection), isSigner: false, isWritable: true }, // 8
           { pubkey: providerTokenATA, isSigner: false, isWritable: true }, // 9
-          { pubkey: initializerTokenATA, isSigner: false, isWritable: true }, // 10
-          { pubkey: solanaWeb3.SystemProgram.programId, isSigner: false, isWritable: false }, // 11
-          { pubkey: mplCoreProgramId, isSigner: false, isWritable: false }, // 12
-          { pubkey: splToken.TOKEN_PROGRAM_ID, isSigner: false, isWritable: false }, // 13
-          { pubkey: devTreasury, isSigner: false, isWritable: true }, // 14
-          { pubkey: mcDegensTreasury, isSigner: false, isWritable: true }, // 15
+          { pubkey: new solanaWeb3.PublicKey(swapTokenMint), isSigner: false, isWritable: true }, // 10  HERE
+          { pubkey: initializerTokenATA, isSigner: false, isWritable: true }, // 11
+          { pubkey: solanaWeb3.SystemProgram.programId, isSigner: false, isWritable: false }, // 12
+          { pubkey: mplCoreProgramId, isSigner: false, isWritable: false }, // 13
+          { pubkey: splToken.TOKEN_PROGRAM_ID, isSigner: false, isWritable: false }, // 14
+          { pubkey: splToken.TOKEN_2022_PROGRAM_ID, isSigner: false, isWritable: false }, // 15  HERE
+          { pubkey: devTreasury, isSigner: false, isWritable: true }, // 16
+          { pubkey: mcDegensTreasury, isSigner: false, isWritable: true }, // 17
         ];
         let swapNFTsIx = new solanaWeb3.TransactionInstruction({programId:coreNftSwapProgramId,data:Buffer.from(uarray),keys:keys});
         let instructions = [swapNFTsIx];
@@ -10170,11 +10273,13 @@ $(window).on('load', async function() {
       if(type=="cnft_sent"){
         let list_ = data;
         list_.sort((a, b) => a.utime - b.utime);
-        let token_img_1 = '<img src="/img/default_token.png" class="spl_default smart_default_nft" />';
-        let token_img_2 = '<img src="/img/default_token.png" class="spl_default smart_default_nft" />';
-        let nft_img_1 = '<img src="/img/img-placeholder.png" class="smart_default_1" />';
-        let nft_img_2 = '<img src="/img/img-placeholder.png" class="smart_default_nft" />';
         for (let i = 0; i < list_.length; i++) {
+
+          let token_img_1 = '<img src="/img/default_token.png" class="spl_default smart_default_nft" />';
+          let token_img_2 = '<img src="/img/default_token.png" class="spl_default smart_default_nft" />';
+          let nft_img_1 = '<img src="/img/img-placeholder.png" class="smart_default_1" />';
+          let nft_img_2 = '<img src="/img/img-placeholder.png" class="smart_default_nft" />';
+
           if (!$("ul[data-cnft_sent='" + list_[i].acct + "']").length) {
             
             list_[i].swap_tokens_name = false;
@@ -10274,11 +10379,13 @@ $(window).on('load', async function() {
         let list_ = data;
         list_.sort((a, b) => a.utime - b.utime);
         list_spl = list_.reverse();
-        let token_img_1 = '<img src="/img/default_token.png" class="spl_default smart_default_nft" />';
-        let token_img_2 = '<img src="/img/default_token.png" class="spl_default smart_default_nft" />';
-        let nft_img_1 = '<img src="/img/img-placeholder.png" class="smart_default_1" />';
-        let nft_img_2 = '<img src="/img/img-placeholder.png" class="smart_default_nft" />';
         for (let i = 0; i < list_.length; i++) {
+
+          let token_img_1 = '<img src="/img/default_token.png" class="spl_default smart_default_nft" />';
+          let token_img_2 = '<img src="/img/default_token.png" class="spl_default smart_default_nft" />';
+          let nft_img_1 = '<img src="/img/img-placeholder.png" class="smart_default_1" />';
+          let nft_img_2 = '<img src="/img/img-placeholder.png" class="smart_default_nft" />';
+
           if (!$("ul[data-cnft_received='" + list_[i].acct + "']").length) {
             
             list_[i].swap_tokens_name = false;
@@ -10366,11 +10473,13 @@ $(window).on('load', async function() {
       if(type=="nft_sent"){
         let list_ = data;
         list_.sort((a, b) => a.utime - b.utime);
-        let token_img_1 = '<img src="/img/default_token.png" class="spl_default smart_default_nft" />';
-        let token_img_2 = '<img src="/img/default_token.png" class="spl_default smart_default_nft" />';
-        let nft_img_1 = '<img src="/img/img-placeholder.png" class="smart_default_1" />';
-        let nft_img_2 = '<img src="/img/img-placeholder.png" class="smart_default_nft" />';
         for (let i = 0; i < list_.length; i++) {
+
+          let token_img_1 = '<img src="/img/default_token.png" class="spl_default smart_default_nft" />';
+          let token_img_2 = '<img src="/img/default_token.png" class="spl_default smart_default_nft" />';
+          let nft_img_1 = '<img src="/img/img-placeholder.png" class="smart_default_1" />';
+          let nft_img_2 = '<img src="/img/img-placeholder.png" class="smart_default_nft" />';
+
           if (!$("ul[data-nft_sent='" + list_[i].acct + "']").length) {
             
             list_[i].swap_tokens_name = false;
@@ -10470,11 +10579,11 @@ $(window).on('load', async function() {
         let list_ = data;
         list_.sort((a, b) => a.utime - b.utime);
         list_spl = list_.reverse();
-        let token_img_1 = '<img src="/img/default_token.png" class="spl_default smart_default_nft" />';
-        let token_img_2 = '<img src="/img/default_token.png" class="spl_default smart_default_nft" />';
-        let nft_img_1 = '<img src="/img/img-placeholder.png" class="smart_default_1" />';
-        let nft_img_2 = '<img src="/img/img-placeholder.png" class="smart_default_nft" />';
         for (let i = 0; i < list_.length; i++) {
+          let token_img_1 = '<img src="/img/default_token.png" class="spl_default smart_default_nft" />';
+          let token_img_2 = '<img src="/img/default_token.png" class="spl_default smart_default_nft" />';
+          let nft_img_1 = '<img src="/img/img-placeholder.png" class="smart_default_1" />';
+          let nft_img_2 = '<img src="/img/img-placeholder.png" class="smart_default_nft" />';
           if (!$("ul[data-nft_received='" + list_[i].acct + "']").length) {
             
             list_[i].swap_tokens_name = false;
@@ -10561,11 +10670,13 @@ $(window).on('load', async function() {
       if(type=="pnft_sent"){
         let list_ = data;
         list_.sort((a, b) => a.utime - b.utime);
-        let token_img_1 = '<img src="/img/default_token.png" class="spl_default smart_default_nft" />';
-        let token_img_2 = '<img src="/img/default_token.png" class="spl_default smart_default_nft" />';
-        let nft_img_1 = '<img src="/img/img-placeholder.png" class="smart_default_1" />';
-        let nft_img_2 = '<img src="/img/img-placeholder.png" class="smart_default_nft" />';
         for (let i = 0; i < list_.length; i++) {
+
+          let token_img_1 = '<img src="/img/default_token.png" class="spl_default smart_default_nft" />';
+          let token_img_2 = '<img src="/img/default_token.png" class="spl_default smart_default_nft" />';
+          let nft_img_1 = '<img src="/img/img-placeholder.png" class="smart_default_1" />';
+          let nft_img_2 = '<img src="/img/img-placeholder.png" class="smart_default_nft" />';
+
           if (!$("ul[data-pnft_sent='" + list_[i].acct + "']").length) {
             
             list_[i].swap_tokens_name = false;
@@ -10665,11 +10776,11 @@ $(window).on('load', async function() {
         let list_ = data;
         list_.sort((a, b) => a.utime - b.utime);
         list_spl = list_.reverse();
-        let token_img_1 = '<img src="/img/default_token.png" class="spl_default smart_default_nft" />';
-        let token_img_2 = '<img src="/img/default_token.png" class="spl_default smart_default_nft" />';
-        let nft_img_1 = '<img src="/img/img-placeholder.png" class="smart_default_1" />';
-        let nft_img_2 = '<img src="/img/img-placeholder.png" class="smart_default_nft" />';
         for (let i = 0; i < list_.length; i++) {
+          let token_img_1 = '<img src="/img/default_token.png" class="spl_default smart_default_nft" />';
+          let token_img_2 = '<img src="/img/default_token.png" class="spl_default smart_default_nft" />';
+          let nft_img_1 = '<img src="/img/img-placeholder.png" class="smart_default_1" />';
+          let nft_img_2 = '<img src="/img/img-placeholder.png" class="smart_default_nft" />';
           if (!$("ul[data-pnft_received='" + list_[i].acct + "']").length) {
             
             list_[i].swap_tokens_name = false;
@@ -10861,11 +10972,11 @@ $(window).on('load', async function() {
         let list_ = data;
         list_.sort((a, b) => a.utime - b.utime);
         list_spl = list_.reverse();
-        let token_img_1 = '<img src="/img/default_token.png" class="spl_default smart_default_nft" />';
-        let token_img_2 = '<img src="/img/default_token.png" class="spl_default smart_default_nft" />';
-        let nft_img_1 = '<img src="/img/img-placeholder.png" class="smart_default_1" />';
-        let nft_img_2 = '<img src="/img/img-placeholder.png" class="smart_default_nft" />';
         for (let i = 0; i < list_.length; i++) {
+          let token_img_1 = '<img src="/img/default_token.png" class="spl_default smart_default_nft" />';
+          let token_img_2 = '<img src="/img/default_token.png" class="spl_default smart_default_nft" />';
+          let nft_img_1 = '<img src="/img/img-placeholder.png" class="smart_default_1" />';
+          let nft_img_2 = '<img src="/img/img-placeholder.png" class="smart_default_nft" />';
           if (!$("ul[data-core_received='" + list_[i].acct + "']").length) {
             
             list_[i].swap_tokens_name = false;
