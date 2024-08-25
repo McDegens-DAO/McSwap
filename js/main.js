@@ -5073,7 +5073,7 @@ $(window).on('load', async function() {
             },3000);
             return;
           }
-          $("#cover_message").html("Success!...");
+          $("#cover_message").html("Success!");
           $("#swap_executing").removeClass("provisioning").html("Execute Contract");
           $(".fulfil_e").removeClass("active_swap");
           $(".fulfil_f").addClass("active_swap");
@@ -5791,10 +5791,13 @@ $(window).on('load', async function() {
         if(typeof getAsset.data.result.grouping != "undefined" && typeof getAsset.data.result.grouping[0] != "undefined" && typeof getAsset.data.result.grouping[0].group_value != "undefined"){
           assetCollection = getAsset.data.result.grouping[0].group_value;
         }
-        getAsset = await axiosInstance.post(conf.cluster,{jsonrpc:"2.0",method:"getAsset",id:"rpd-op-123",params:{id:swapAsset},});
+
         let swapAssetCollection = new solanaWeb3.PublicKey("11111111111111111111111111111111");
-        if(typeof getAsset.data.result.grouping != "undefined" && typeof getAsset.data.result.grouping[0] != "undefined" && typeof getAsset.data.result.grouping[0].group_value != "undefined"){
-          swapAssetCollection = getAsset.data.result.grouping[0].group_value;
+        if(swapAsset.toString() != "11111111111111111111111111111111"){
+          getAsset = await axiosInstance.post(conf.cluster,{jsonrpc:"2.0",method:"getAsset",id:"rpd-op-123",params:{id:swapAsset},});
+          if(typeof getAsset.data.result.grouping != "undefined" && typeof getAsset.data.result.grouping[0] != "undefined" && typeof getAsset.data.result.grouping[0].group_value != "undefined"){
+            swapAssetCollection = getAsset.data.result.grouping[0].group_value;
+          }
         }
 
         let CORE_TOKEN_PROGRAM = splToken.TOKEN_PROGRAM_ID;
@@ -6006,7 +6009,6 @@ $(window).on('load', async function() {
     $("#scroll_wrapper").getNiceScroll(0).doScrollTop(0, 1000);
   });
   
-  
   // swap viewer
   async function swap_viewer() {
     let pathArray = window.location.pathname.split('/');
@@ -6035,7 +6037,6 @@ $(window).on('load', async function() {
       $(".fee_fulfil_sig .swap_val, .fee_fulfil_alt .swap_val, .share_fulfil_sig .swap_val").html("");
       
       let ids = pathArray[2].split("-");
-//       try {
       
       $("#fulfil_a_id").val(ids[0]);
       $("#fulfil_b_id").val(ids[1]);
@@ -6123,8 +6124,11 @@ $(window).on('load', async function() {
       } 
       else if (getswapAsset != null && is_core === true) {
         let CORESwapProgramId = new solanaWeb3.PublicKey(conf.MCSWAP_CORE_PROGRAM);
-        swapStatePDA = solanaWeb3.PublicKey.findProgramAddressSync([Buffer.from("swap-state"),
-        new solanaWeb3.PublicKey(assetId).toBytes(), new solanaWeb3.PublicKey(swapAssetId).toBytes()], CORESwapProgramId);
+        swapStatePDA = solanaWeb3.PublicKey.findProgramAddressSync([
+        Buffer.from("swap-state"),
+        new solanaWeb3.PublicKey(assetId).toBytes(), 
+        new solanaWeb3.PublicKey(swapAssetId).toBytes()], 
+        CORESwapProgramId);
         $("#c_type, #d_type").val("CORE");
         swapState = await connection.getAccountInfo(swapStatePDA[0]).catch(function(){});
       } 
@@ -6161,7 +6165,17 @@ $(window).on('load', async function() {
         $("#proofs_c").html("Fetching...").show();
         swapState = await connection.getAccountInfo(swapStatePDA[0]).catch(function(){});
       } 
-            
+      else if (getswapAsset == null && is_core === true) {
+        let CORESwapProgramId = new solanaWeb3.PublicKey(conf.MCSWAP_CORE_PROGRAM);
+        swapStatePDA = solanaWeb3.PublicKey.findProgramAddressSync([
+        Buffer.from("swap-state"),
+        new solanaWeb3.PublicKey(assetId).toBytes(), 
+        new solanaWeb3.PublicKey("11111111111111111111111111111111").toBytes()], 
+        CORESwapProgramId);
+        $("#c_type").val("CORE");
+        swapState = await connection.getAccountInfo(swapStatePDA[0]).catch(function(err){});
+      }
+
       swapInitializer = null;
       swapLamports = null;
       swapTokens = null;
@@ -6397,79 +6411,6 @@ $(window).on('load', async function() {
         let do_symbol;
         let do_mint;
         let do_cmc;         
-        
-        // let is_22_1 = false;
-        // let SPL_PROGRAM_1 = splToken.TOKEN_PROGRAM_ID;
-        // if(spl_token1Amount > 0){
-        //   axiosInstance = axios.create({baseURL:conf.cluster});
-        //   getAsset = await axiosInstance.post(conf.cluster,{jsonrpc:"2.0",method:"getAsset",id:"rpd-op-123",params:{id:token1Mint},}); 
-        //   if(typeof getAsset.data.result.mint_extensions != "undefined"){
-        //     SPL_PROGRAM_1 = splToken.TOKEN_2022_PROGRAM_ID;
-        //     console.log("Token 1 is using Token 2022");
-        //     console.log(SPL_PROGRAM_1.toString());
-        //     is_22_1 = true;
-        //   }
-        //   else{
-        //     console.log("Token 1 is using SPL Token");
-        //     console.log(SPL_PROGRAM_1.toString());
-        //   }
-        // }
-
-        // let is_22_2 = false;
-        // let SPL_PROGRAM_2 = splToken.TOKEN_PROGRAM_ID;
-        // if(spl_token2Amount > 0){
-        //   axiosInstance = axios.create({baseURL:conf.cluster});
-        //   getAsset = await axiosInstance.post(conf.cluster,{jsonrpc:"2.0",method:"getAsset",id:"rpd-op-123",params:{id:token2Mint},}); 
-        //   if(typeof getAsset.data.result.mint_extensions != "undefined"){
-        //     SPL_PROGRAM_2 = splToken.TOKEN_2022_PROGRAM_ID;
-        //     console.log("Token 2 is using Token 2022");
-        //     console.log(SPL_PROGRAM_2.toString());
-        //     is_22_2 = true;
-        //   }
-        //   else{
-        //     console.log("Token 2 is using SPL Token");
-        //     console.log(SPL_PROGRAM_2.toString());
-        //   }
-        // }
-
-        // let is_22_3 = false;
-        // let SPL_PROGRAM_3 = splToken.TOKEN_PROGRAM_ID;
-        // if(spl_token3Amount > 0){ 
-        //   if(token3Mint == "11111111111111111111111111111111"){
-        //     console.log("Token 3 is SOL");
-        //   }
-        //   else{
-        //     axiosInstance = axios.create({baseURL:conf.cluster});
-        //     getAsset = await axiosInstance.post(conf.cluster,{jsonrpc:"2.0",method:"getAsset",id:"rpd-op-123",params:{id:token3Mint},}); 
-        //     if(typeof getAsset.data.result.mint_extensions != "undefined"){
-        //       SPL_PROGRAM_3 = splToken.TOKEN_2022_PROGRAM_ID;
-        //       console.log("Token 3 is using Token 2022");
-        //       console.log(SPL_PROGRAM_3.toString());
-        //       is_22_3 = true;
-        //     }
-        //     else{
-        //       console.log("Token 3 is using SPL Token");
-        //       console.log(SPL_PROGRAM_3.toString());
-        //     }
-        //   }
-        // }
-
-        // let is_22_4 = false;
-        // let SPL_PROGRAM_4 = splToken.TOKEN_PROGRAM_ID;
-        // if(spl_token4Amount > 0){ 
-        //   axiosInstance = axios.create({baseURL:conf.cluster});
-        //   getAsset = await axiosInstance.post(conf.cluster,{jsonrpc:"2.0",method:"getAsset",id:"rpd-op-123",params:{id:token4Mint},}); 
-        //   if(typeof getAsset.data.result.mint_extensions != "undefined"){
-        //     SPL_PROGRAM_4 = splToken.TOKEN_2022_PROGRAM_ID;
-        //     console.log("Token 4 is using Token 2022");
-        //     console.log(SPL_PROGRAM_4.toString());
-        //     is_22_4 = true;
-        //   }
-        //   else{
-        //     console.log("Token 4 is using SPL Token");
-        //     console.log(SPL_PROGRAM_4.toString());
-        //   }
-        // }
         
         ////////////////////////////////////////////////////////////////////////
         // spl 1
