@@ -5951,7 +5951,7 @@ $(window).on('load', async function() {
   $(document).delegate(".share_id .swap_copy", "click", function() {
     let cp = copy($(".share_id .swap_val").html())
       .then(function() {
-        alert("McSwap Link copied, but you better make sure!");
+        alert("Copied to Clipboard!");
       });
   });
 
