@@ -11451,7 +11451,7 @@ $(window).on('load', async function() {
   $("title").html(conf.title);
   $("#donat_to").html(conf.wallet_name);
   $("#donat_address").html(conf.sol);
-  $("#vrs").html(conf.version);
+  $("#vrs").html(parseFloat(conf.version).toFixed(1));
   $("select.tx_priority, select.donation_priority, select.nft_donation_priority").val(conf.default_priority);
   setTimeout(() => {
     $("#init_cover").fadeOut(400);
