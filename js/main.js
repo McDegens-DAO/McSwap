@@ -8095,13 +8095,7 @@ $(window).on('load', async function() {
   $(document).delegate("#vrs", "click", function() {
     let cp = copy("McSwap OTC : " + $("#vrs").html())
       .then(function() {
-        alert("McSwap OTC: " + $("#vrs").html());
-        // let openifo = confirm("McSwap OTC : " + $("#vrs").html() + "\nClick Ok for more details.\nClick Cancel to stay here.");
-        // if (openifo === true) {
-        //   window.open("https://github.com/McDegens-DAO/McSwap");
-        // } else {
-        //   return;
-        // }
+        alert(conf.wallet_name+" "+$("#vrs").html());
       });
   });
   
