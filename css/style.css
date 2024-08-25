@@ -3994,7 +3994,7 @@ button#smart_tool_reload img.smart_rotate {
   overflow: hidden;
   height: calc(100% - 120px);
   border-top: 1px solid #000;
-  border-bottom: 1px solid #000;
+  border-bottom: 1px solid #020202;
   margin: 0 10px 0 10px;
   width: calc(100% - 20px);
 }
@@ -4002,7 +4002,7 @@ button#smart_tool_reload img.smart_rotate {
   position: absolute;
   bottom: 0;
   display: none;
-  border-top: 1px solid #1a1a1a;
+  border-top: 1px solid #161616;
   height: 19px;
   margin: 0;
   width: calc(100% - 20px);
@@ -4062,6 +4062,12 @@ ul.smart_ul li.smart_row_time{
 ul.smart_ul li.smart_row_box{
   margin: 10px 0 14px 4px;
   cursor: pointer;
+  padding: 12px 10px 9px 10px;
+  background: #161616;
+  border-radius: 6px;
+}
+ul.smart_ul li.smart_row_box:hover{
+  background: #030303;
 }
 .smart_left{
   width: 40%;
@@ -4090,6 +4096,7 @@ ul.smart_ul li.smart_row_box{
 .smart_default{
   display: inline-block;
   width: calc(50% - 10px);
+  height: 42.72px;
   margin: 0 5px 0 5px;
   border-radius: 6px;
 }

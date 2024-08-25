@@ -3434,7 +3434,7 @@ $(window).on('load', async function() {
           $("#swap_deploying").removeClass("provisioning").html("3. Deploy");
           $(".swap_f").removeClass("active_swap");
           $(".swap_g").addClass("active_swap");
-          $(".mode_switch, #nav_shop, #nav_view, .ass_donate, .ass_swap, .ass_sell, #wallet_disconnect, #wallet_refresh, #wallet_nfts, #wallet_cnfts, .mcprofile_close").prop("disabled", false);
+          $(".mode_switch, #nav_shop, #nav_view, .ass_donate, .ass_swap, .ass_sell, .ass_meta, #wallet_disconnect, #wallet_refresh, #wallet_nfts, #wallet_cnfts, .mcprofile_close").prop("disabled", false);
           $("#donate_sol, .mcprofile_close, #wallet_refresh").show();
           $("ul[data-id='" + $("#create_a_id").val() + "']").remove();
           $("#wallet_nfts span.count").html('(' + $("ul[data-type='nft']:visible").length + ')');
@@ -4034,7 +4034,7 @@ $(window).on('load', async function() {
             $("#swap_deploying").removeClass("provisioning").html("3. Deploy");
             $(".swap_f").removeClass("active_swap");
             $(".swap_g").addClass("active_swap");
-            $(".mode_switch, #nav_shop, #nav_view, .ass_donate, .ass_swap, .ass_sell, #wallet_disconnect, #wallet_refresh, #wallet_nfts, #wallet_cnfts, .mcprofile_close").prop("disabled", false);
+            $(".mode_switch, #nav_shop, #nav_view, .ass_donate, .ass_swap, .ass_sell, .ass_meta, #wallet_disconnect, #wallet_refresh, #wallet_nfts, #wallet_cnfts, .mcprofile_close").prop("disabled", false);
             $("#donate_sol, .mcprofile_close, #wallet_refresh").show();
             $("ul[data-id='" + $("#create_a_id").val() + "']").remove();
             $("#wallet_cnfts span.count").html('(' + $("ul[data-type='cnft']:visible").length + ')');
@@ -4364,7 +4364,8 @@ $(window).on('load', async function() {
           $("#swap_deploying").removeClass("provisioning").html("3. Deploy");
           $(".swap_f").removeClass("active_swap");
           $(".swap_g").addClass("active_swap");
-          $(".mode_switch, #nav_shop, #nav_view, .ass_donate, .ass_swap, .ass_sell, #wallet_disconnect, #wallet_refresh, #wallet_nfts, #wallet_cnfts, .mcprofile_close").prop("disabled", false);
+          $(".mode_switch, #nav_shop, #nav_view, .ass_donate, .ass_swap, .ass_sell, .ass_meta, #wallet_disconnect, #wallet_refresh, #wallet_nfts, #wallet_cnfts, .mcprofile_close").prop("disabled", false);
+          // $(".mode_switch, #nav_shop, #nav_view, .ass_donate, .ass_swap, .ass_sell, #wallet_disconnect, #wallet_refresh, #wallet_nfts, #wallet_cnfts, .mcprofile_close").prop("disabled", false);
           $("#donate_sol, .mcprofile_close, #wallet_refresh").show();
           $("ul[data-id='" + $("#create_a_id").val() + "']").remove();
           $("#wallet_nfts span.count").html('(' + $("ul[data-type='nft']:visible").length + ')');
@@ -4630,7 +4631,7 @@ $(window).on('load', async function() {
           $("#swap_deploying").removeClass("provisioning").html("3. Deploy");
           $(".swap_f").removeClass("active_swap");
           $(".swap_g").addClass("active_swap");
-          $(".mode_switch, #nav_shop, #nav_view, .ass_donate, .ass_swap, .ass_sell, #wallet_disconnect, #wallet_refresh, #wallet_nfts, #wallet_cnfts, .mcprofile_close").prop("disabled", false);
+          $(".mode_switch, #nav_shop, #nav_view, .ass_donate, .ass_swap, .ass_sell, .ass_meta, #wallet_disconnect, #wallet_refresh, #wallet_nfts, #wallet_cnfts, .mcprofile_close").prop("disabled", false);
           $("#donate_sol, .mcprofile_close, #wallet_refresh").show();
           $("ul[data-id='" + $("#create_a_id").val() + "']").remove();
           $("#wallet_nfts span.count").html('(' + $("ul[data-type='nft']:visible").length + ')');
@@ -4700,7 +4701,7 @@ $(window).on('load', async function() {
         let assetId = $("#fulfil_a_id").val();
         let swapAssetId = $("#fulfil_b_id").val();
         if(swapAssetId==""){
-          let swapAssetId = "11111111111111111111111111111111";
+          swapAssetId = "11111111111111111111111111111111";
         }     
         
         let cNFTSwapProgramId = new solanaWeb3.PublicKey(conf.MCSWAP_CNFT_PROGRAM);     
@@ -4735,7 +4736,11 @@ $(window).on('load', async function() {
           return;
         }        
         
-        let swapStatePDA = solanaWeb3.PublicKey.findProgramAddressSync([Buffer.from("cNFT-swap"),new solanaWeb3.PublicKey(assetId).toBytes(),new solanaWeb3.PublicKey(swapAssetId).toBytes()],cNFTSwapProgramId);
+        let swapStatePDA = solanaWeb3.PublicKey.findProgramAddressSync([
+          Buffer.from("cNFT-swap"),
+          new solanaWeb3.PublicKey(assetId).toBytes(),
+          new solanaWeb3.PublicKey(swapAssetId).toBytes()
+        ],cNFTSwapProgramId);
         let swapState = null;
         swapState = await connection.getAccountInfo(swapStatePDA[0])
         .catch(function(error) {
@@ -4839,6 +4844,11 @@ $(window).on('load', async function() {
 //           console.log("swapProof ", swapProof);
         }
         
+        if(swapProof == null){
+          swapProof = [];
+        }
+        console.log("swapProof ", swapProof.length);
+        
         let swapVaultPDA = solanaWeb3.PublicKey.findProgramAddressSync([Buffer.from("cNFT-vault")],cNFTSwapProgramId);
         if (getAsset.data.result.ownership.owner == swapVaultPDA || swapLeafOwner == swapVaultPDA) { 
 //           console.log("One or both cNFTs are already in the Swap Vault");
@@ -4846,11 +4856,8 @@ $(window).on('load', async function() {
         }           
         
         //////////////////////////////////////////////////////////////////
-
         console.log("token:", swapTokenMint.toString());
-
         let TOKEN_PROGRAM = splToken.TOKEN_PROGRAM_ID;
-
         getAsset = await axiosInstance.post(conf.cluster,{jsonrpc:"2.0",method:"getAsset",id:"rpd-op-123",params:{id:swapTokenMint.toString()},}); 
         if(typeof getAsset.data.result.mint_extensions != "undefined"){
           TOKEN_PROGRAM = splToken.TOKEN_2022_PROGRAM_ID;
@@ -4861,7 +4868,6 @@ $(window).on('load', async function() {
           console.log("Using SPL Token");
           console.log(TOKEN_PROGRAM.toString());
         }
-
         initializerTokenATA = await splToken.getAssociatedTokenAddress(
         swapTokenMint,
         swapInitializer,
@@ -4869,7 +4875,6 @@ $(window).on('load', async function() {
         TOKEN_PROGRAM,
         splToken.ASSOCIATED_TOKEN_PROGRAM_ID,);
         console.log("Initializer Mint ATA: ", initializerTokenATA.toString());  
-
         providerTokenATA = await splToken.getAssociatedTokenAddress(
         swapTokenMint,
         provider.publicKey,
@@ -4877,7 +4882,6 @@ $(window).on('load', async function() {
         TOKEN_PROGRAM,
         splToken.ASSOCIATED_TOKEN_PROGRAM_ID);
         console.log("Provider Mint ATA: ", providerTokenATA.toString());  
-
         //////////////////////////////////////////////////////////////////
 
         var totalSize = 1 + 32 + 32 + 1 + 1;
@@ -5048,6 +5052,9 @@ $(window).on('load', async function() {
         
         try {
           $("#cover_message").html("Requesting Approval...");
+          
+
+
           let signedTx = await provider.signTransaction(tx);
           let txId = await connection.sendRawTransaction(signedTx.serialize(),{     
               skipPreflight: true,
@@ -6255,11 +6262,15 @@ $(window).on('load', async function() {
           if(proofs_required != false){
             $("#proofs_c").html(proofs_required + " x Proofs").show();
           }
-          proofs_required = false;
-          proofs_required = await required_proofs(ids[1]);
-          if(proofs_required != false){
-            $("#proofs_d").html(proofs_required + " x Proofs").show();
+
+          if(ids[1] != ""){
+            proofs_required = false;
+            proofs_required = await required_proofs(ids[1]);
+            if(proofs_required != false){
+              $("#proofs_d").html(proofs_required + " x Proofs").show();
+            }
           }
+
         } 
         
         if (typeof provider == "undefined" || provider.isConnected === false) {
@@ -6387,6 +6398,80 @@ $(window).on('load', async function() {
         let do_mint;
         let do_cmc;         
         
+        // let is_22_1 = false;
+        // let SPL_PROGRAM_1 = splToken.TOKEN_PROGRAM_ID;
+        // if(spl_token1Amount > 0){
+        //   axiosInstance = axios.create({baseURL:conf.cluster});
+        //   getAsset = await axiosInstance.post(conf.cluster,{jsonrpc:"2.0",method:"getAsset",id:"rpd-op-123",params:{id:token1Mint},}); 
+        //   if(typeof getAsset.data.result.mint_extensions != "undefined"){
+        //     SPL_PROGRAM_1 = splToken.TOKEN_2022_PROGRAM_ID;
+        //     console.log("Token 1 is using Token 2022");
+        //     console.log(SPL_PROGRAM_1.toString());
+        //     is_22_1 = true;
+        //   }
+        //   else{
+        //     console.log("Token 1 is using SPL Token");
+        //     console.log(SPL_PROGRAM_1.toString());
+        //   }
+        // }
+
+        // let is_22_2 = false;
+        // let SPL_PROGRAM_2 = splToken.TOKEN_PROGRAM_ID;
+        // if(spl_token2Amount > 0){
+        //   axiosInstance = axios.create({baseURL:conf.cluster});
+        //   getAsset = await axiosInstance.post(conf.cluster,{jsonrpc:"2.0",method:"getAsset",id:"rpd-op-123",params:{id:token2Mint},}); 
+        //   if(typeof getAsset.data.result.mint_extensions != "undefined"){
+        //     SPL_PROGRAM_2 = splToken.TOKEN_2022_PROGRAM_ID;
+        //     console.log("Token 2 is using Token 2022");
+        //     console.log(SPL_PROGRAM_2.toString());
+        //     is_22_2 = true;
+        //   }
+        //   else{
+        //     console.log("Token 2 is using SPL Token");
+        //     console.log(SPL_PROGRAM_2.toString());
+        //   }
+        // }
+
+        // let is_22_3 = false;
+        // let SPL_PROGRAM_3 = splToken.TOKEN_PROGRAM_ID;
+        // if(spl_token3Amount > 0){ 
+        //   if(token3Mint == "11111111111111111111111111111111"){
+        //     console.log("Token 3 is SOL");
+        //   }
+        //   else{
+        //     axiosInstance = axios.create({baseURL:conf.cluster});
+        //     getAsset = await axiosInstance.post(conf.cluster,{jsonrpc:"2.0",method:"getAsset",id:"rpd-op-123",params:{id:token3Mint},}); 
+        //     if(typeof getAsset.data.result.mint_extensions != "undefined"){
+        //       SPL_PROGRAM_3 = splToken.TOKEN_2022_PROGRAM_ID;
+        //       console.log("Token 3 is using Token 2022");
+        //       console.log(SPL_PROGRAM_3.toString());
+        //       is_22_3 = true;
+        //     }
+        //     else{
+        //       console.log("Token 3 is using SPL Token");
+        //       console.log(SPL_PROGRAM_3.toString());
+        //     }
+        //   }
+        // }
+
+        // let is_22_4 = false;
+        // let SPL_PROGRAM_4 = splToken.TOKEN_PROGRAM_ID;
+        // if(spl_token4Amount > 0){ 
+        //   axiosInstance = axios.create({baseURL:conf.cluster});
+        //   getAsset = await axiosInstance.post(conf.cluster,{jsonrpc:"2.0",method:"getAsset",id:"rpd-op-123",params:{id:token4Mint},}); 
+        //   if(typeof getAsset.data.result.mint_extensions != "undefined"){
+        //     SPL_PROGRAM_4 = splToken.TOKEN_2022_PROGRAM_ID;
+        //     console.log("Token 4 is using Token 2022");
+        //     console.log(SPL_PROGRAM_4.toString());
+        //     is_22_4 = true;
+        //   }
+        //   else{
+        //     console.log("Token 4 is using SPL Token");
+        //     console.log(SPL_PROGRAM_4.toString());
+        //   }
+        // }
+        
+        ////////////////////////////////////////////////////////////////////////
         // spl 1
         if (spl_token1Mint.toString() == conf.usdc) {
           spl_symbol = "USDC";
@@ -6394,17 +6479,15 @@ $(window).on('load', async function() {
           spl_amount = spl_token1Amount.toString();
           spl_deciamls = 6;
           spl_amount_ = spl_amount;
-        } else {
-          spl_pda = await get_pda(spl_token1Mint.toString());
-          spl_metaplex = await Metadata.fromAccountAddress(connection, new solanaWeb3.PublicKey(spl_pda));
-          spl_uri = spl_metaplex.data.uri;
-          spl_metadata = await axios.get(spl_uri);
-          spl_img = spl_metadata.data.image;
-          spl_symbol = spl_metadata.data.symbol;
-          spl_data = await connection.getAccountInfo(spl_token1Mint);
-          spl_data = splToken.MintLayout.decode(spl_data.data);
+        } 
+        else {
+          axiosInstance = axios.create({baseURL:conf.cluster});
+          getAsset = await axiosInstance.post(conf.cluster,{jsonrpc:"2.0",method:"getAsset",id:"rpd-op-123",params:{id:spl_token1Mint.toString()},});           
+          spl_uri = getAsset.data.result.content.json_uri;
+          spl_img = getAsset.data.result.content.files[0].uri;
+          spl_symbol = getAsset.data.result.token_info.symbol;
           spl_amount_ = spl_token1Amount.toString();
-          spl_deciamls = spl_data.decimals;
+          spl_deciamls = getAsset.data.result.token_info.decimals;
         }
         spl_multiplier = 1;
         for (let i = 0; i < spl_deciamls; i++) {
@@ -6414,7 +6497,6 @@ $(window).on('load', async function() {
         $("#spl_img_5").attr("src", spl_img).removeClass("spl_default");
         $("#spl_choice_5").html(spl_symbol);
         $("#spl_field_5").val(spl_amount).attr("data-spl_mint", spl_token1Mint.toString()).attr("data-spl_decimals", spl_deciamls).attr("data-spl_units", spl_amount_);
-        
         do_id = "spl_field_5";
         do_ele = $("#"+do_id);
         do_ele.next("input").val("•••");
@@ -6437,9 +6519,10 @@ $(window).on('load', async function() {
             } 
           }
         }
-//         console.log("do_cmc", do_cmc);
         await review_usd_value(do_cmc, do_id, do_symbol, do_ele.val(), do_decimals);
-        
+        ////////////////////////////////////////////////////////////////////////
+
+        ////////////////////////////////////////////////////////////////////////
         // spl 2
         if (spl_token2Mint.toString() != "11111111111111111111111111111111") {
           
@@ -6450,16 +6533,13 @@ $(window).on('load', async function() {
             spl_deciamls = 6;
             spl_amount_ = spl_amount;
           } else {
-            spl_pda = await get_pda(spl_token2Mint.toString());
-            spl_metaplex = await Metadata.fromAccountAddress(connection, new solanaWeb3.PublicKey(spl_pda));
-            spl_uri = spl_metaplex.data.uri;
-            spl_metadata = await axios.get(spl_uri);
-            spl_img = spl_metadata.data.image;
-            spl_symbol = spl_metadata.data.symbol;
-            spl_data = await connection.getAccountInfo(spl_token2Mint);
-            spl_data = splToken.MintLayout.decode(spl_data.data);
+            axiosInstance = axios.create({baseURL:conf.cluster});
+            getAsset = await axiosInstance.post(conf.cluster,{jsonrpc:"2.0",method:"getAsset",id:"rpd-op-123",params:{id:spl_token2Mint.toString()},});           
+            spl_uri = getAsset.data.result.content.json_uri;
+            spl_img = getAsset.data.result.content.files[0].uri;
+            spl_symbol = getAsset.data.result.token_info.symbol;
             spl_amount_ = spl_token2Amount.toString();
-            spl_deciamls = spl_data.decimals;
+            spl_deciamls = getAsset.data.result.token_info.decimals;
           }
           spl_multiplier = 1;
           for (let i = 0; i < spl_deciamls; i++) {
@@ -6468,7 +6548,7 @@ $(window).on('load', async function() {
           spl_amount = spl_amount_ / spl_multiplier;
           $("#spl_img_6").attr("src", spl_img).removeClass("spl_default");
           $("#spl_choice_6").html(spl_symbol);
-          $("#spl_field_6").val(spl_amount).attr("data-spl_mint", spl_token1Mint.toString()).attr("data-spl_decimals", spl_deciamls).attr("data-spl_units", spl_amount_);
+          $("#spl_field_6").val(spl_amount).attr("data-spl_mint", spl_token2Mint.toString()).attr("data-spl_decimals", spl_deciamls).attr("data-spl_units", spl_amount_);
         
           do_id = "spl_field_6";
           do_ele = $("#"+do_id);
@@ -6496,7 +6576,9 @@ $(window).on('load', async function() {
           await review_usd_value(do_cmc, do_id, do_symbol, do_ele.val(), do_decimals);
         
         }
-        
+        ////////////////////////////////////////////////////////////////////////
+
+        ////////////////////////////////////////////////////////////////////////
         // spl 3
         if (spl_token3Mint.toString() == "11111111111111111111111111111111") {
           spl_symbol = "SOL";
@@ -6504,23 +6586,22 @@ $(window).on('load', async function() {
           spl_amount = spl_token3Amount.toString();
           spl_deciamls = 9;
           spl_amount_ = spl_amount;
-        } else if (spl_token3Mint.toString() == conf.usdc) {
+        } 
+        else if (spl_token3Mint.toString() == conf.usdc) {
           spl_symbol = "USDC";
           spl_img = "/img/usdc.png";
           spl_amount = spl_token3Amount.toString();
           spl_deciamls = 6;
           spl_amount_ = spl_amount;
-        } else {
-          spl_pda = await get_pda(spl_token3Mint.toString());
-          spl_metaplex = await Metadata.fromAccountAddress(connection, new solanaWeb3.PublicKey(spl_pda));
-          spl_uri = spl_metaplex.data.uri;
-          spl_metadata = await axios.get(spl_uri);
-          spl_img = spl_metadata.data.image;
-          spl_symbol = spl_metadata.data.symbol;
-          spl_data = await connection.getAccountInfo(spl_token3Mint);
-          spl_data = splToken.MintLayout.decode(spl_data.data);
+        } 
+        else {
+          axiosInstance = axios.create({baseURL:conf.cluster});
+          getAsset = await axiosInstance.post(conf.cluster,{jsonrpc:"2.0",method:"getAsset",id:"rpd-op-123",params:{id:spl_token3Mint.toString()},});           
+          spl_uri = getAsset.data.result.content.json_uri;
+          spl_img = getAsset.data.result.content.files[0].uri;
+          spl_symbol = getAsset.data.result.token_info.symbol;
           spl_amount_ = spl_token3Amount.toString();
-          spl_deciamls = spl_data.decimals;
+          spl_deciamls = getAsset.data.result.token_info.decimals;
         }
         spl_multiplier = 1;
         for (let i = 0; i < spl_deciamls; i++) {
@@ -6530,7 +6611,6 @@ $(window).on('load', async function() {
         $("#spl_img_7").attr("src", spl_img).removeClass("spl_default");
         $("#spl_choice_7").html(spl_symbol);
         $("#spl_field_7").val(spl_amount).attr("data-spl_mint", spl_token3Mint.toString()).attr("data-spl_decimals", spl_deciamls).attr("data-spl_units", spl_amount_);
-        
         do_id = "spl_field_7";
         do_ele = $("#"+do_id);
         do_ele.next("input").val("•••");
@@ -6553,9 +6633,10 @@ $(window).on('load', async function() {
             } 
           }
         }
-//         console.log("do_cmc", do_cmc);
         await review_usd_value(do_cmc, do_id, do_symbol, do_ele.val(), do_decimals);        
-        
+        ////////////////////////////////////////////////////////////////////////
+
+        ////////////////////////////////////////////////////////////////////////
         // spl 4
         if (spl_token4Mint.toString() != "11111111111111111111111111111111") {
           if (spl_token4Mint.toString() == conf.usdc) {
@@ -6565,16 +6646,13 @@ $(window).on('load', async function() {
             spl_deciamls = 6;
             spl_amount_ = spl_amount;
           } else {
-            spl_pda = await get_pda(spl_token4Mint.toString());
-            spl_metaplex = await Metadata.fromAccountAddress(connection, new solanaWeb3.PublicKey(spl_pda));
-            spl_uri = spl_metaplex.data.uri;
-            spl_metadata = await axios.get(spl_uri);
-            spl_img = spl_metadata.data.image;
-            spl_symbol = spl_metadata.data.symbol;
-            spl_data = await connection.getAccountInfo(spl_token4Mint);
-            spl_data = splToken.MintLayout.decode(spl_data.data);
+            axiosInstance = axios.create({baseURL:conf.cluster});
+            getAsset = await axiosInstance.post(conf.cluster,{jsonrpc:"2.0",method:"getAsset",id:"rpd-op-123",params:{id:spl_token4Mint.toString()},});           
+            spl_uri = getAsset.data.result.content.json_uri;
+            spl_img = getAsset.data.result.content.files[0].uri;
+            spl_symbol = getAsset.data.result.token_info.symbol;
             spl_amount_ = spl_token4Amount.toString();
-            spl_deciamls = spl_data.decimals;
+            spl_deciamls = getAsset.data.result.token_info.decimals;
           }
           spl_multiplier = 1;
           for (let i = 0; i < spl_deciamls; i++) {
@@ -6608,10 +6686,10 @@ $(window).on('load', async function() {
             }
           }
           // console.log("do_cmc", do_cmc);
-          await review_usd_value(do_cmc, do_id, do_symbol, do_ele.val(), do_decimals);        
-        
+          await review_usd_value(do_cmc, do_id, do_symbol, do_ele.val(), do_decimals);
         }
-
+        ////////////////////////////////////////////////////////////////////////
+        
         // check for wallet connection
         let allow_execute = true;
         if (typeof provider != "undefined" && provider.isConnected === true) {
@@ -10127,40 +10205,51 @@ $(window).on('load', async function() {
         let img_4 = default_img;
         for (let i = 0; i < list_spl.length; i++) {
           if (!$("ul[data-spl_received='" + list_spl[i].acct + "']").length) {
-            
-            for (let t = 0; t < spl_tokens.length; t++) {
-              let tokn = spl_tokens[t];
-              if (tokn.address == list_spl[i].token_1_mint) {
-                list_spl[i].token_1_name = tokn.name;
-                list_spl[i].token_1_symbol = tokn.symbol;
-                list_spl[i].token_1_image = tokn.img;
-                list_spl[i].token_1_decimals = tokn.decimals;
-                let amt = await decimal_joe(list_spl[i].token_1_amount, list_spl[i].token_1_decimals);
-                list_spl[i].token_1_amt = amt;
-                break;
+
+            if(list_spl[i].token_1_mint == "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"){
+              list_spl[i].token_1_name = "USDC";
+              list_spl[i].token_1_symbol = "USDC";
+              list_spl[i].token_1_image = "/img/usdc.png";
+              list_spl[i].token_1_decimals = 6;
+              let amt = await decimal_joe(list_spl[i].token_1_amount, list_spl[i].token_1_decimals);
+              list_spl[i].token_1_amt = amt;
+            }
+            else{
+              for (let t = 0; t < spl_tokens.length; t++) {
+                let tokn = spl_tokens[t];
+                if (tokn.address == list_spl[i].token_1_mint) {
+                  list_spl[i].token_1_name = tokn.name;
+                  list_spl[i].token_1_symbol = tokn.symbol;
+                  list_spl[i].token_1_image = tokn.img;
+                  list_spl[i].token_1_decimals = tokn.decimals;
+                  let amt = await decimal_joe(list_spl[i].token_1_amount, list_spl[i].token_1_decimals);
+                  list_spl[i].token_1_amt = amt;
+                  break;
+                }
               }
             }
 
             if (list_spl[i].token_2_amount > 0) {
-              for (let t = 0; t < spl_tokens.length; t++) {
-                let tokn = spl_tokens[t];
-                if (list_spl[i].token_2_mint == "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v") {
-                  list_spl[i].token_2_name = "USD Coin";
-                  list_spl[i].token_2_symbol = "USDC";
-                  list_spl[i].token_2_image = "/img/sol.png";
-                  list_spl[i].token_2_decimals = 6;
-                  let amt = await decimal_joe(list_spl[i].token_2_amount, list_spl[i].token_2_decimals);
-                  list_spl[i].token_2_amt = amt;
-                  break;
-                }
-                if (tokn.address == list_spl[i].token_2_mint) {
-                  list_spl[i].token_2_name = tokn.name;
-                  list_spl[i].token_2_symbol = tokn.symbol;
-                  list_spl[i].token_2_image = tokn.img;
-                  list_spl[i].token_2_decimals = tokn.decimals;
-                  let amt = await decimal_joe(list_spl[i].token_2_amount, list_spl[i].token_2_decimals);
-                  list_spl[i].token_2_amt = amt;
-                  break;
+              if(list_spl[i].token_2_mint == "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"){
+                list_spl[i].token_2_name = "USDC";
+                list_spl[i].token_2_symbol = "USDC";
+                list_spl[i].token_2_image = "/img/usdc.png";
+                list_spl[i].token_2_decimals = 6;
+                let amt = await decimal_joe(list_spl[i].token_2_amount, list_spl[i].token_2_decimals);
+                list_spl[i].token_2_amt = amt;
+              }
+              else{
+                for (let t = 0; t < spl_tokens.length; t++) {
+                  let tokn = spl_tokens[t];
+                  if (tokn.address == list_spl[i].token_2_mint) {
+                    list_spl[i].token_2_name = tokn.name;
+                    list_spl[i].token_2_symbol = tokn.symbol;
+                    list_spl[i].token_2_image = tokn.img;
+                    list_spl[i].token_2_decimals = tokn.decimals;
+                    let amt = await decimal_joe(list_spl[i].token_2_amount, list_spl[i].token_2_decimals);
+                    list_spl[i].token_2_amt = amt;
+                    break;
+                  }
                 }
               }
             } 
@@ -10173,56 +10262,61 @@ $(window).on('load', async function() {
               list_spl[i].token_2_amt = amt;
             }
 
-
-            for (let t = 0; t < spl_tokens.length; t++) {
-              let tokn = spl_tokens[t];
-              if (list_spl[i].token_3_mint == "11111111111111111111111111111111") {
-                list_spl[i].token_3_name = "SOL";
-                list_spl[i].token_3_symbol = "SOL";
-                list_spl[i].token_3_image = "/img/sol.png";
-                list_spl[i].token_3_decimals = 9;
-                let amt = await decimal_joe(list_spl[i].token_3_amount, list_spl[i].token_3_decimals);
-                list_spl[i].token_3_amt = amt;
-                break;
-              } else if (list_spl[i].token_3_mint == "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v") {
-                list_spl[i].token_3_name = "USD Coin";
-                list_spl[i].token_3_symbol = "USDC";
-                list_spl[i].token_3_image = "/img/usdc.png";
-                list_spl[i].token_3_decimals = 6;
-                let amt = await decimal_joe(list_spl[i].token_3_amount, list_spl[i].token_3_decimals);
-                list_spl[i].token_3_amt = amt;
-                break;
-              } else if (tokn.address == list_spl[i].token_3_mint) {
-                list_spl[i].token_3_name = tokn.name;
-                list_spl[i].token_3_symbol = tokn.symbol;
-                list_spl[i].token_3_image = tokn.img;
-                list_spl[i].token_3_decimals = tokn.decimals;
-                let amt = await decimal_joe(list_spl[i].token_3_amount, list_spl[i].token_3_decimals);
-                list_spl[i].token_3_amt = amt;
-                break;
-              }
+            if (list_spl[i].token_3_mint == "11111111111111111111111111111111") {
+              list_spl[i].token_3_name = "SOL";
+              list_spl[i].token_3_symbol = "SOL";
+              list_spl[i].token_3_image = "/img/sol.png";
+              list_spl[i].token_3_decimals = 9;
+              let amt = await decimal_joe(list_spl[i].token_3_amount, list_spl[i].token_3_decimals);
+              list_spl[i].token_3_amt = amt;
+              break;
+            } 
+            else if (list_spl[i].token_3_mint == "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v") {
+              list_spl[i].token_3_name = "USD Coin";
+              list_spl[i].token_3_symbol = "USDC";
+              list_spl[i].token_3_image = "/img/usdc.png";
+              list_spl[i].token_3_decimals = 6;
+              let amt = await decimal_joe(list_spl[i].token_3_amount, list_spl[i].token_3_decimals);
+              list_spl[i].token_3_amt = amt;
+              break;
             }
-            
-
-            if (list_spl[i].token_4_amount > 0) {
+            else{
               for (let t = 0; t < spl_tokens.length; t++) {
                 let tokn = spl_tokens[t];
-                if (list_spl[i].token_4_mint == "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v") {
-                  list_spl[i].token_4_name = "USD Coin";
-                  list_spl[i].token_4_symbol = "USDC";
-                  list_spl[i].token_4_image = "/img/usdc.png";
-                  list_spl[i].token_4_decimals = 6;
-                  let amt = await decimal_joe(list_spl[i].token_4_amount, list_spl[i].token_4_decimals);
-                  list_spl[i].token_4_amt = amt;
+                if (tokn.address == list_spl[i].token_3_mint) {
+                  list_spl[i].token_3_name = tokn.name;
+                  list_spl[i].token_3_symbol = tokn.symbol;
+                  list_spl[i].token_3_image = tokn.img;
+                  list_spl[i].token_3_decimals = tokn.decimals;
+                  let amt = await decimal_joe(list_spl[i].token_3_amount, list_spl[i].token_3_decimals);
+                  list_spl[i].token_3_amt = amt;
                   break;
-                } else if (tokn.address == list_spl[i].token_4_mint) {
-                  list_spl[i].token_4_name = tokn.name;
-                  list_spl[i].token_4_symbol = tokn.symbol;
-                  list_spl[i].token_4_image = tokn.img;
-                  list_spl[i].token_4_decimals = tokn.decimals;
-                  let amt = await decimal_joe(list_spl[i].token_4_amount, list_spl[i].token_4_decimals);
-                  list_spl[i].token_4_amt = amt;
-                  break;
+                }
+              }
+            }
+
+            if (list_spl[i].token_4_amount > 0) {
+              if(list_spl[i].token_4_mint == "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"){
+                list_spl[i].token_4_name = "USD Coin";
+                list_spl[i].token_4_symbol = "USDC";
+                list_spl[i].token_4_image = "/img/usdc.png";
+                list_spl[i].token_4_decimals = 6;
+                let amt = await decimal_joe(list_spl[i].token_4_amount, list_spl[i].token_4_decimals);
+                list_spl[i].token_4_amt = amt;
+                break;
+              }
+              else{
+                for (let t = 0; t < spl_tokens.length; t++) {
+                  let tokn = spl_tokens[t];
+                  if (tokn.address == list_spl[i].token_4_mint) {
+                    list_spl[i].token_4_name = tokn.name;
+                    list_spl[i].token_4_symbol = tokn.symbol;
+                    list_spl[i].token_4_image = tokn.img;
+                    list_spl[i].token_4_decimals = tokn.decimals;
+                    let amt = await decimal_joe(list_spl[i].token_4_amount, list_spl[i].token_4_decimals);
+                    list_spl[i].token_4_amt = amt;
+                    break;
+                  }
                 }
               }
             } 
@@ -10234,7 +10328,6 @@ $(window).on('load', async function() {
               let amt = await decimal_joe(list_spl[i].token_4_amount, list_spl[i].token_4_decimals);
               list_spl[i].token_4_amt = amt;
             }
-            
 
             let item_date = new Date((list_spl[i].utime * 1000));
             item_date = item_date.toLocaleDateString('en-US') + " " + item_date.toLocaleTimeString('en-US');
@@ -10394,16 +10487,26 @@ $(window).on('load', async function() {
             list_[i].swap_tokens_image = false;
             list_[i].swap_tokens_decimals = 0;
             
-            for (let t = 0; t < spl_tokens.length; t++) {
-              let tokn = spl_tokens[t];
-              if (tokn.address == list_[i].swap_tokens_mint && list_[i].swap_tokens_mint != "11111111111111111111111111111111") {
-                list_[i].swap_tokens_name = tokn.name;
-                list_[i].swap_tokens_symbol = tokn.symbol;
-                list_[i].swap_tokens_image = tokn.img;
-                list_[i].swap_tokens_decimals = tokn.decimals;
-                let amt = await decimal_joe(list_[i].swap_tokens_amount, tokn.decimals);
-                list_[i].swap_tokens_amount = amt;
-                break;
+            if(list_[i].swap_tokens_mint == "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"){
+              list_[i].swap_tokens_name = "USDC";
+              list_[i].swap_tokens_symbol = "USDC";
+              list_[i].swap_tokens_image = "/img/usdc.png";
+              list_[i].swap_tokens_decimals = 6;
+              let amt = await decimal_joe(list_[i].swap_tokens_amount, list_[i].swap_tokens_decimals);
+              list_[i].swap_tokens_amount = amt;
+            }
+            else{
+              for (let t = 0; t < spl_tokens.length; t++) {
+                let tokn = spl_tokens[t];
+                if (tokn.address == list_[i].swap_tokens_mint && list_[i].swap_tokens_mint != "11111111111111111111111111111111") {
+                  list_[i].swap_tokens_name = tokn.name;
+                  list_[i].swap_tokens_symbol = tokn.symbol;
+                  list_[i].swap_tokens_image = tokn.img;
+                  list_[i].swap_tokens_decimals = tokn.decimals;
+                  let amt = await decimal_joe(list_[i].swap_tokens_amount, tokn.decimals);
+                  list_[i].swap_tokens_amount = amt;
+                  break;
+                }
               }
             }
             
@@ -10592,16 +10695,26 @@ $(window).on('load', async function() {
             list_[i].swap_tokens_image = false;
             list_[i].swap_tokens_decimals = 0;
             
-            for (let t = 0; t < spl_tokens.length; t++) {
-              let tokn = spl_tokens[t];
-              if (tokn.address == list_[i].swap_tokens_mint && list_[i].swap_tokens_mint != "11111111111111111111111111111111") {
-                list_[i].swap_tokens_name = tokn.name;
-                list_[i].swap_tokens_symbol = tokn.symbol;
-                list_[i].swap_tokens_image = tokn.img;
-                list_[i].swap_tokens_decimals = tokn.decimals;
-                let amt = await decimal_joe(list_[i].swap_tokens_amount, tokn.decimals);
-                list_[i].swap_tokens_amount = amt;
-                break;
+            if(list_[i].swap_tokens_mint == "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"){
+              list_[i].swap_tokens_name = "USDC";
+              list_[i].swap_tokens_symbol = "USDC";
+              list_[i].swap_tokens_image = "/img/usdc.png";
+              list_[i].swap_tokens_decimals = 6;
+              let amt = await decimal_joe(list_[i].swap_tokens_amount, list_[i].swap_tokens_decimals);
+              list_[i].swap_tokens_amount = amt;
+            }
+            else{
+              for (let t = 0; t < spl_tokens.length; t++) {
+                let tokn = spl_tokens[t];
+                if (tokn.address == list_[i].swap_tokens_mint && list_[i].swap_tokens_mint != "11111111111111111111111111111111") {
+                  list_[i].swap_tokens_name = tokn.name;
+                  list_[i].swap_tokens_symbol = tokn.symbol;
+                  list_[i].swap_tokens_image = tokn.img;
+                  list_[i].swap_tokens_decimals = tokn.decimals;
+                  let amt = await decimal_joe(list_[i].swap_tokens_amount, tokn.decimals);
+                  list_[i].swap_tokens_amount = amt;
+                  break;
+                }
               }
             }
             
@@ -10788,17 +10901,27 @@ $(window).on('load', async function() {
             list_[i].swap_tokens_symbol = false;
             list_[i].swap_tokens_image = false;
             list_[i].swap_tokens_decimals = 0;
-            
-            for (let t = 0; t < spl_tokens.length; t++) {
-              let tokn = spl_tokens[t];
-              if (tokn.address == list_[i].swap_tokens_mint && list_[i].swap_tokens_mint != "11111111111111111111111111111111") {
-                list_[i].swap_tokens_name = tokn.name;
-                list_[i].swap_tokens_symbol = tokn.symbol;
-                list_[i].swap_tokens_image = tokn.img;
-                list_[i].swap_tokens_decimals = tokn.decimals;
-                let amt = await decimal_joe(list_[i].swap_tokens_amount, tokn.decimals);
-                list_[i].swap_tokens_amount = amt;
-                break;
+
+            if(list_[i].swap_tokens_mint == "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"){
+              list_[i].swap_tokens_name = "USDC";
+              list_[i].swap_tokens_symbol = "USDC";
+              list_[i].swap_tokens_image = "/img/usdc.png";
+              list_[i].swap_tokens_decimals = 6;
+              let amt = await decimal_joe(list_[i].swap_tokens_amount, list_[i].swap_tokens_decimals);
+              list_[i].swap_tokens_amount = amt;
+            }
+            else{
+              for (let t = 0; t < spl_tokens.length; t++) {
+                let tokn = spl_tokens[t];
+                if (tokn.address == list_[i].swap_tokens_mint && list_[i].swap_tokens_mint != "11111111111111111111111111111111") {
+                  list_[i].swap_tokens_name = tokn.name;
+                  list_[i].swap_tokens_symbol = tokn.symbol;
+                  list_[i].swap_tokens_image = tokn.img;
+                  list_[i].swap_tokens_decimals = tokn.decimals;
+                  let amt = await decimal_joe(list_[i].swap_tokens_amount, tokn.decimals);
+                  list_[i].swap_tokens_amount = amt;
+                  break;
+                }
               }
             }
             
@@ -10836,7 +10959,6 @@ $(window).on('load', async function() {
             }            
             
             if (list_[i].swap_tokens_amount > 0) {
-//               token_img_2 = '<a href="' + conf.cnft_explorer + '11111111111111111111111111111111" target="_blank"><img src="/img/sol.png" class="smart_default_nft" /></a>';
               token_img_2 = '<a href="' + conf.cnft_explorer + list_[i].swap_tokens_mint + '" target="_blank"><img src="' + list_[i].swap_tokens_image + '" class="smart_default_nft" /></a>';
               changes += '<div class="smart_row"><span class="smart_change"><span class="smart_direction">-</span><span class="smart_value smart_down">' + list_[i].swap_tokens_amount + '</span></span><span class="smart_symbol">' + list_[i].swap_tokens_symbol + '</span></div>';
             }
@@ -10985,19 +11107,29 @@ $(window).on('load', async function() {
             list_[i].swap_tokens_image = false;
             list_[i].swap_tokens_decimals = 0;
             
-            for (let t = 0; t < spl_tokens.length; t++) {
-              let tokn = spl_tokens[t];
-              if (tokn.address == list_[i].swap_tokens_mint && list_[i].swap_tokens_mint != "11111111111111111111111111111111") {
-                list_[i].swap_tokens_name = tokn.name;
-                list_[i].swap_tokens_symbol = tokn.symbol;
-                list_[i].swap_tokens_image = tokn.img;
-                list_[i].swap_tokens_decimals = tokn.decimals;
-                let amt = await decimal_joe(list_[i].swap_tokens_amount, tokn.decimals);
-                list_[i].swap_tokens_amount = amt;
-                break;
+            if(list_[i].swap_tokens_mint == "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"){
+              list_[i].swap_tokens_name = "USDC";
+              list_[i].swap_tokens_symbol = "USDC";
+              list_[i].swap_tokens_image = "/img/usdc.png";
+              list_[i].swap_tokens_decimals = 6;
+              let amt = await decimal_joe(list_[i].swap_tokens_amount, list_[i].swap_tokens_decimals);
+              list_[i].swap_tokens_amount = amt;
+            }
+            else{
+              for (let t = 0; t < spl_tokens.length; t++) {
+                let tokn = spl_tokens[t];
+                if (tokn.address == list_[i].swap_tokens_mint && list_[i].swap_tokens_mint != "11111111111111111111111111111111") {
+                  list_[i].swap_tokens_name = tokn.name;
+                  list_[i].swap_tokens_symbol = tokn.symbol;
+                  list_[i].swap_tokens_image = tokn.img;
+                  list_[i].swap_tokens_decimals = tokn.decimals;
+                  let amt = await decimal_joe(list_[i].swap_tokens_amount, tokn.decimals);
+                  list_[i].swap_tokens_amount = amt;
+                  break;
+                }
               }
             }
-            
+
             if(list_[i].swap_sol_amount > 0){
               let amt = await decimal_joe(list_[i].swap_sol_amount, 9);
               list_[i].swap_sol_amount = amt;
