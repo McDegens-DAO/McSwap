@@ -14,7 +14,7 @@ $(window).on('load', async function() {
     return 0;
   });
   
-  conf.version = 1.8;
+  conf.version = 2.0;
   conf.provider = false;
   conf.billion = 1000000000;
   conf.solmin = 10000000; // starting min balance to use the app 0.01 SOL
