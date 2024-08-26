@@ -11449,9 +11449,7 @@ $(window).on('load', async function() {
     $("#init_cover").fadeOut(400);
     $("#init_loader").fadeOut(400);
     setTimeout(() => {
-
-      alert("McSwap OTC is currently being tested. You are welcome to poke around the interface. Production Launch Soon!");
-
+      // alert("McSwap OTC is currently being tested. You are welcome to poke around the interface. Production Launch Soon!");
       $("#center_logo").addClass("animate__animated animate__zoomIn").show();
       if(conf.social===true){
         setTimeout(() => {
