@@ -7189,8 +7189,6 @@ $(window).on('load', async function() {
           skipPreflight: true,
           maxRetries: 0 
         });
-        //console.log("Signature: ", signature);
-        //console.log(`https://solscan.io/tx/${signature}`);
         $("#cover_message").html("Processing...");
         let final = await finalized(signature,10,4);
         if(final != "finalized"){
@@ -7349,8 +7347,6 @@ $(window).on('load', async function() {
         skipPreflight: true,
         maxRetries: 0 
       });
-      //console.log("Signature: ", signature);
-      //console.log(`https://solscan.io/tx/${signature}`);
       $("#cover_message").html("Processing...");
       let final = await finalized(signature,10,4);
       if(final != "finalized"){
@@ -8809,7 +8805,6 @@ $(window).on('load', async function() {
       });
       console.log("Signature: ", signature);
       $(".spl_share_sig .swap_val").html(signature);
-      console.log(`https://solscan.io/tx/${signature}`);
       $(".spl_share_sig .swap_val").html(signature);
       $("#cover_message").html("Processing...");
       let final = await finalized(signature,10,4);
@@ -9475,13 +9470,10 @@ $(window).on('load', async function() {
     
     try {
       let signedTx = await provider.signTransaction(swapTokensTx);
-//       let txId = await connection.sendTransaction(signedTx);
       let txId = await connection.sendRawTransaction(signedTx.serialize(),{     
         skipPreflight: true,
         maxRetries: 0 
       });
-      console.log("Signature: ", txId);
-      console.log(`https://solscan.io/tx/${txId}`);
       $("#cover_message").html("Executing Contract...");
       let final = await finalized(txId,10,4);
       if(final != "finalized"){
