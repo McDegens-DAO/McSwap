@@ -3948,23 +3948,27 @@ button#spl_choice_7:disabled,button#spl_choice_8:disabled{
   border-top: 1px solid #000;
   border-bottom: 1px solid #1a1a1a;
   width: 115px;
-  max-height: 52px;
+  max-height: 46px;
   font-family: 'Oxygen', sans-serif;
 }
 button#smart_tool_received{
   vertical-align: middle;
-  line-height: 46px;
+  /* line-height: 46px; */
+  height: 47px;
   border-right: 1px solid #1a1a1a;
   left: 10px;
   font-family: 'Oxygen', sans-serif;
+  padding: 0 0 2px 0;
 }
 button#smart_tool_sent{
   vertical-align: middle;
-  line-height: 46px;
+  /* line-height: 46px; */
+  height: 47px;
   border-left: 1px solid #000;
   border-right: 1px solid #1a1a1a;
   left: 125px;
   font-family: 'Oxygen', sans-serif;
+  padding: 0 0 2px 0;
 }
 button#smart_tool_reload{
   vertical-align: middle;
@@ -3977,9 +3981,9 @@ button#smart_tool_reload{
   height: 48px;
 }
 button#smart_tool_reload img {
-  width: 18px;
-  height: 18px;
-  margin: 14px 0 0 2px;
+  width: 17px;
+  height: 17px;
+  margin: 13px 0 0 3px;
   cursor: pointer;
 }
 button#smart_tool_reload img.smart_rotate {
@@ -4495,6 +4499,9 @@ button#bob_cancel{
 @media only screen and (max-width: 424px) {
   h1 {
     font-size: 5.4em;
+  }
+  button#smart_tool_reload img {
+    margin: 0 0 1px 2px;
   }
 }
 
