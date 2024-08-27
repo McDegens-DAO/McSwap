@@ -4450,7 +4450,7 @@ button#bob_cancel{
   
   .bob_asset{
     display: inline-block;
-    width: calc(50% - 5px);
+    width: calc(50% - 10px);
     list-style-type: none;
     padding: 0;
     cursor: pointer;
