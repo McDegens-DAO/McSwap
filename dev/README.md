@@ -13,9 +13,9 @@ Protocol: McSwap
 
 ## Status
 
-We are currently adding Token2022 support and IDLs to all McSwap Protocol Programs on Solana. A Production version of McSwap OTC App will be availble as soon as possible. Follow [@SolDapper](https://x.com/SolDapper) or the [McDegens DAO Discord](https://discord.com/invite/hXXDvYTQhj) for updates. And thank you for your interest.
+McSwap OTC (beta) 2.0 is live!
 
-## Live Demo
+## Live App
 [McSwap.xyz](https://mcswap.xyz) (currently testing)
 
 ## Features
