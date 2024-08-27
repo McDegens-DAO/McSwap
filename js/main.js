@@ -3690,7 +3690,7 @@ $(window).on('load', async function() {
         let createTokenATA = null;
         let createTokenATAIx = null;
 
-        if (swapTokens > 0) {
+        if (swapTokenMint.toString() != "11111111111111111111111111111111") {
 
           let CNFT_TOKEN_PROGRAM = splToken.TOKEN_PROGRAM_ID;
           axiosInstance = axios.create({baseURL:conf.cluster});
@@ -3728,6 +3728,7 @@ $(window).on('load', async function() {
 //             console.log("Create Token ATA Ix: ", createTokenATAIx);    
           }
           else {createTokenATA = false;}
+
         }
 
 
@@ -4192,7 +4193,7 @@ $(window).on('load', async function() {
         let createSwapTokenATAIx = null;
         let swapTokenATA = null;
         let swapTokenInfo = null;
-        if(swapTokenMint != "11111111111111111111111111111111"){
+        if(swapTokenMint.toString() != "11111111111111111111111111111111"){
 
           axiosInstance = axios.create({baseURL:conf.cluster});
           let getStandard = await axiosInstance.post(conf.cluster,{jsonrpc:"2.0",method:"getAsset",id:"rpd-op-123",params:{id:swapTokenMint.toString()},}); 
@@ -4479,7 +4480,7 @@ $(window).on('load', async function() {
         let createSwapTokenATAIx = null;
         let CORE_TOKEN_PROGRAM = splToken.TOKEN_PROGRAM_ID;
 
-        if(swapTokens > 0){
+        if(swapTokenMint.toString() != "11111111111111111111111111111111"){
 
           axiosInstance = axios.create({baseURL:conf.cluster});
           getAsset = await axiosInstance.post(conf.cluster,{jsonrpc:"2.0",method:"getAsset",id:"rpd-op-123",params:{id:swapTokenMint.toString()},}); 
