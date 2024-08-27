@@ -4462,6 +4462,7 @@ button#bob_cancel{
     padding: 0;
     width: 100%;
     height: auto;
+    min-height: 185px;
   }
 
   .bob_name{
