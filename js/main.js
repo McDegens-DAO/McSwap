@@ -5266,6 +5266,8 @@ $(window).on('load', async function() {
 
         let providerSwapMintATA = new solanaWeb3.PublicKey("11111111111111111111111111111111");
         let initializerSwapMintATA = new solanaWeb3.PublicKey("11111111111111111111111111111111");
+        let providerTokenATA = new solanaWeb3.PublicKey("11111111111111111111111111111111");
+        let initializerTokenATA = new solanaWeb3.PublicKey("11111111111111111111111111111111");
 
         //////////////////////////////////////////////////////////////////
         // bob mint
@@ -5298,22 +5300,24 @@ $(window).on('load', async function() {
         //////////////////////////////////////////////////////////////////
         // token
         let SPL_PROGRAM_3 = splToken.TOKEN_PROGRAM_ID;
-        getAsset = await axiosInstance.post(conf.cluster,{jsonrpc:"2.0",method:"getAsset",id:"rpd-op-123",params:{id:swapTokenMint.toString()},}); 
-        if(typeof getAsset.data.result.mint_extensions != "undefined"){
-          SPL_PROGRAM_3 = splToken.TOKEN_2022_PROGRAM_ID;
-          console.log("Using Token 2022");
-          console.log(SPL_PROGRAM.toString());
+        if(swapTokens > 0){
+          getAsset = await axiosInstance.post(conf.cluster,{jsonrpc:"2.0",method:"getAsset",id:"rpd-op-123",params:{id:swapTokenMint.toString()},}); 
+          if(typeof getAsset.data.result.mint_extensions != "undefined"){
+            SPL_PROGRAM_3 = splToken.TOKEN_2022_PROGRAM_ID;
+            console.log("Using Token 2022");
+            console.log(SPL_PROGRAM.toString());
+          }
+          else{
+            console.log("Using SPL Token");
+            console.log(SPL_PROGRAM.toString());
+          }
+          providerTokenATA = await splToken.getAssociatedTokenAddress(
+          swapTokenMint,provider.publicKey,false,
+          SPL_PROGRAM_3,splToken.ASSOCIATED_TOKEN_PROGRAM_ID,);
+          initializerTokenATA = await splToken.getAssociatedTokenAddress(
+          swapTokenMint,initializer,false,
+          SPL_PROGRAM_3,splToken.ASSOCIATED_TOKEN_PROGRAM_ID,);
         }
-        else{
-          console.log("Using SPL Token");
-          console.log(SPL_PROGRAM.toString());
-        }
-        let providerTokenATA = await splToken.getAssociatedTokenAddress(
-        swapTokenMint,provider.publicKey,false,
-        SPL_PROGRAM_3,splToken.ASSOCIATED_TOKEN_PROGRAM_ID,);
-        let initializerTokenATA = await splToken.getAssociatedTokenAddress(
-        swapTokenMint,initializer,false,
-        SPL_PROGRAM_3,splToken.ASSOCIATED_TOKEN_PROGRAM_ID,);
         //////////////////////////////////////////////////////////////////
 
         let totalSize = 1;
