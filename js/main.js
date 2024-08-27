@@ -5292,15 +5292,15 @@ $(window).on('load', async function() {
           SPL_PROGRAM_2,splToken.ASSOCIATED_TOKEN_PROGRAM_ID,);
           console.log("Initializer Swap Mint ATA: ", initializerSwapMintATA.toString());
         }
-        let providerMintATA = await splToken.getAssociatedTokenAddress(
-        initializerMint,provider.publicKey,false,
-        SPL_PROGRAM_2,splToken.ASSOCIATED_TOKEN_PROGRAM_ID,);
+        // let providerMintATA = await splToken.getAssociatedTokenAddress(
+        // initializerMint,provider.publicKey,false,
+        // SPL_PROGRAM_2,splToken.ASSOCIATED_TOKEN_PROGRAM_ID,);
         //////////////////////////////////////////////////////////////////
 
         //////////////////////////////////////////////////////////////////
         // token
         let SPL_PROGRAM_3 = splToken.TOKEN_PROGRAM_ID;
-        if(swapTokens > 0){
+        if(swapTokenMint != "11111111111111111111111111111111"){
           getAsset = await axiosInstance.post(conf.cluster,{jsonrpc:"2.0",method:"getAsset",id:"rpd-op-123",params:{id:swapTokenMint.toString()},}); 
           if(typeof getAsset.data.result.mint_extensions != "undefined"){
             SPL_PROGRAM_3 = splToken.TOKEN_2022_PROGRAM_ID;
