@@ -22,7 +22,7 @@ conf.idler = 10; // number of minutes before auto disconnecting wallet for inact
 conf.social = true; // true or false
 conf.discord = "https://discord.com/invite/hXXDvYTQhj"; // set host discord
 conf.github = "https://github.com/McDegens-DAO/McSwap?tab=readme-ov-file#mcswap-otc"; // set host github
-conf.twitter = "https://x.com/mcswapotc"; // set host twitter
+conf.twitter = "https://x./mcswapotc"; // set host twitter
 // ************************************************************************************
 
 // ************************************************************************************
