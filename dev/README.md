@@ -3,7 +3,7 @@ OSS Docs
 
 ![alt text](https://github.com/McDegens-DAO/McSwap/blob/main/css/skins/default/img/banner-github.png?raw=true)
 
-Version: 1.8 (alpha)
+Version: (beta) 2.0
 
 Hosting: cPanel
 
