@@ -4447,13 +4447,15 @@ button#bob_cancel{
     display: inline-block;
     width: calc(50% - 5px);
     list-style-type: none;
-    margin: 0 10px 10px 0;
     padding: 0;
     cursor: pointer;
   }
 
+  #bob_chooser_list ul.bob_asset:nth-child(odd){
+    margin: 0 10px 10px 0;
+  }
   #bob_chooser_list ul.bob_asset:nth-child(even){
-    margin: 0;
+    margin: 0 0 10px 0;
   }
 
   .bob_img{
