@@ -4443,6 +4443,11 @@ button#bob_cancel{
 
 @media only screen and (max-width: 525px) {
 
+  #bob_chooser_list{
+    width: calc(100% - 30px);
+    padding: 10px 0 10px 10px;
+  }
+  
   .bob_asset{
     display: inline-block;
     width: calc(50% - 5px);
