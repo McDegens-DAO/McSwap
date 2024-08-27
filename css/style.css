@@ -4379,10 +4379,10 @@ button#bob_cancel{
       position: relative;
       width: 100%;
       min-height: 26px;
-      padding-top: 12px;
+      padding-top: 11px;
       background: #141414;
-      height: 37px;
-      max-height: 37px;
+      height: 26px;
+      max-height: 26px;
   }
   
   .connect_me{
@@ -4400,7 +4400,7 @@ button#bob_cancel{
   }
 
   #mode_buttons button{
-    padding: 12px 25px 11px 25px;
+    padding: 11px 25px 11px 25px;
     max-height: 37px;
   }
   
