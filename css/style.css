@@ -4373,7 +4373,7 @@ button#bob_cancel{
   }
   .pikl_balance, .usdc_balance, .sol_balance {
       font-size: 12px;
-      margin: 15px auto 0 auto;
+      margin: 16px auto 0 auto;
       text-align: center;
       display: block;
       position: relative;
@@ -4381,8 +4381,10 @@ button#bob_cancel{
       min-height: 26px;
       padding-top: 12px;
       background: #141414;
+      height: 37px;
       max-height: 37px;
   }
+  
   .connect_me{
     width: calc(100% - 49px);
     min-height: 0;
