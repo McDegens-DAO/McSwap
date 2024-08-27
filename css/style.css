@@ -4396,7 +4396,7 @@ button#bob_cancel{
   }
 
   #mode_buttons button{
-    padding-top: 1px;
+    padding: 10px 25px 10px 25px;
   }
   
 }
