@@ -9186,7 +9186,7 @@ $(window).on('load', async function() {
     // token 3 **************************************************************
     let SPL_PROGRAM_3 = splToken.TOKEN_PROGRAM_ID;
     if(token3Amount > 0){
-      if(token3Mint == "11111111111111111111111111111111"){
+      if(token3Mint.toString() == "11111111111111111111111111111111"){
         console.log("Token 3 is SOL");
       }
       else{
@@ -9233,7 +9233,7 @@ $(window).on('load', async function() {
       }
     }
     let providerToken4ATA = providerToken3ATA;
-    if (parseInt(token4Amount.toString()) > 0) {
+    if (token4Amount > 0) {
       providerToken4ATA = await splToken.getAssociatedTokenAddress(
         token4Mint,
         provider.publicKey,
@@ -10135,6 +10135,7 @@ $(window).on('load', async function() {
         let img_2 = default_img;
         let img_3 = default_img;
         let img_4 = default_img;
+
         for (let i = 0; i < list_spl.length; i++) {
           if (!$("ul[data-spl_received='" + list_spl[i].acct + "']").length) {
 
@@ -10160,6 +10161,8 @@ $(window).on('load', async function() {
                 }
               }
             }
+
+            console.log("1");
 
             if (list_spl[i].token_2_amount > 0) {
               if(list_spl[i].token_2_mint == "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"){
@@ -10194,25 +10197,36 @@ $(window).on('load', async function() {
               list_spl[i].token_2_amt = amt;
             }
 
+            console.log("2");
+
             if (list_spl[i].token_3_mint == "11111111111111111111111111111111") {
+              
+              console.log("a");
+
               list_spl[i].token_3_name = "SOL";
               list_spl[i].token_3_symbol = "SOL";
               list_spl[i].token_3_image = "/img/sol.png";
               list_spl[i].token_3_decimals = 9;
               let amt = await decimal_joe(list_spl[i].token_3_amount, list_spl[i].token_3_decimals);
               list_spl[i].token_3_amt = amt;
-              break;
+              
             } 
             else if (list_spl[i].token_3_mint == "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v") {
+
+              console.log("b");
+              
               list_spl[i].token_3_name = "USD Coin";
               list_spl[i].token_3_symbol = "USDC";
               list_spl[i].token_3_image = "/img/usdc.png";
               list_spl[i].token_3_decimals = 6;
               let amt = await decimal_joe(list_spl[i].token_3_amount, list_spl[i].token_3_decimals);
               list_spl[i].token_3_amt = amt;
-              break;
+
             }
             else{
+
+              console.log("c");
+
               for (let t = 0; t < spl_tokens.length; t++) {
                 let tokn = spl_tokens[t];
                 if (tokn.address == list_spl[i].token_3_mint) {
@@ -10225,8 +10239,11 @@ $(window).on('load', async function() {
                   break;
                 }
               }
+
             }
 
+            console.log("3");
+            
             if (list_spl[i].token_4_amount > 0) {
               if(list_spl[i].token_4_mint == "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"){
                 list_spl[i].token_4_name = "USD Coin";
@@ -10261,6 +10278,8 @@ $(window).on('load', async function() {
               list_spl[i].token_4_amt = amt;
             }
 
+            console.log("4");
+            
             let item_date = new Date((list_spl[i].utime * 1000));
             item_date = item_date.toLocaleDateString('en-US') + " " + item_date.toLocaleTimeString('en-US');
             
@@ -10288,9 +10307,11 @@ $(window).on('load', async function() {
             let last_10 = list_spl[i].peer_a.substr(list_spl[i].peer_b.length - 10);
             let peer = first_10 + "..." + last_10;
             smart_item += '<li class="smart_peer" data-peer="' + list_spl[i].peer_b + '">' + peer + '</li>';
+            
             if(!$("[data-spl_received='"+list_spl[i].acct+"']").length){
               $("#spl_received").prepend('<ul class="spl_received smart_ul" data-spl_received="' + list_spl[i].acct + '">' + smart_item + '</ul>');
             }
+
           }
         } 
       }
