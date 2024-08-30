@@ -8071,6 +8071,11 @@ $(window).on('load', async function() {
     }
     $("#scroll_wrapper").getNiceScroll(0).doScrollTop(0, 1000);
   });
+
+  // view the share blink from proposal composer
+  $(document).delegate(".spl_share_blink .swap_val", "click", function() {
+    window.open($(this).html());
+  });
   
   // clear a spl choice
   $(document).delegate(".active_spl #spl_img_1, .active_spl #spl_img_2, .active_spl #spl_img_3, .active_spl #spl_img_4", "click", function() {
