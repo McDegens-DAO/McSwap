@@ -8923,10 +8923,10 @@ $(window).on('load', async function() {
       console.log("swapState - is_initialized: ", decodedSwapStateData.is_initialized);
       console.log("swapState - initializer: ", new solanaWeb3.PublicKey(decodedSwapStateData.initializer).toString());
       console.log("swapState - token1_mint: ", new solanaWeb3.PublicKey(decodedSwapStateData.token1_mint).toString());
-      token1Amount = new BN(decodedSwapStateData.token1Amount, 10, "le").toString();
+      token1Amount = new BN(decodedSwapStateData.token1_amount, 10, "le").toString();
       console.log("swapState - temp_token1_account", new solanaWeb3.PublicKey(decodedSwapStateData.temp_token1_account).toString());
       console.log("swapState - token2_mint: ", new solanaWeb3.PublicKey(decodedSwapStateData.token2_mint).toString());
-      token2Amount = new BN(decodedSwapStateData.token2Amount, 10, "le").toString();
+      token2Amount = new BN(decodedSwapStateData.token2_amount, 10, "le").toString();
       console.log("swapState - temp_token2_account", new solanaWeb3.PublicKey(decodedSwapStateData.temp_token2_account).toString());
       token1Mint = new solanaWeb3.PublicKey(decodedSwapStateData.token1_mint);
       tempToken1Account = new solanaWeb3.PublicKey(decodedSwapStateData.temp_token1_account);
@@ -8959,9 +8959,15 @@ $(window).on('load', async function() {
       splToken.ASSOCIATED_TOKEN_PROGRAM_ID
     );
 
+    console.log("token1Amount", token1Amount);
+    console.log("token1Mint", token1Mint.toString());
+    console.log("token2Amount", token2Amount);
+    console.log("token2Mint", token2Mint.toString());
+
     let SPL_PROGRAM_2 = splToken.TOKEN_PROGRAM_ID;
     let token2ATA = token1ATA;
     if(token2Amount > 0){
+
       axiosInstance = axios.create({baseURL:conf.cluster});
       getAsset = await axiosInstance.post(conf.cluster,{jsonrpc:"2.0",method:"getAsset",id:"rpd-op-123",params:{id:token2Mint},}); 
       if(typeof getAsset.data.result.mint_extensions != "undefined"){
@@ -9002,9 +9008,9 @@ $(window).on('load', async function() {
       { pubkey: provider.publicKey, isSigner: true, isWritable: true }, // 0
       { pubkey: swapVaultPDA[0], isSigner: false, isWritable: false }, // 1
       { pubkey: swapStatePDA[0], isSigner: false, isWritable: true }, // 2
-      { pubkey: token1Mint, isSigner: false, isWritable: false }, // 3
+      { pubkey: token1Mint, isSigner: false, isWritable: true }, // 3
       { pubkey: tempToken1Account, isSigner: false, isWritable: true }, // 4
-      { pubkey: token2Mint, isSigner: false, isWritable: false }, // 5
+      { pubkey: token2Mint, isSigner: false, isWritable: true }, // 5
       { pubkey: tempToken2Account, isSigner: false, isWritable: true }, // 6
       { pubkey: token1ATA, isSigner: false, isWritable: true }, // 7
       { pubkey: token2ATA, isSigner: false, isWritable: true }, // 8
