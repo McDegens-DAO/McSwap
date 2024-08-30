@@ -7,9 +7,9 @@ $rule=new stdClass;
 
 // ***************************************************************
 // repeat for each rule
-$rule->pathPattern = "https://mcswap.xyz/spl/*";
-$rule->apiPath = "https://www.solana-action-express.com/mcswap-spl-config/*";
-$rules[] = $rule;
+// $rule->pathPattern = "https://mcswap.xyz/spl/*";
+// $rule->apiPath = "https://www.solana-action-express.com/mcswap-spl-config/*";
+// $rules[] = $rule;
 // $rule->pathPattern = "/swap/*";
 // $rule->apiPath = "https://www.solana-action-express.com/mcswap-swap-config/*";
 // $rules[] = $rule;
