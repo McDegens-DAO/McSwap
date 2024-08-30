@@ -102,7 +102,7 @@ $(window).on('load', async function() {
     BufferLayout.u8("dev_percentage"),
     publicKey("dev_treasury"),
     publicKey("mcdegens_treasury"),
-]);
+  ]);
   
   const SWAP_CNFT_STATE = BufferLayout.struct([
     BufferLayout.u8("is_initialized"),
@@ -180,7 +180,7 @@ $(window).on('load', async function() {
     uint64("swap_lamports"),
     publicKey("swap_token_mint"),
     uint64("swap_tokens"),
-]);
+  ]);
   
   let social_1 = new Image();
   let social_2 = new Image();
