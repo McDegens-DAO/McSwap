@@ -5959,6 +5959,14 @@ $(window).on('load', async function() {
         alert("Copied to Clipboard!");
       });
   });
+  // copy mcswap id
+  $(document).delegate(".share_id .swap_copy", "click", function() {
+    let cp = copy($(".share_id .swap_val").html())
+      .then(function() {
+        alert("Copied to Clipboard!");
+      });
+  });
+
 
   // copy swap alt signature
   $(document).delegate("#copy_fulfil_sig", "click", function() {
@@ -8029,10 +8037,18 @@ $(window).on('load', async function() {
   $(document).delegate(".spl_share_id .swap_copy", "click", function() {
     let cp = copy($(".spl_share_id .swap_val").html())
       .then(function() {
-        alert("McSwap Link copied, but you better make sure!");
+        alert("McSwap Link copied!");
       });
   });
-  
+
+  // copy mcswap blink
+  $(document).delegate(".spl_share_blink .swap_copy", "click", function() {
+    let cp = copy($(".spl_share_blink .swap_val").html())
+      .then(function() {
+        alert("McSwap Blink copied!");
+      });
+  });
+
   // copy spl exec signature
   $(document).delegate(".share_spl_exec_sig .swap_copy", "click", function() {
     let cp = copy($(".share_spl_exec_sig .swap_val").html())
