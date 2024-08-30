@@ -8840,7 +8840,10 @@ $(window).on('load', async function() {
       let peer = $("#spl_owner").val();
       $("#spl_clear").click();
       $(".swap_spl_d, .swap_spl_a").addClass("active_spl");
-      $(".spl_share_id .swap_val").html(conf.host + "/spl/" + provider.publicKey.toString() + "-" + peer);
+      const _link_ = conf.host + "/spl/" + provider.publicKey.toString() + "-" + peer;
+      $(".spl_share_id .swap_val").html(_link_);
+      const _blink_ = "https://www.solana-action-express.com/mcswap-spl-config/"+provider.publicKey.toString()+"-"+peer;
+      $(".spl_share_blink .swap_val").html("https://dial.to/?action=solana-action%3A"+encodeURIComponent(_blink_)+"&cluster=mainnet");
       setTimeout(() => {
         $("#spl_choice_1").prop("disabled", false);
         $("#cover").fadeOut(400);
