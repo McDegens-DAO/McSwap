@@ -8029,7 +8029,7 @@ $(window).on('load', async function() {
   $(document).delegate(".spl_share_sig .swap_copy", "click", function() {
     let cp = copy($(".spl_share_sig .swap_val").html())
       .then(function() {
-        alert("Signature copied, but you better make sure!");
+        alert("Signature copied!");
       });
   });
 
