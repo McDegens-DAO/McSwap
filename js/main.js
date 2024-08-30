@@ -8981,7 +8981,6 @@ $(window).on('load', async function() {
         splToken.ASSOCIATED_TOKEN_PROGRAM_ID
       );
     }
-    console.log("initializer ata 2", token2ATA[0].toString());
     
     var totalSize = 1 + 32;
     console.log("totalSize", totalSize);
