@@ -8915,6 +8915,7 @@ $(window).on('load', async function() {
     let token2Mint = null;
     let tempToken2Account = null;
     let token1Amount = 0;
+    let token2Amount = 0;
 
     if (swapState != null) {
       let encodedSwapStateData = swapState.data;
@@ -8925,7 +8926,7 @@ $(window).on('load', async function() {
       token1Amount = new BN(decodedSwapStateData.token1Amount, 10, "le").toString();
       console.log("swapState - temp_token1_account", new solanaWeb3.PublicKey(decodedSwapStateData.temp_token1_account).toString());
       console.log("swapState - token2_mint: ", new solanaWeb3.PublicKey(decodedSwapStateData.token2_mint).toString());
-      console.log("swapState - token2_amount", new BN(decodedSwapStateData.token2Amount, 10, "le").toString());
+      token2Amount = new BN(decodedSwapStateData.token2Amount, 10, "le").toString();
       console.log("swapState - temp_token2_account", new solanaWeb3.PublicKey(decodedSwapStateData.temp_token2_account).toString());
       token1Mint = new solanaWeb3.PublicKey(decodedSwapStateData.token1_mint);
       tempToken1Account = new solanaWeb3.PublicKey(decodedSwapStateData.temp_token1_account);
