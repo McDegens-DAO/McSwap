@@ -8931,7 +8931,6 @@ $(window).on('load', async function() {
       tempToken1Account = new solanaWeb3.PublicKey(decodedSwapStateData.temp_token1_account);
       token2Mint = new solanaWeb3.PublicKey(decodedSwapStateData.token2_mint);
       tempToken2Account = new solanaWeb3.PublicKey(decodedSwapStateData.temp_token2_account);
-
     } else {
       console.log("Swap Not Initialized");
       return;
@@ -8959,9 +8958,8 @@ $(window).on('load', async function() {
       splToken.ASSOCIATED_TOKEN_PROGRAM_ID
     );
 
-
     let SPL_PROGRAM_2 = splToken.TOKEN_PROGRAM_ID;
-    if(token1Amount > 0){
+    if(token2Amount > 0){
       axiosInstance = axios.create({baseURL:conf.cluster});
       getAsset = await axiosInstance.post(conf.cluster,{jsonrpc:"2.0",method:"getAsset",id:"rpd-op-123",params:{id:token2Mint},}); 
       if(typeof getAsset.data.result.mint_extensions != "undefined"){
@@ -8981,7 +8979,8 @@ $(window).on('load', async function() {
       SPL_PROGRAM_2, 
       splToken.ASSOCIATED_TOKEN_PROGRAM_ID
     );
-
+    console.log("initializer ata 2", token2ATA[0].toString());
+    
     var totalSize = 1 + 32;
     console.log("totalSize", totalSize);
 
