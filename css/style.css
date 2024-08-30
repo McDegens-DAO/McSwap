@@ -2677,7 +2677,7 @@ span#sender_total, span#receiver_total, span#review_receive_total, span#review_s
 }
 
 .swap_g .share_id span.swap_val,
-.swap_spl_d .spl_share_id span.swap_val{
+.swap_spl_d .spl_share_id, .spl_share_blink, span.swap_val{
   color: #fffa9c;
   cursor: pointer;
 }
@@ -3030,7 +3030,7 @@ span#sender_total, span#receiver_total, span#review_receive_total, span#review_s
     font-size: 10px;
     overflow: hidden;
   }
-  .spl_share_sig span.swap_val, .spl_share_id span.swap_val{
+  .spl_share_sig span.swap_val, .spl_share_id span.swap_val, .spl_share_blink span.swap_val{
     font-size: 10px;
     overflow: hidden;
     height: 12px;
@@ -3618,7 +3618,7 @@ button#mode_nft{
   display: none;
 }
 
-.spl_share_sig .swap_label, .spl_share_id .swap_label{
+.spl_share_sig .swap_label, .spl_share_id .swap_label, .spl_share_blink .swap_label{
   width: 70px;
 }
 
@@ -3885,7 +3885,7 @@ button#spl_choice_7:disabled,button#spl_choice_8:disabled{
   cursor: not-allowed;
 }
 
-.spl_share_id .swap_val{
+.spl_share_id .swap_val, .spl_share_blink .swap_val{
   cursor: pointer;
 }
 
