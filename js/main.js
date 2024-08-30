@@ -10185,7 +10185,6 @@ $(window).on('load', async function() {
                 }
               }
             }
-
             console.log("1");
 
             if (list_spl[i].token_2_amount > 0) {
@@ -10220,7 +10219,6 @@ $(window).on('load', async function() {
               let amt = await decimal_joe(list_spl[i].token_2_amount, list_spl[i].token_2_decimals);
               list_spl[i].token_2_amt = amt;
             }
-
             console.log("2");
 
             if (list_spl[i].token_3_mint == "11111111111111111111111111111111") {
@@ -10265,7 +10263,6 @@ $(window).on('load', async function() {
               }
 
             }
-
             console.log("3");
             
             if (list_spl[i].token_4_amount > 0) {
@@ -10276,7 +10273,6 @@ $(window).on('load', async function() {
                 list_spl[i].token_4_decimals = 6;
                 let amt = await decimal_joe(list_spl[i].token_4_amount, list_spl[i].token_4_decimals);
                 list_spl[i].token_4_amt = amt;
-                break;
               }
               else{
                 for (let t = 0; t < spl_tokens.length; t++) {
@@ -10301,7 +10297,6 @@ $(window).on('load', async function() {
               let amt = await decimal_joe(list_spl[i].token_4_amount, list_spl[i].token_4_decimals);
               list_spl[i].token_4_amt = amt;
             }
-
             console.log("4");
             
             let item_date = new Date((list_spl[i].utime * 1000));
