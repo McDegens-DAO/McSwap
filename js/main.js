@@ -8074,7 +8074,9 @@ $(window).on('load', async function() {
 
   // view the share blink from proposal composer
   $(document).delegate(".spl_share_blink .swap_val", "click", function() {
-    window.open($(this).html());
+    if($(this).html() != ""){
+      window.open($(this).html()+"&cluster=mainnet");
+    }
   });
   
   // clear a spl choice
@@ -8848,7 +8850,7 @@ $(window).on('load', async function() {
       const _link_ = conf.host + "/spl/" + provider.publicKey.toString() + "-" + peer;
       $(".spl_share_id .swap_val").html(_link_);
       const _blink_ = "https://www.solana-action-express.com/mcswap-spl-config/"+provider.publicKey.toString()+"-"+peer;
-      $(".spl_share_blink .swap_val").html("https://dial.to/?action=solana-action%3A"+encodeURIComponent(_blink_)+"&cluster=mainnet");
+      $(".spl_share_blink .swap_val").html("https://dial.to/?action=solana-action%3A"+encodeURIComponent(_blink_));
       setTimeout(() => {
         $("#spl_choice_1").prop("disabled", false);
         $("#cover").fadeOut(400);
