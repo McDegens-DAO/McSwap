@@ -8959,6 +8959,7 @@ $(window).on('load', async function() {
     );
 
     let SPL_PROGRAM_2 = splToken.TOKEN_PROGRAM_ID;
+    let token2ATA = token1ATA;
     if(token2Amount > 0){
       axiosInstance = axios.create({baseURL:conf.cluster});
       getAsset = await axiosInstance.post(conf.cluster,{jsonrpc:"2.0",method:"getAsset",id:"rpd-op-123",params:{id:token2Mint},}); 
@@ -8971,14 +8972,14 @@ $(window).on('load', async function() {
         console.log("Token 2 is using SPL Token");
         console.log(SPL_PROGRAM_2.toString());
       }
-    }    
-    let token2ATA = await splToken.getAssociatedTokenAddress(
-      token2Mint, 
-      provider.publicKey,
-      false, 
-      SPL_PROGRAM_2, 
-      splToken.ASSOCIATED_TOKEN_PROGRAM_ID
-    );
+      token2ATA = await splToken.getAssociatedTokenAddress(
+        token2Mint, 
+        provider.publicKey,
+        false, 
+        SPL_PROGRAM_2, 
+        splToken.ASSOCIATED_TOKEN_PROGRAM_ID
+      );
+    }
     console.log("initializer ata 2", token2ATA[0].toString());
     
     var totalSize = 1 + 32;
