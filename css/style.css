@@ -3739,6 +3739,7 @@ input#spl_owner::placeholder {
   display: inline-block;
   vertical-align: top;
   height: 50px;
+  width: 50px;
   margin: 2px 15px 0 2px;
   border-radius: 6px;
   cursor: pointer;
