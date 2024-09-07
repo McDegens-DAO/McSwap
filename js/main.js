@@ -7153,9 +7153,21 @@ $(window).on('load', async function() {
         return;
       }
       
+      let NFT_ATA_PROGRAM = splToken.TOKEN_PROGRAM_ID;
+      const axiosInstance = axios.create({baseURL:conf.cluster});
+      const getAsset = await axiosInstance.post(conf.cluster,{jsonrpc:"2.0",method:"getAsset",id:"rpd-op-123",params:{id:assetId},}); 
+      if(typeof getAsset.data.result.mint_extensions != "undefined"){
+        NFT_ATA_PROGRAM = splToken.TOKEN_2022_PROGRAM_ID;
+          console.log("Using Token 2022");
+          console.log(NFT_ATA_PROGRAM.toString());
+        }
+      else{
+          console.log("Using SPL Token");
+          console.log(NFT_ATA_PROGRAM.toString());
+      }
       let initializerMintATA = await splToken.getAssociatedTokenAddress(
       new solanaWeb3.PublicKey(assetId), provider.publicKey, false,
-      splToken.TOKEN_PROGRAM_ID, splToken.ASSOCIATED_TOKEN_PROGRAM_ID, );
+      NFT_ATA_PROGRAM, splToken.ASSOCIATED_TOKEN_PROGRAM_ID,);
       
       let totalSize = 1;
       //console.log("totalSize", totalSize);
