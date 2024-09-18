@@ -4172,7 +4172,7 @@ $(window).on('load', async function() {
           swapMintATA = await splToken.getAssociatedTokenAddress(new solanaWeb3.PublicKey(swapMint),
           provider.publicKey,false,splToken.TOKEN_PROGRAM_ID,splToken.ASSOCIATED_TOKEN_PROGRAM_ID,);
           console.log("Taker Mint ATA: ", swapMintATA.toString());
-          let takerMintInfo = await connection.getAccountInfo(swapMintATA).catch(function(){});
+          takerMintInfo = await connection.getAccountInfo(swapMintATA).catch(function(){});
           if (takerMintInfo == null) {
             createSwapMintATA = true;
             createSwapMintATAIx = splToken.createAssociatedTokenAccountInstruction(provider.publicKey,swapMintATA,
