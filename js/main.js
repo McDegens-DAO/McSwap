@@ -9955,7 +9955,7 @@ $(window).on('load', async function() {
               }
             });
           }
-          // get active core contracts for the connected wallet
+          // get active core contracts received for the connected wallet
           accounts = await connection.getParsedProgramAccounts(CORE_ProgramId,{filters:[{dataSize:186,},{memcmp:{offset:74,bytes:wallet,},},],}).catch(function(){});
           if(accounts != null){
             accounts.forEach(async(account, i) => {
