@@ -3,10 +3,7 @@ header("Access-Control-Allow-Methods:GET");if(isset($_SERVER['HTTP_ACCESS_CONTRO
 $response=new stdClass;
 $rules=array();
 $rule=new stdClass;
-// define rules below
-
 // ***************************************************************
-// repeat for each rule
 $rule=new stdClass;
 $rule->pathPattern = "/spl/*";
 $rule->apiPath = "https://www.solana-action-express.com/mcswap-spl-config/*";
@@ -36,8 +33,6 @@ $rule->pathPattern = "/createCORE";
 $rule->apiPath = "https://www.solana-action-express.com/mcswap-core-create";
 $rules[] = $rule;
 // ***************************************************************
-
-// output data
 $response->rules=$rules;
 echo json_encode($response);
 exit();
