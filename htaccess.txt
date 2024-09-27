@@ -7,8 +7,14 @@ RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 RewriteRule ^actions.json$ actions.php [L]
 # rpc requests
 RewriteRule ^rpc/([^.]*)$ "/rpc/rpc.php" [L,QSA]
+
 # swap requests
+RewriteRule ^swap-nft/([^.]*)$ "/index.html" [L,QSA]
+RewriteRule ^swap-pnft/([^.]*)$ "/index.html" [L,QSA]
+RewriteRule ^swap-cnft/([^.]*)$ "/index.html" [L,QSA]
+RewriteRule ^swap-core/([^.]*)$ "/index.html" [L,QSA]
 RewriteRule ^swap/([^.]*)$ "/index.html" [L,QSA]
+
 # swap requests (spl)
 RewriteRule ^spl/([^.]*)$ "/index.html" [L,QSA]
 # propose requests

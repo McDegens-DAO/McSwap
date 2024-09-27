@@ -6040,10 +6040,12 @@ $(window).on('load', async function() {
         }
       }, 100);
       $("#create_a_id").val(pathArray[2]);
-    } else if (typeof pathArray[1] != "undefined" && typeof pathArray[2] != "undefined" &&
-      pathArray[1] == "swap" &&
-      pathArray[1] != "" &&
-      pathArray[2] != ""
+    } else if (
+      typeof pathArray[1]!="undefined"&&typeof pathArray[2]!="undefined"&&pathArray[1]=="swap"&&pathArray[1]!=""&&pathArray[2]!=""||
+      typeof pathArray[1]!="undefined"&&typeof pathArray[2]!="undefined"&&pathArray[1]=="swap-nft"&&pathArray[1]!=""&&pathArray[2]!=""||
+      typeof pathArray[1]!="undefined"&&typeof pathArray[2]!="undefined"&&pathArray[1]=="swap-pnft"&&pathArray[1]!=""&&pathArray[2]!=""||
+      typeof pathArray[1]!="undefined"&&typeof pathArray[2]!="undefined"&&pathArray[1]=="swap-cnft"&&pathArray[1]!=""&&pathArray[2]!=""||
+      typeof pathArray[1]!="undefined"&&typeof pathArray[2]!="undefined"&&pathArray[1]=="swap-core"&&pathArray[1]!=""&&pathArray[2]!=""
     ) {
       
       $("#mc_swap_viewer .mc_title").html("Fetching Contract...");
