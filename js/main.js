@@ -6047,7 +6047,7 @@ $(window).on('load', async function() {
       typeof pathArray[1]!="undefined"&&typeof pathArray[2]!="undefined"&&pathArray[1]=="swap-cnft"&&pathArray[1]!=""&&pathArray[2]!=""||
       typeof pathArray[1]!="undefined"&&typeof pathArray[2]!="undefined"&&pathArray[1]=="swap-core"&&pathArray[1]!=""&&pathArray[2]!=""
     ) {
-      
+            
       $("#mc_swap_viewer .mc_title").html("Fetching Contract...");
       $(".fee_fulfil_sig .swap_val, .fee_fulfil_alt .swap_val, .share_fulfil_sig .swap_val").html("");
       
