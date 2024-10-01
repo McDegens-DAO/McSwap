@@ -5,6 +5,10 @@ $rules=array();
 $rule=new stdClass;
 // ***************************************************************
 $rule=new stdClass;
+$rule->pathPattern = "/mcswap";
+$rule->apiPath = "https://www.solana-action-express.com/mcswap";
+$rules[] = $rule;
+$rule=new stdClass;
 $rule->pathPattern = "/spl/*";
 $rule->apiPath = "https://www.solana-action-express.com/mcswap-spl-config/*";
 $rules[] = $rule;
